@@ -176,7 +176,7 @@ export function createFarmer(scene){
  }
  ellipsoid(headArt,M.nose,0,-.078,.283,.025,.024,.023);
  ellipsoid(headArt,M.skin,-.006,-.072,.298,.014,.012,.010);
- seam(headArt,M.mouth,[[-.029,-.165,.245],[-.012,-.174,.248],[.012,-.174,.248],[.032,-.162,.245]],.0035,16);
+ seam(headArt,M.mouth,[[-.038,-.164,.264],[-.018,-.176,.267],[.015,-.176,.267],[.037,-.162,.264]],.0045,16);
  // Every eye layer remains under its original blink pivot (.083 vertically).
  const eyes=[];
  for(const side of [-1,1]){
