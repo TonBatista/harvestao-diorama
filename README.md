@@ -1,6 +1,6 @@
 # Harvestão — Fazenda em miniatura
 
-Jogo de fazenda 3D para navegador, com controles por toque e teclado. Versão 0.9. O personagem tem boné arredondado para trás, duas mechas grandes, olhos verticais, mangas curtas e luvas claras. Boné e macacão verde sálvia, lenço roxo e mochila laranja gasta, todos em tons desbotados. Caminhada, corrida e ferramentas mantêm os mesmos pivôs e código de animação.
+Jogo de fazenda 3D para navegador, com controles por toque e teclado. Versão 0.10. O personagem foi reproporcionado: cabeça maior e rosto arredondado, boné alto para trás, mechas curtas volumosas, olhos delicados, mangas curtas, luvas e botas arredondadas. As calças são uma malha contínua que dobra nos joelhos. Boné e macacão verde sálvia, lenço roxo e mochila laranja gasta, todos em tons desbotados. Caminhada, corrida e ferramentas mantêm seu código de animação, velocidade e ciclo das pernas. A altura da cabeça e dos ombros acompanha as novas proporções.
 
 A vegetação foi remodelada com folhas curvas espessas e nervuradas, cachos de morango, nabos parcialmente expostos, árvores ramificadas com folhas individuais e grama mais densa. O terreno tem relevo sutil e os tocos têm casca e anéis irregulares de crescimento.
 
