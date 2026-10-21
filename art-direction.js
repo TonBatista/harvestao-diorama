@@ -90,33 +90,48 @@ export function canopyGeometry(){
  for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),r=1+.075*Math.sin(x*13+z*4)*Math.sin(y*11-z*6)+.045*Math.cos(z*17+x*7);p.setXYZ(i,x*r,y*r,z*r)}g.computeVertexNormals();return g;
 }
 let crownPalette;
-const crownCore=new T.SphereGeometry(1,8,6),crownPoints=crownCore.attributes.position;
-for(let i=0;i<crownPoints.count;i++){const x=crownPoints.getX(i),y=crownPoints.getY(i),z=crownPoints.getZ(i),r=.94+.095*Math.sin(x*8+z*5)*Math.cos(y*9-x*3)+.055*Math.cos(z*13-y*6);crownPoints.setXYZ(i,x*r,y*r,z*r)}crownCore.computeVertexNormals();
-const crownLeaf=new T.BufferGeometry();
-crownLeaf.setAttribute('position',new T.Float32BufferAttribute([0,0,-.5,-.35,.05,-.16,-.28,.1,.18,0,.14,.5,.28,.1,.18,.35,.05,-.16,0,.18,0],3));
-crownLeaf.setAttribute('uv',new T.Float32BufferAttribute([.5,0,0,.34,.1,.68,.5,1,.9,.68,1,.34,.5,.5],2));
-crownLeaf.setIndex([6,0,1,6,1,2,6,2,3,6,3,4,6,4,5,6,5,0]);crownLeaf.computeVertexNormals();
+// A broad, folded leaf carries the silhouette itself. The crown has no solid
+// balls under its foliage, so small gaps reveal forks and overlapping sprays.
+const crownLeaf=new T.BufferGeometry(),leafPoints=[],leafUV=[],leafIndices=[];
+for(let row=0;row<7;row++){
+ const v=row/6,width=Math.pow(Math.sin(v*Math.PI),.75)*.31+.002,curve=.085*Math.sin(v*Math.PI)-.065*v*v;
+ for(let col=0;col<3;col++){
+  const side=col-1;leafPoints.push(side*width,curve+.055*(1-side*side)*Math.sin(v*Math.PI)-.012*side*side+.009*Math.sin(v*13+side*3),v-.48);leafUV.push(col/2,v);
+ }
+ if(row<6)for(let col=0;col<2;col++){const n=row*3+col;leafIndices.push(n,n+3,n+1,n+1,n+3,n+4)}
+}
+crownLeaf.setAttribute('position',new T.Float32BufferAttribute(leafPoints,3));crownLeaf.setAttribute('uv',new T.Float32BufferAttribute(leafUV,2));crownLeaf.setIndex(leafIndices);crownLeaf.computeVertexNormals();
+const branchGeometry=new T.CylinderGeometry(1,1,1,7);
 export function treeCrown(seed=0){
  if(!crownPalette){
-  const moss=miniatureTexture('moss',3)||surfaceTexture('leaf'),leaf=miniatureTexture('leaf')||surfaceTexture('leaf');
-  crownPalette=['#a5b18b','#c4c79e'].map(color=>new T.MeshStandardMaterial({color,map:moss,bumpMap:moss,bumpScale:.035,roughness:1}));
-  for(const color of ['#c3cf9f','#e4dfb5'])crownPalette.push(new T.MeshStandardMaterial({color,map:leaf,bumpMap:leaf,bumpScale:.008,roughness:1,side:T.DoubleSide}));
+  const source=miniatureTexture('leaf')||surfaceTexture('leaf'),canvas=document.createElement('canvas');canvas.width=canvas.height=512;const q=canvas.getContext('2d');q.filter='contrast(.8) saturate(.9)';q.drawImage(source.image,0,0,512,512);const leaf=new T.CanvasTexture(canvas);leaf.colorSpace=T.SRGBColorSpace;leaf.anisotropy=4;
+  crownPalette=['#b9cea7','#cddbb7','#d4dfb9','#a6c398'].map(color=>new T.MeshStandardMaterial({color,map:leaf,bumpMap:leaf,bumpScale:.014,roughness:.73,side:T.DoubleSide}));
  }
- const g=new T.Group();
- // Small irregular inner masses supply density; their tiled moss map has no
- // enlarged leaf silhouette. Individual leaflets break the edge into sprays.
- const clusters=[[-.38,-.05,-.13,.64,.56,.59],[.34,-.02,.14,.65,.57,.59],[-.13,.35,.04,.63,.45,.56],[.06,-.33,-.1,.65,.35,.54]];
- clusters.forEach(([x,y,z,sx,sy,sz],i)=>{const m=add(g,crownCore,crownPalette[i%2],x,y,z,sx,sy,sz);m.rotation.set(random(seed+i)*.5,random(seed+i+2)*6,random(seed+i+4)*.4)});
- const up=new T.Vector3(0,1,0),normal=new T.Vector3();
- for(let i=0;i<160;i++){
-  const n=i+seed*173,u=(i+.5)/160,y=1-2*u,a=i*2.399963+seed*.17,r=Math.sqrt(1-y*y),edge=.89+random(n+4)*.12;
-  const x=Math.cos(a)*r*.94*edge,z=Math.sin(a)*r*.83*edge,yy=y*.65*edge+.045*Math.sin(a*3),size=.18+random(n+10)*.1;
-  const m=add(g,crownLeaf,crownPalette[2+(i%3===0?1:0)],x,yy,z,size*(.85+random(n+15)*.25),size,size);
-  normal.set(x*.65,yy+.15,z*.65).normalize();m.quaternion.setFromUnitVectors(up,normal);m.rotateY(random(n+30)*Math.PI*2);m.rotateX((random(n+40)-.5)*.55);
- }
+ const g=new T.Group(),up=new T.Vector3(0,1,0),normal=new T.Vector3(),start=new T.Vector3(),end=new T.Vector3(),mid=new T.Vector3(),bark=artisanMaterial('#9b8b6c','bark');
+ const branch=(a,b,r)=>{start.fromArray(a);end.fromArray(b);mid.subVectors(end,start);const m=add(g,branchGeometry,bark,(start.x+end.x)/2,(start.y+end.y)/2,(start.z+end.z)/2,r,mid.length(),r*.8);m.quaternion.setFromUnitVectors(up,mid.normalize());return m};
+ branch([0,-.74,0],[.025,.24,-.025],.073);
+ const clusters=[[-.63,-.15,-.13,.38,.30,.37],[.58,-.10,.20,.40,.32,.37],[-.34,.40,.04,.42,.34,.39],[.23,.47,-.23,.40,.35,.40],[-.13,-.37,.37,.43,.28,.37],[.11,-.23,-.48,.43,.31,.37],[-.65,.19,.30,.36,.31,.35],[.62,.23,-.27,.36,.32,.35]];
+ clusters.forEach(([cx,cy,cz,rx,ry,rz],cluster)=>{
+  const phase=seed*.11,turn=new T.Vector3(cx,cy,cz).applyAxisAngle(up,phase),x=turn.x,y=turn.y,z=turn.z;
+  branch([.025,-.38+cluster*.045,-.025],[x*.88,y,z*.88],.021+random(seed+cluster)*.014);
+  for(let i=0;i<60;i++){
+   const n=seed*173+cluster*97+i,a=i*2.399963+cluster*1.1,yy=1-2*(i+.5)/60,r=Math.sqrt(1-yy*yy),depth=.50+.50*Math.cbrt(random(n+40));
+   const dx=Math.cos(a)*r*rx*depth,dz=Math.sin(a)*r*rz*depth,dy=yy*ry*depth,size=.19+random(n+18)*.11;
+   const m=add(g,crownLeaf,crownPalette[(cluster+(i%5===0?1:0))%4],x+dx,y+dy,z+dz,size*(.90+random(n+15)*.22),size,size);
+   normal.set(dx*.7,.14+dy*.8,dz*.7).normalize();m.quaternion.setFromUnitVectors(up,normal);m.rotateY(a+(random(n+30)-.5)*1.6);m.rotateX((random(n+32)-.5)*.65);
+  }
+ });
  return g;
 }
 export function meadowGeometry(){
- const points=[],uv=[];for(let i=0;i<3;i++){const angle=i*2.094,c=Math.cos(angle),s=Math.sin(angle),width=.025;
- for(const [x,y,z] of [[-width,0,0],[width,0,0],[width*.55,.15,.025],[-width,0,0],[width*.55,.15,.025],[-width*.55,.15,.025],[-width*.55,.15,.025],[width*.55,.15,.025],[0,.29,.095]]){points.push(x*c+z*s,y,z*c-x*s);uv.push(x/width*.5+.5,y/.29)}}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(points,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.computeVertexNormals();return g;
+ const points=[],uv=[],indices=[];
+ for(let i=0;i<5;i++){
+  const angle=i*2.399963,c=Math.cos(angle),s=Math.sin(angle),h=.20+random(i+70)*.15,w=.013+random(i+93)*.008,bend=.065+random(i+31)*.07,spread=.018+random(i+11)*.022,base=points.length/3;
+  for(let row=0;row<3;row++){
+   const v=row/2,width=w*(row===0?1:row===1?.63:.035),z=spread+bend*v*v;
+   for(const side of [-1,1]){const x=side*width;points.push(x*c+z*s,v*h,z*c-x*s);uv.push((side+1)/2,v)}
+  }
+  indices.push(base,base+2,base+1,base+1,base+2,base+3,base+2,base+4,base+3,base+3,base+4,base+5);
+ }
+ const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(points,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(indices);g.computeVertexNormals();return g;
 }

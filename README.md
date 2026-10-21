@@ -1,12 +1,12 @@
 # Harvestão — Fazenda em miniatura
 
-Jogo de fazenda 3D para navegador, com controles por toque e teclado. Versão 0.8.
+Jogo de fazenda 3D para navegador, com controles por toque e teclado. Versão 0.9. O personagem tem boné arredondado para trás, duas mechas grandes, olhos verticais, mangas curtas e luvas claras. Boné e macacão verde sálvia, lenço roxo e mochila laranja gasta, todos em tons desbotados. Caminhada, corrida e ferramentas mantêm os mesmos pivôs e código de animação.
 
-O personagem usa boné e macacão verde musgo, camisa ocre, lenço roxo e uma mochilinha de lona laranja dessaturada, com desgaste, costuras e fivelas. O modelo preserva os pivôs da caminhada, corrida e ferramentas.
+A vegetação foi remodelada com folhas curvas espessas e nervuradas, cachos de morango, nabos parcialmente expostos, árvores ramificadas com folhas individuais e grama mais densa. O terreno tem relevo sutil e os tocos têm casca e anéis irregulares de crescimento.
 
 ## Jogar
 
-Abra o site publicado no GitHub Pages deste repositório. O jogo usa WebGL e salva o progresso no armazenamento local do navegador. O salvamento pode ser exportado/importado pelo menu.
+[Jogue no GitHub Pages](https://tonbatista.github.io/harvestao-diorama/). O jogo usa WebGL e salva o progresso no armazenamento local do navegador. O salvamento pode ser exportado/importado pelo menu.
 
 - WASD ou setas: mover; corrida já ativada.
 - R: alternar corrida/caminhada; Shift: forçar corrida.

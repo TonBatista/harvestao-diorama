@@ -8,8 +8,13 @@ export function miniatureTexture(kind,repeat=1){
  const key=kind+repeat;if(maps.has(key))return maps.get(key);
  const original=sources.get(kind==='tilled'?'earth':kind);if(!original)return null;
  const c=document.createElement('canvas');c.width=c.height=768;const q=c.getContext('2d');
- q.filter=kind==='earth'?'contrast(.6) brightness(1.05) saturate(.65)':kind==='tilled'?'contrast(.75) brightness(.90) saturate(.7)':kind==='moss'?'contrast(.88) brightness(1.16) saturate(1.05)':kind==='leaf'?'brightness(1.15) saturate(.85)':'none';q.drawImage(original,0,0);q.filter='none';
- if(kind==='earth'){q.fillStyle='#927b5c55';q.fillRect(0,0,768,768)}
+ q.filter=kind==='earth'?'contrast(.55) brightness(1.08) saturate(.55) blur(1.1px)':kind==='tilled'?'contrast(.72) brightness(.94) saturate(.65)':kind==='moss'?'contrast(.88) brightness(1.16) saturate(1.05)':kind==='leaf'?'brightness(1.15) saturate(.85)':'none';q.drawImage(original,0,0);q.filter='none';
+ if(kind==='earth'){
+  // Compact garden soil: soft clods underneath a fine granular surface.
+  q.fillStyle='#947b5b77';q.fillRect(0,0,768,768);
+  let seed=4271;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+  for(let i=0;i<12500;i++){const x=random()*768,y=random()*768,r=.35+random()*1.5;q.fillStyle=i%3?'#2e241b12':'#e1cba21c';q.beginPath();q.ellipse(x,y,r,r*(.45+random()*.6),random()*6.28,0,6.28);q.fill()}
+ }
  const map=new T.CanvasTexture(c);map.colorSpace=T.SRGBColorSpace;map.wrapS=map.wrapT=T.MirroredRepeatWrapping;map.repeat.set(repeat,repeat);map.anisotropy=8;maps.set(key,map);return map;
 }
 export function contactTexture(){const c=document.createElement('canvas');c.width=c.height=64;const q=c.getContext('2d'),g=q.createRadialGradient(32,32,2,32,32,32);g.addColorStop(0,'#202416b0');g.addColorStop(.38,'#20241670');g.addColorStop(1,'#20241600');q.fillStyle=g;q.fillRect(0,0,64,64);return new T.CanvasTexture(c)}
