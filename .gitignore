@@ -1,0 +1,5 @@
+node_modules/
+.openai/
+work/
+*.log
+harvestao-progresso.json

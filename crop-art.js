@@ -1,0 +1,196 @@
+import * as T from './three.module.js';
+import {CROPS} from './simulation.js';
+import {miniatureTexture} from './miniature-materials.js';
+
+// Every shape and material is shared: world.js can merge a whole field by material.
+const random=n=>{const v=Math.sin(n*127.1+34.2)*43758.5453;return v-Math.floor(v)};
+const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
+
+function leafGeometry(kind){
+ const position=[],uv=[],indices=[],rows=24,columns=6;
+ for(let i=0;i<=rows;i++){
+  const t=i/rows,s=Math.sin(Math.PI*t);
+  let width=.38*Math.pow(Math.max(0,s),.75),rise=.13*s+t*.035;
+  if(kind==='turnip')width=.35*Math.pow(Math.max(0,s),.58)*(1+.22*Math.sin(t*Math.PI*7));
+  if(kind==='strawberry')width=.46*Math.pow(Math.max(0,s),.58)*(1-.12*Math.abs(Math.sin(t*Math.PI*12)));
+  if(kind==='lance')width=.19*Math.pow(Math.max(0,s),.8);
+  if(kind==='vine')width=.50*Math.pow(Math.max(0,s),.55)*(1+.23*Math.cos(t*Math.PI*5));
+  if(kind==='corn'){width=.17*Math.pow(Math.max(0,s),.7);rise=.40*Math.sin(t*Math.PI*.87)-t*.12}
+  for(let j=0;j<=columns;j++){
+   const u=j/columns*2-1;
+   const fold=-Math.pow(Math.abs(u),1.5)*s*.11;
+   position.push(u*width,rise+fold+Math.sin(t*17+u)*Math.abs(u)*s*.012,t);
+   uv.push(j/columns,1-t);
+  }
+ }
+ for(let i=0;i<rows;i++)for(let j=0;j<columns;j++){const a=i*(columns+1)+j;indices.push(a,a+1,a+columns+1,a+1,a+columns+2,a+columns+1)}
+ const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(position,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(indices);g.computeVertexNormals();return g;
+}
+
+function fruitTexture(kind,bump=false){
+ const size=512,c=document.createElement('canvas');c.width=c.height=size;
+ const q=c.getContext('2d'),image=q.createImageData(size,size);
+ const palette=kind==='berry'?[184,31,23]:kind==='turnip'?[226,224,204]:kind==='cucumber'?[66,95,37]:kind==='potato'?[156,121,75]:[142,69,74];
+ for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+  const i=(y*size+x)*4,noise=(random(x*7+y*11)-.5)*13;
+  let variation=noise;
+  if(kind==='berry')variation+=Math.sin(x*.035)*5+Math.cos(y*.018)*6;
+  if(kind==='cucumber')variation+=Math.pow((1+Math.cos(x/size*Math.PI*16))/2,8)*22;
+  const shade=kind==='turnip'?Math.sin(y/size*Math.PI)*7:0;
+  for(let k=0;k<3;k++)image.data[i+k]=bump?128+noise:palette[k]+variation+shade;
+  image.data[i+3]=255;
+ }
+ q.putImageData(image,0,0);
+ if(kind==='turnip'&&!bump){const g=q.createLinearGradient(0,0,0,size);g.addColorStop(0,'#bfa8b54d');g.addColorStop(.25,'#e4dbd100');g.addColorStop(1,'#a7a08212');q.fillStyle=g;q.fillRect(0,0,size,size)}
+ if(kind==='berry')for(let row=0;row<14;row++){
+  const y=52+row*28,count=23;
+  for(let col=0;col<count;col++){
+   const id=row*count+col,x=(col+.5+(row%2)*.5)*size/count+random(id+3)*3;
+   q.save();q.translate(x,y+random(id+700)*5);q.rotate((random(id+411)-.5)*.5);
+   q.fillStyle=bump?'#656565':'#5f160e88';q.beginPath();q.ellipse(0,1,3.1,5.1,0,0,Math.PI*2);q.fill();
+   q.fillStyle=bump?'#c6c6c6':'#d9b66d';q.beginPath();q.ellipse(-.35,-.35,1.5,3.1,0,0,Math.PI*2);q.fill();
+   q.restore();
+  }
+ }
+ if(kind==='potato')for(let i=0;i<32;i++){const x=random(i+33)*size,y=random(i+99)*size;q.fillStyle=bump?'#626262':'#75522e66';q.beginPath();q.ellipse(x,y,2.7,1.7,.3,0,Math.PI*2);q.fill()}
+ const map=new T.CanvasTexture(c);map.colorSpace=bump?T.NoColorSpace:T.SRGBColorSpace;map.anisotropy=8;return map;
+}
+
+export function createCropArt(){
+ const baseLeaf=miniatureTexture('leaf');
+ const greens=['#e1eccb','#c4dba4','#b2ca88','#d1e1b1'].map(color=>new T.MeshStandardMaterial({color,map:baseLeaf,bumpMap:baseLeaf,bumpScale:.007,roughness:.83,side:T.DoubleSide}));
+ const stems=new T.MeshStandardMaterial({color:'#6e8740',roughness:.9});
+ const gold=new T.MeshStandardMaterial({color:'#d8aa43',roughness:.82});
+ const flowerWhite=new T.MeshStandardMaterial({color:'#f1ebd4',roughness:.84,side:T.DoubleSide});
+ const purpleStem=new T.MeshStandardMaterial({color:'#88735a',roughness:.95});
+ const berryMap=fruitTexture('berry'),berryBump=fruitTexture('berry',true);
+ const berries=['#fff0df','#d6d8bd'].map(color=>new T.MeshStandardMaterial({color,map:berryMap,bumpMap:berryBump,bumpScale:.0045,roughness:.56}));
+ const turnipMap=fruitTexture('turnip'),root=new T.MeshStandardMaterial({map:turnipMap,roughness:.87,bumpMap:turnipMap,bumpScale:.002});
+ const potatoMap=fruitTexture('potato'),potato=new T.MeshStandardMaterial({map:potatoMap,bumpMap:potatoMap,bumpScale:.003,roughness:.92});
+ const sweetMap=fruitTexture('sweetpotato'),sweet=new T.MeshStandardMaterial({map:sweetMap,bumpMap:sweetMap,bumpScale:.003,roughness:.91});
+ const cucumberMap=fruitTexture('cucumber'),cucumber=new T.MeshStandardMaterial({map:cucumberMap,bumpMap:cucumberMap,bumpScale:.003,roughness:.73});
+ const tomatoRed=new T.MeshStandardMaterial({color:'#c24328',roughness:.54});
+ const tomatoGreen=new T.MeshStandardMaterial({color:'#8ca351',roughness:.72});
+ const seedMaterial=new T.MeshStandardMaterial({color:'#b9925d',roughness:1});
+ const shapes=Object.fromEntries(['turnip','strawberry','oval','lance','vine','corn'].map(kind=>[kind,leafGeometry(kind)]));
+ const sphere=new T.SphereGeometry(1,16,10),smallSphere=new T.SphereGeometry(1,8,6),stemGeometry=new T.CylinderGeometry(.8,1,1,5,1),cone=new T.ConeGeometry(1,1,7);
+ const strawberryGeometry=new T.SphereGeometry(1,20,14),sp=strawberryGeometry.attributes.position;
+ for(let i=0;i<sp.count;i++){
+  const y=sp.getY(i),angle=Math.atan2(sp.getZ(i),sp.getX(i)),taper=.54+.46*(y+1)/2;
+  const ridge=1+Math.cos(angle*5)*.018;
+  sp.setXYZ(i,sp.getX(i)*taper*ridge,y,sp.getZ(i)*taper*ridge);
+ }
+ strawberryGeometry.computeVertexNormals();
+ const up=new T.Vector3(0,1,0);
+ function mesh(parent,g,material,x,y,z,sx=1,sy=sx,sz=sx){const m=new T.Mesh(g,material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=m.receiveShadow=true;parent.add(m);return m}
+ function stem(parent,a,b,r=.007,material=stems){const from=new T.Vector3(...a),to=new T.Vector3(...b),d=to.clone().sub(from);const m=mesh(parent,stemGeometry,material,(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2,r,d.length(),r);m.quaternion.setFromUnitVectors(up,d.normalize());return m}
+ function leaf(parent,kind,x,y,z,length,angle,tilt=-.2,color=0,width=1,roll=0){const m=mesh(parent,shapes[kind],greens[color%greens.length],x,y,z,length*width,length,length);m.rotation.set(tilt,angle,roll,'YXZ');return m}
+ function calyx(parent,x,y,z,size=.07){for(let i=0;i<5;i++)leaf(parent,'lance',x,y,z,size,i*Math.PI*.4,.12,i%4,1.35)}
+ function flower(parent,x,y,z,size=.035){for(let i=0;i<5;i++){const a=i*Math.PI*.4;mesh(parent,smallSphere,flowerWhite,x+Math.sin(a)*size*.65,y,z+Math.cos(a)*size*.65,size*.65,size*.16,size*.53)}mesh(parent,smallSphere,gold,x,y+.004,z,size*.33,size*.22,size*.33)}
+ function strawberry(parent,x,y,z,r=.135,color=0){mesh(parent,strawberryGeometry,berries[color%2],x,y,z,r,r*1.13,r);calyx(parent,x,y+r*1.03,z,r*.62)}
+ function bulb(parent,x,y,z,size=1){mesh(parent,sphere,root,x,y,z,.20*size,.18*size,.20*size);mesh(parent,cone,root,x,y-.19*size,z,.036*size,.16*size,.034*size).rotation.z=Math.PI}
+ function turnipLeaves(parent,x,z,stage,seed,y=.25,held=false){
+  const growth=.35+stage*.65,count=stage<.32?4:stage<.65?7:10;
+  for(let i=0;i<count;i++){
+   const a=i*2.399+random(seed)*2,inner=i>5,length=(inner?.29:.44)*growth*(.88+random(seed+i)*.20),tilt=inner?-.72-random(i+seed)*.22:-.20-random(i+seed)*.22;
+   const dx=Math.sin(a)*.025,dz=Math.cos(a)*.025;
+   stem(parent,[x,y-.025,z],[x+dx,y+.025,z+dz],.008*growth);
+   leaf(parent,'turnip',x+dx,y+.01,z+dz,length,a,tilt,i,1,(random(seed+i*3)-.5)*.13);
+  }
+ }
+ function strawberryPlant(parent,x,z,stage,seed){
+  const growth=.30+stage*.70,count=stage<.35?2:3;
+  for(let j=0;j<count;j++){
+   const a=j*2.094+random(seed)*2,r=.15*growth,xx=x+Math.sin(a)*r,zz=z+Math.cos(a)*r,y=.22+growth*.10+random(seed+j)*.025;
+   stem(parent,[x,.10,z],[xx,y,zz],.007);
+   // Three separate, serrated leaflets meet at each petiole.
+   for(let k=-1;k<=1;k++){
+    const angle=a+k*.94,length=(k===0?.25:.21)*growth;
+    leaf(parent,'strawberry',xx,y,zz,length,angle,-.22-(k===0?.1:0),(j+k+4)%4,1,(random(seed+j+k)-.5)*.1);
+   }
+  }
+  if(stage>.64){
+   const fruits=stage>=1?4:2;
+   for(let j=0;j<fruits;j++){
+    const a=j*2.4+.35+random(seed)*3,r=.27+random(seed+j+9)*.025,xx=x+Math.sin(a)*r,zz=z+Math.cos(a)*r;
+    if(stage>=1){const size=.111+random(seed+j+2)*.022;stem(parent,[x,.25,z],[xx,.15+size,zz],.005);strawberry(parent,xx,.13+size*.15,zz,size,j)}
+    else {flower(parent,xx,.20,zz,.040);stem(parent,[x,.18,z],[xx,.20,zz],.004)}
+   }
+  }
+ }
+ function potatoPlant(parent,x,z,stage,seed){
+  const growth=.25+stage*.75;
+  for(let j=0;j<3;j++){
+   const a=j*2.4+seed,dx=Math.sin(a)*.10,dz=Math.cos(a)*.1,h=(.39+random(seed+j)*.12)*growth;
+   stem(parent,[x,.06,z],[x+dx,h,z+dz],.010);
+   for(let k=0;k<3;k++){
+    const y=.13*growth+k*.10*growth,spread=.05+k*.015;
+    for(const side of [-1,1])leaf(parent,'oval',x+dx*(k/3)+Math.sin(a+1.57)*spread*side,y,z+dz*(k/3)+Math.cos(a+1.57)*spread*side,(.20+k*.018)*growth,a+side*1.15,-.20,k+j,1.0);
+   }
+   leaf(parent,'oval',x+dx,h-.02,z+dz,.19*growth,a,-.50,j);
+   if(stage>=.85&&j!==1)flower(parent,x+dx,h+.025,z+dz,.035);
+  }
+ }
+ function vinePlant(parent,x,z,stage,seed,sweetPotato=false){
+  const growth=.3+.7*stage;
+  for(let j=0;j<3;j++){
+   const a=j*2.4+random(seed)*3,tipx=x+Math.sin(a)*.28*growth,tipz=z+Math.cos(a)*.28*growth;
+   stem(parent,[x,.07,z],[tipx,.13,tipz],.009,sweetPotato?purpleStem:stems);
+   for(let k=0;k<3;k++){
+    const t=(k+1)/3,xx=x+(tipx-x)*t,zz=z+(tipz-z)*t;
+    leaf(parent,'vine',xx,.12+random(seed+k)*.06,zz,(.22+random(seed+k)*.05)*growth,a+(k%2?1:-1)*.8,-.18,j+k,sweetPotato?.78:1);
+   }
+   if(!sweetPotato&&stage>=.7){const xx=x+Math.sin(a)*.23,zz=z+Math.cos(a)*.23;if(stage>=1){const fruit=mesh(parent,sphere,cucumber,xx,.14,zz,.075,.24,.075);fruit.rotation.set(.85,a,.1);flower(parent,xx+Math.sin(a)*.15,.13,zz+Math.cos(a)*.15,.021)}else flower(parent,tipx,.2,tipz,.033)}
+  }
+ }
+ function tomatoPlant(parent,x,z,stage,seed){
+  const growth=.24+.76*stage,h=.88*growth;
+  stem(parent,[x,.05,z],[x+.025,h,z],.013);
+  stem(parent,[x+.10,.06,z],[x+.10,h+.06,z],.015,purpleStem);
+  for(let j=0;j<6;j++){
+   const a=j*2.4+random(seed)*2,y=.19*growth+j*.10*growth,r=.14*growth,xx=x+Math.sin(a)*r,zz=z+Math.cos(a)*r;
+   stem(parent,[x,y-.03,z],[xx,y+.03,zz],.006);
+   for(let k=-1;k<=1;k++)leaf(parent,'turnip',xx,y+.02,zz,(k===0?.23:.17)*growth,a+k*1.1,-.15,j+k+4,.75);
+  }
+  if(stage>.65)for(let j=0;j<4;j++){const a=j*2.4+.5,r=.19,xx=x+Math.sin(a)*r,zz=z+Math.cos(a)*r,y=.23+(j%3)*.14,size=stage>=1?.115:.075;stem(parent,[x,y+.1,z],[xx,y+.09,zz],.005);mesh(parent,sphere,stage>=1?tomatoRed:tomatoGreen,xx,y,zz,size,size*.85,size);calyx(parent,xx,y+size*.81,zz,size*.58)}
+ }
+ function cornPlant(parent,x,z,stage,seed){
+  const growth=.2+.8*stage,h=1.20*growth;
+  stem(parent,[x,.05,z],[x,h,z],.018);
+  for(let j=0;j<7;j++){const a=j*Math.PI+.38,y=.16+j*.13*growth;leaf(parent,'corn',x,y,z,(.48-j*.025)*growth,a,-.10,j,1.2)}
+  if(stage>.7)for(let j=0;j<2;j++){
+   const side=j?1:-1,xx=x+side*.065,yy=.58+j*.19;
+   const cob=mesh(parent,sphere,gold,xx,yy,z,.06,.16,.06);cob.rotation.z=side*-.25;
+   for(let k=0;k<3;k++)leaf(parent,'lance',xx,yy-.13,z,.31,k*2.1,-1.1,k,.8);
+  }
+  if(stage>.8)for(let j=0;j<7;j++){const a=j*2.4;stem(parent,[x,h-.1,z],[x+Math.sin(a)*.085,h+.10+random(seed+j)*.04,z+Math.cos(a)*.085],.004,gold)}
+ }
+ function heldCrop(parent,id,x,z){
+  if(id==='turnip'){bulb(parent,x,.15,z,1.05);turnipLeaves(parent,x,z,1,2,.28,true);return}
+  if(id==='strawberry'){strawberry(parent,x,.17,z,.21);return}
+  if(id==='tomato'){mesh(parent,sphere,tomatoRed,x,.14,z,.22,.19,.22);calyx(parent,x,.32,z,.13);return}
+  if(id==='potato'||id==='sweetpotato'){const m=mesh(parent,sphere,id==='potato'?potato:sweet,x,.13,z,id==='potato'?.23:.13,id==='potato'?.15:.29,.16);m.rotation.z=id==='potato'?.14:.9;return}
+  if(id==='cucumber'){const m=mesh(parent,sphere,cucumber,x,.14,z,.105,.36,.105);m.rotation.z=.78;return}
+  if(id==='corn'){const m=mesh(parent,sphere,gold,x,.18,z,.12,.34,.12);m.rotation.z=.45;for(let i=0;i<3;i++)leaf(parent,'corn',x,.02,z,.50,i*2.1,-.9,i,1.7);return}
+ }
+ function cropModel(parent,p,x,z,held=false){
+  const definition=CROPS[p.crop];if(!definition)return;
+  if(held){heldCrop(parent,p.crop,x,z);return}
+  const stage=clamp(p.age/definition.days),seed=x*11+z*31;
+  if(stage<.13){for(let i=0;i<3;i++)mesh(parent,smallSphere,seedMaterial,x+(i-1)*.09,.072,z+random(seed+i)*.025,.023,.014,.016);return}
+  if(p.crop==='turnip'){
+   if(stage>.5)bulb(parent,x,.17,z,(stage-.3)/.7);
+   turnipLeaves(parent,x,z,stage,seed,.13+stage*.13);
+  }else if(p.crop==='strawberry')strawberryPlant(parent,x,z,stage,seed);
+  else if(p.crop==='potato')potatoPlant(parent,x,z,stage,seed);
+  else if(p.crop==='cucumber'||p.crop==='sweetpotato')vinePlant(parent,x,z,stage,seed,p.crop==='sweetpotato');
+  else if(p.crop==='tomato')tomatoPlant(parent,x,z,stage,seed);
+  else if(p.crop==='corn')cornPlant(parent,x,z,stage,seed);
+ }
+ function weedModel(parent,x,z){
+  const seed=x*17+z*11;
+  for(let i=0;i<9;i++){const a=i*2.399+random(seed)*2;leaf(parent,'lance',x,.075,z,.24+random(seed+i)*.13,a,-.12-random(seed+i+3)*.42,i,1.8,(random(seed+i+7)-.5)*.18)}
+  for(let i=0;i<3;i++)leaf(parent,'lance',x,.09,z,.21,i*2.1,-1.05,i,1.3);
+ }
+ return {cropModel,weedModel};
+}
