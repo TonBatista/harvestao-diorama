@@ -23,6 +23,7 @@ export function soilEdgeTexture(){const c=document.createElement('canvas');c.wid
 // The game and HUD remain sharp around the player; only the scene goes through the lens.
 export function miniatureLens(renderer){
  renderer.info.autoReset=false;
+ const drawingSize=new T.Vector2();
  const target=new T.WebGLRenderTarget(1,1,{type:T.HalfFloatType,samples:2,depthTexture:new T.DepthTexture(1,1)});
  const uniforms={sceneMap:{value:target.texture},depthMap:{value:target.depthTexture},pixel:{value:new T.Vector2(1,1)},depthRange:{value:99.9},blurScale:{value:1}};
  const material=new T.ShaderMaterial({uniforms,depthTest:false,depthWrite:false,
@@ -31,15 +32,15 @@ export function miniatureLens(renderer){
  float depthAt(vec2 uv){return texture2D(depthMap,uv).r*depthRange;}
  void main(){
   float z=depthAt(vUv);vec2 slope=vec2(dFdx(z),dFdy(z));float ao=0.;
-  for(int i=0;i<8;i++){float a=float(i)*2.399963;vec2 offset=vec2(cos(a),sin(a))*(3.+float(i)*1.2);float delta=z+dot(slope,offset)-depthAt(vUv+offset*pixel);ao+=smoothstep(.025,.10,delta)*(1.-smoothstep(.15,.65,delta));}
+  for(int i=0;i<4;i++){float a=float(i)*2.399963;vec2 offset=vec2(cos(a),sin(a))*(3.+float(i)*2.5);float delta=z+dot(slope,offset)-depthAt(vUv+offset*pixel);ao+=smoothstep(.025,.10,delta)*(1.-smoothstep(.15,.65,delta));}
   float coc=smoothstep(.22,.49,abs(vUv.y-.51))*3.0*blurScale;
   vec3 color=texture2D(sceneMap,vUv).rgb*2.;float total=2.;
-  for(int i=0;i<12;i++){float a=float(i)*2.399963;vec2 offset=vec2(cos(a),sin(a))*sqrt((float(i)+.5)/12.)*coc;float other=depthAt(vUv+offset*pixel);float weight=1.-smoothstep(1.,3.,abs(other-z));color+=texture2D(sceneMap,vUv+offset*pixel).rgb*weight;total+=weight;}
-  color/=total;color*=1.-ao*.045;float vignette=1.-.10*smoothstep(.32,.72,length((vUv-.5)*vec2(.85,1.)));
+  if(coc>.01)for(int i=0;i<6;i++){float a=float(i)*2.399963;vec2 offset=vec2(cos(a),sin(a))*sqrt((float(i)+.5)/6.)*coc;float other=depthAt(vUv+offset*pixel);float weight=1.-smoothstep(1.,3.,abs(other-z));color+=texture2D(sceneMap,vUv+offset*pixel).rgb*weight;total+=weight;}
+  color/=total;color*=1.-ao*.09;float vignette=1.-.10*smoothstep(.32,.72,length((vUv-.5)*vec2(.85,1.)));
   gl_FragColor=vec4(color*vignette,1.);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
  }`});
  const scene=new T.Scene();scene.add(new T.Mesh(new T.PlaneGeometry(2,2),material));const camera=new T.Camera();let width=0,height=0;
- return {render(world,view){renderer.info.reset();const size=renderer.getDrawingBufferSize(new T.Vector2());if(width!==size.x||height!==size.y){width=size.x;height=size.y;target.setSize(width,height);uniforms.pixel.value.set(1/width,1/height);uniforms.blurScale.value=height/900}uniforms.depthRange.value=view.far-view.near;renderer.setRenderTarget(target);renderer.render(world,view);renderer.setRenderTarget(null);renderer.render(scene,camera)}};
+ return {render(world,view){renderer.info.reset();const size=renderer.getDrawingBufferSize(drawingSize);if(width!==size.x||height!==size.y){width=size.x;height=size.y;target.setSize(width,height);uniforms.pixel.value.set(1/width,1/height);uniforms.blurScale.value=height/900}uniforms.depthRange.value=view.far-view.near;renderer.setRenderTarget(target);renderer.render(world,view);renderer.setRenderTarget(null);renderer.render(scene,camera)}};
 }

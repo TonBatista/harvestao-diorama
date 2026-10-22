@@ -23,7 +23,7 @@ function material(color,kind='plain'){
  if(kind==='fabric'){m.map=fineCloth();m.bumpMap=m.map;m.bumpScale=.0007}
  return m;
 }
-function add(parent,geometry,mat,x=0,y=0,z=0,sx=1,sy=sx,sz=sx){const o=new T.Mesh(geometry,mat);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+function add(parent,geometry,mat,x=0,y=0,z=0,sx=1,sy=sx,sz=sx){const o=new T.Mesh(geometry,mat);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=mat.userData.castShadow!==false;o.receiveShadow=true;parent.add(o);return o}
 function ellipsoid(parent,mat,x,y,z,sx,sy=sx,sz=sx){return add(parent,sphere,mat,x,y,z,sx,sy,sz)}
 function softBox(parent,mat,x,y,z,w,h,d,r=Math.min(w,h,d)*.38){return add(parent,roundedBox(w,h,d,r),mat,x,y,z)}
 function clothPanel(parent,mat,x,y,z,w,h,d,r){
@@ -99,6 +99,8 @@ export function createFarmer(scene){
   pack:material('#ad7e5e','fabric'),packFade:material('#bb9170','fabric'),packShade:material('#8f6d53','fabric'),packEdge:material('#b09878','fabric'),patch:material('#c3b08b','fabric'),
   eye:material('#282b25'),iris:material('#5a4a36'),eyeWhite:material('#f4edda'),glint:material('#fffbea'),mouth:material('#966953','skin')
  };
+ // Tiny stitching and facial details remain visible without their own shadow draws.
+ for(const key of ['thread','clothThread','brass','metalDark','packEdge','capSeam','lace','eyeWhite','eye','iris','glint','mouth','hairFine','blush','scarfLight','overallLight'])M[key].userData.castShadow=false;
  const packMap=wornCanvas();for(const key of ['pack','packFade','packShade']){M[key].map=M[key].bumpMap=packMap;M[key].bumpScale=.002}
  const leatherMap=nubuck();for(const key of ['boot','bootDark','bootLight']){M[key].map=M[key].bumpMap=leatherMap;M[key].bumpScale=.002}
  M.glint.roughness=.24;M.eye.roughness=.29;M.iris.roughness=.31;M.hair.roughness=M.hairLight.roughness=.48;

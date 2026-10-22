@@ -7,7 +7,7 @@ const random=n=>{const v=Math.sin(n*127.1+34.2)*43758.5453;return v-Math.floor(v
 const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
 
 function leafGeometry(kind){
- const position=[],uv=[],indices=[],compact=kind==='sepal',rows=compact?6:18,columns=compact?4:8,stride=(rows+1)*(columns+1);
+ const position=[],uv=[],indices=[],compact=kind==='sepal',rows=compact?4:10,columns=compact?3:4,stride=(rows+1)*(columns+1);
  // Cupped, fleshy blades have an underside and a raised midrib.
  for(let side=0;side<2;side++)for(let i=0;i<=rows;i++){
   const t=i/rows,s=Math.max(0,Math.sin(Math.PI*t));
@@ -27,7 +27,7 @@ function leafGeometry(kind){
  }
  for(let side=0;side<2;side++)for(let i=0;i<rows;i++)for(let j=0;j<columns;j++){
   const a=side*stride+i*(columns+1)+j,b=a+1,c=a+columns+1,d=c+1;
-  indices.push(...(side?[a,c,b,b,c,d]:[a,b,c,b,d,c]));
+  indices.push(...(side?[a,b,c,b,d,c]:[a,c,b,b,c,d]));
  }
  const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(position,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(indices);g.computeVertexNormals();return g;
 }
@@ -93,17 +93,17 @@ export function createCropArt(){
  const tomatoGreen=new T.MeshStandardMaterial({color:'#8ca351',roughness:.72});
  const seedMaterial=new T.MeshStandardMaterial({color:'#b9925d',roughness:1});
  const shapes=Object.fromEntries(['turnip','strawberry','oval','lance','vine','corn','sepal'].map(kind=>[kind,leafGeometry(kind)]));
- const sphere=new T.SphereGeometry(1,16,10),smallSphere=new T.SphereGeometry(1,8,6),stemGeometry=new T.CylinderGeometry(.8,1,1,5,1),cone=new T.ConeGeometry(1,1,7);
- const strawberryGeometry=new T.SphereGeometry(1,20,14),sp=strawberryGeometry.attributes.position;
+ const sphere=new T.SphereGeometry(1,12,8),smallSphere=new T.SphereGeometry(1,8,6),stemGeometry=new T.CylinderGeometry(.8,1,1,5,1),cone=new T.ConeGeometry(1,1,7);
+ const strawberryGeometry=new T.SphereGeometry(1,16,10),sp=strawberryGeometry.attributes.position;
  for(let i=0;i<sp.count;i++){
   const y=sp.getY(i),angle=Math.atan2(sp.getZ(i),sp.getX(i)),taper=.54+.46*(y+1)/2;
   const ridge=1+Math.cos(angle*5)*.018;
   sp.setXYZ(i,sp.getX(i)*taper*ridge,y,sp.getZ(i)*taper*ridge);
  }
  strawberryGeometry.computeVertexNormals();
- const up=new T.Vector3(0,1,0);
+ const up=new T.Vector3(0,1,0),direction=new T.Vector3();
  function mesh(parent,g,material,x,y,z,sx=1,sy=sx,sz=sx){const m=new T.Mesh(g,material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=m.receiveShadow=true;parent.add(m);return m}
- function stem(parent,a,b,r=.007,material=stems){const from=new T.Vector3(...a),to=new T.Vector3(...b),d=to.clone().sub(from);const m=mesh(parent,stemGeometry,material,(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2,r,d.length(),r);m.quaternion.setFromUnitVectors(up,d.normalize());return m}
+ function stem(parent,a,b,r=.007,material=stems){direction.set(b[0]-a[0],b[1]-a[1],b[2]-a[2]);const m=mesh(parent,stemGeometry,material,(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2,r,direction.length(),r);m.quaternion.setFromUnitVectors(up,direction.normalize());return m}
  function leaf(parent,kind,x,y,z,length,angle,tilt=-.2,color=0,width=1,roll=0){const m=mesh(parent,shapes[kind],greens[color%greens.length],x,y,z,length*width,length,length);m.rotation.set(tilt,angle,roll,'YXZ');return m}
  function calyx(parent,x,y,z,size=.07){for(let i=0;i<5;i++)leaf(parent,'sepal',x,y,z,size,i*Math.PI*.4,.12,i%4,1.35)}
  function flower(parent,x,y,z,size=.035){for(let i=0;i<5;i++){const a=i*Math.PI*.4;mesh(parent,smallSphere,flowerWhite,x+Math.sin(a)*size*.65,y,z+Math.cos(a)*size*.65,size*.65,size*.16,size*.53)}mesh(parent,smallSphere,gold,x,y+.004,z,size*.33,size*.22,size*.33)}
