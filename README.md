@@ -1,6 +1,14 @@
 # Harvestão — cena de retomada
 
-Versão 0.12. Primeira cena jogável, ainda em desenvolvimento.
+Versão 0.13. Primeira cena jogável, ainda em desenvolvimento.
+
+## Controles e personagem 0.13
+
+Barra vertical à esquerda, com + no topo e − na base. Arraste para ajustar de 70% a 340%; porcentagem ou tecla 0 restauram 100%. A barra também aceita teclado e não interfere no movimento.
+
+Olhos castanhos menores, mangas e lenço menos volumosos, macacão violeta acinzentado, boné verde e mochila laranja gasta. Sem aumento na geometria. Orientação inicializada pelo progresso, normalizada e protegida contra valores inválidos; giro suave pelo menor arco. O giro atual foi conferido no direcional do jogo; matemática validada em oito direções a 30/60/120 FPS. Importações versionadas em 0.13 para renovar o cache.
+
+Esta revisão foi editada diretamente no GitHub devido à falha local de início de processos (0x80070020). Antes da próxima edição local, sincronize main nas pastas de desenvolvimento e publicação.
 
 ## Personagem e câmera 0.12
 
