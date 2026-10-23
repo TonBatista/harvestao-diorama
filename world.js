@@ -4,7 +4,7 @@ import {loadMiniatureMaterials,miniatureTexture,miniatureLens,contactTexture,soi
 import {artisanMaterial,cottage,canopyGeometry,meadowGeometry,treeCrown} from './art-direction.js';
 import {FIELD,TILE,CROPS,frontTile} from './simulation.js';
 import {createCropArt} from './crop-art.js';
-import {createFarmer} from './farmer-art.js?v=0.12';
+import {createFarmer} from './farmer-art.js?v=0.13';
 const seedGeo=new T.SphereGeometry(1,5,3);
 const geo={box:new T.BoxGeometry(1,1,1),ball:new T.SphereGeometry(1,16,12),cylinder:new T.CylinderGeometry(1,1,1,12),cone:new T.ConeGeometry(1,1,12),leaf:new T.SphereGeometry(1,8,5)};
 const materials=new Map();function mat(c){if(!materials.has(c))materials.set(c,new T.MeshStandardMaterial({color:c,roughness:.9}));return materials.get(c)}
@@ -141,6 +141,7 @@ function rebuild(){
 rebuild();
 // Refined art uses the same joint hierarchy and animation pivots.
 const {farmer,body,head,eyes,scarf,tail,arms,legs,knees,feet}=createFarmer(scene);
+const wrapAngle=angle=>T.MathUtils.euclideanModulo(angle+Math.PI,Math.PI*2)-Math.PI;state.player.angle=Number.isFinite(state.player.angle)?wrapAngle(state.player.angle):Math.PI;farmer.rotation.y=state.player.angle;
 const waterHandleGeometry=new T.TorusGeometry(.15,.025,5,14);const equipment=new T.Group();arms[1].add(equipment);function toolModel(id){renderDirty=true;renderer.shadowMap.needsUpdate=true;equipment.clear();if(id==='hand'||id==='seed')return;if(id==='water'){cyl(equipment,'#6f9293',0,-.43,.15,.17,.29);const handle=new T.Mesh(waterHandleGeometry,mat('#9fb2a5'));handle.position.set(0,-.25,.15);equipment.add(handle);let spout=cyl(equipment,'#a3b7ab',0,-.4,.4,.035,.3);spout.rotation.x=1.1;ball(equipment,'#b8c5ae',0,-.33,.54,.09,.035,.07)}else{let h=cyl(equipment,'#a6824b',0,-.34,.3,.035,.85);h.rotation.x=Math.PI/2;if(id==='hoe')box(equipment,'#879390',0,-.35,.7,.27,.2,.055);if(id==='axe')box(equipment,'#8c9992',.03,-.34,.65,.31,.07,.24);if(id==='hammer')box(equipment,'#7c8782',0,-.34,.65,.4,.2,.22);if(id==='sickle'){let blade=box(equipment,'#bcc6ab',.1,-.34,.65,.37,.035,.08);blade.rotation.y=.5}}}toolModel(state.tool);
 const playerShadow=new T.Mesh(shadowGeometry,new T.MeshBasicMaterial({map:contactTexture(),transparent:true,opacity:.30,depthWrite:false}));playerShadow.scale.set(.67,.67,.67);playerShadow.renderOrder=1;scene.add(playerShadow);
 const carried=new T.Group();body.add(carried);let lastHeld=null;function heldModel(){renderDirty=true;renderer.shadowMap.needsUpdate=true;carried.clear();if(state.held){cropModel(carried,{crop:state.held,age:CROPS[state.held].days},0,0,true);carried.position.set(0,2.05,.08)}lastHeld=state.held}
@@ -173,7 +174,7 @@ function move(dx,dy,dt,run){
  gait+=distance/(1.05+blend*.47)*Math.PI*2;
  return distance>1e-6;
 }
-function update(dt,moving){if(dt===0&&!renderDirty&&lastHeld===state.held)return;t+=dt;pollen.rotation.y=Math.sin(t*.05)*.025;pollen.position.y=Math.sin(t*.3)*.05;actionTime=Math.max(0,actionTime-dt);if(pendingEffect){pendingEffect.delay-=dt;if(pendingEffect.delay<=0){emitEffect(pendingEffect.type);pendingEffect=null}}farmer.position.set(state.player.x,.05,state.player.z);playerShadow.position.set(state.player.x,.06,state.player.z);let diff=Math.atan2(Math.sin(state.player.angle-farmer.rotation.y),Math.cos(state.player.angle-farmer.rotation.y));farmer.rotation.y+=diff*(1-Math.exp(-dt*18));motion+=((moving?Math.min(1,speed/2.4):0)-motion)*(1-Math.exp(-dt*20));runBlend+=(T.MathUtils.smoothstep(speed,2.1,4.2)-runBlend)*(1-Math.exp(-dt*12));const bounce=(1-Math.cos(gait*2))*(.006+runBlend*.012)*motion;
+function update(dt,moving){if(dt===0&&!renderDirty&&lastHeld===state.held)return;t+=dt;pollen.rotation.y=Math.sin(t*.05)*.025;pollen.position.y=Math.sin(t*.3)*.05;actionTime=Math.max(0,actionTime-dt);if(pendingEffect){pendingEffect.delay-=dt;if(pendingEffect.delay<=0){emitEffect(pendingEffect.type);pendingEffect=null}}farmer.position.set(state.player.x,.05,state.player.z);playerShadow.position.set(state.player.x,.06,state.player.z);if(!Number.isFinite(state.player.angle))state.player.angle=Number.isFinite(farmer.rotation.y)?farmer.rotation.y:Math.PI;if(!Number.isFinite(farmer.rotation.y))farmer.rotation.y=state.player.angle;const diff=wrapAngle(state.player.angle-farmer.rotation.y);farmer.rotation.y=wrapAngle(farmer.rotation.y+diff*(1-Math.exp(-dt*18)));motion+=((moving?Math.min(1,speed/2.4):0)-motion)*(1-Math.exp(-dt*20));runBlend+=(T.MathUtils.smoothstep(speed,2.1,4.2)-runBlend)*(1-Math.exp(-dt*12));const bounce=(1-Math.cos(gait*2))*(.006+runBlend*.012)*motion;
 const blinkPhase=t%4.7,blink=blinkPhase>4.49?1-Math.sin((blinkPhase-4.49)/.21*Math.PI)*.94:1;for(const eye of eyes)eye.scale.y=.083*blink;body.position.y=bounce+Math.sin(t*2.1)*.005*(1-motion);body.rotation.x=(.035+runBlend*.065)*motion;head.rotation.z=Math.sin(gait)*.018*motion;
 const actionProgress=1-actionTime/.72,hit=actionTime>0?Math.sin(Math.max(0,(actionProgress-.24)/.76)*Math.PI):0;
 body.scale.set(1+hit*.018,1-hit*.025,1+hit*.018);if(actionTime>0&&(actionTool==='hand'||actionTool==='seed'))body.rotation.x=Math.sin(actionProgress*Math.PI)*.28;
@@ -206,4 +207,3 @@ function observeFrame(milliseconds){
 }
 return {renderer,scene,camera,observeFrame,setZoom,get zoom(){return {value:zoomValue,target:zoomTarget,min:minimumZoom,max:maximumZoom}},get performance(){return {pixelRatio:renderer.getPixelRatio(),maximumPixelRatio,frameAverage,plotBuilds,plotRegions:plotChunks.size,grassRegions:grassCells.size}},get animation(){return {moving:motion>.05,running:isRunning,phase:gait,travel,speed,actionTime,hips:legs.map(l=>l.rotation.x),knees:knees.map(l=>l.rotation.x)}},rebuild,move,stop,update,toolModel,effect,act(id=state.tool){stop();actionTool=id;actionTime=.72},locations:{house:{x:.5,z:-7.5},shipping:{x:5.2,z:-5.3},well:{x:11.6,z:.4}},get busy(){return actionTime>0}};
 }
-
