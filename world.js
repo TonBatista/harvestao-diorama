@@ -1,11 +1,11 @@
 import * as T from './three.module.js';
-import {createRegionManager} from './region-manager.js?v=0.14';
+import {createRegionManager} from './region-manager.js?v=0.15';
 import {terrainTexture} from './terrain-materials.js';
 import {loadMiniatureMaterials,miniatureTexture,miniatureLens,contactTexture,soilEdgeTexture} from './miniature-materials.js';
-import {artisanMaterial,cottage,canopyGeometry,meadowGeometry,treeCrown} from './art-direction.js';
+import {artisanMaterial,cottage,canopyGeometry,meadowGeometry,treeCrown} from './art-direction.js?v=0.15';
 import {FIELD,TILE,CROPS,frontTile} from './simulation.js';
 import {createCropArt} from './crop-art.js';
-import {createFarmer} from './farmer-art.js?v=0.14';
+import {createFarmer} from './farmer-art.js?v=0.15';
 const seedGeo=new T.SphereGeometry(1,5,3);
 const geo={box:new T.BoxGeometry(1,1,1),ball:new T.SphereGeometry(1,16,12),cylinder:new T.CylinderGeometry(1,1,1,12),cone:new T.ConeGeometry(1,1,12),leaf:new T.SphereGeometry(1,8,5)};
 const materials=new Map();function mat(c){if(!materials.has(c))materials.set(c,new T.MeshStandardMaterial({color:c,roughness:.9}));return materials.get(c)}
