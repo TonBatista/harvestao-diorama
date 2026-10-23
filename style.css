@@ -25,3 +25,12 @@
 .top-actions .zoom-controls button:disabled{opacity:.32;cursor:default}
 .top-actions .zoom-controls button:active:not(:disabled){background:#cad2b677}
 @media(pointer:coarse){.top-actions .zoom-controls button{width:40px;height:40px}}
+/* Vertical camera rail, clear of the movement pad. */
+.zoom-rail{position:fixed;left:max(18px,env(safe-area-inset-left));top:calc(50% - 112px);height:224px;width:44px;display:flex;flex-direction:column;gap:6px;padding:4px;margin:0;z-index:2;align-items:center;border-radius:22px}
+.zoom-rail button{display:grid;place-items:center;flex:none;width:34px;height:34px;border:0;border-radius:50%;box-shadow:none;background:transparent;color:#4a5e3f;font-size:23px;line-height:1}
+.zoom-rail button:disabled{opacity:.32;cursor:default}.zoom-rail button:active:not(:disabled){background:#cad2b677}
+.zoom-rail #zoomSlider{writing-mode:vertical-lr;direction:rtl;flex:1;width:30px;min-height:40px;margin:0;accent-color:#657c50;cursor:ns-resize;touch-action:none}
+.zoom-rail #zoomReset{position:absolute;left:calc(100% + 7px);top:50%;transform:translateY(-50%);width:43px;height:25px;font-size:10px;font-variant-numeric:tabular-nums;background:#f5edd9eb;border:1px solid #e9ddbd;border-radius:12px}
+.zoom-rail input:focus-visible{outline:2px solid #896b94;outline-offset:3px;border-radius:12px}
+@media(max-height:700px){.zoom-rail{top:185px;height:180px}}
+@media(max-height:550px){.zoom-rail{top:110px;height:calc(100dvh - 260px);min-height:110px;width:36px;left:15px;padding:2px;gap:2px}.zoom-rail button{width:28px;height:28px}.zoom-rail #zoomSlider{width:26px;min-height:30px}}
