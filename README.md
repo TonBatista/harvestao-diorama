@@ -77,3 +77,7 @@ Validação: node --test simulation.test.js. Passaram 11 testes de regras e 19 v
 caminhada-corrida.png contém 64 quadros transparentes renderizados do modelo: oito colunas; quatro direções de caminhada nas primeiras quatro linhas e corrida nas quatro seguintes. O jogo anima o modelo 3D em tempo real.
 
 BASE-DO-PROJETO.md registra o pedido recuperado da conversa original e os próximos critérios de entrega. Arquivos antigos de arte e do renderizador 2D continuam nesta cópia como referência, mas não são carregados.
+
+## Captura da versão 0.13
+
+![Barra vertical de zoom e personagem na versão publicada](https://github.com/user-attachments/assets/09053af9-7cc7-45a3-970c-5457ffd582dd)
