@@ -91,13 +91,13 @@ export function createFarmer(scene){
   cap:material('#788b73','fabric'),capShade:material('#5d735b','fabric'),capSeam:material('#899b80','fabric'),
   shirt:material('#eee7d3','fabric'),shirtShade:material('#d5cbb1','fabric'),shirtLight:material('#f4eedc','fabric'),
   glove:material('#f2eddf','fabric'),gloveShade:material('#d4ccba','fabric'),
-  overall:material('#7c8b76','fabric'),overallDark:material('#616f5d','fabric'),overallLight:material('#8c9a83','fabric'),
+  overall:material('#777181','fabric'),overallDark:material('#5f596d','fabric'),overallLight:material('#938b9c','fabric'),
   thread:material('#b0ad89','fabric'),clothThread:material('#dfcbaa','fabric'),
   scarf:material('#896b94','fabric'),scarfShade:material('#70557c','fabric'),scarfLight:material('#aa8bb2','fabric'),
   boot:material('#64442f'),bootDark:material('#503a2b'),bootLight:material('#806044'),sole:material('#494236'),lace:material('#c1ae85','fabric'),
   brass:material('#b4a073','metal'),metalDark:material('#8b8065','metal'),
   pack:material('#ad7e5e','fabric'),packFade:material('#bb9170','fabric'),packShade:material('#8f6d53','fabric'),packEdge:material('#b09878','fabric'),patch:material('#c3b08b','fabric'),
-  eye:material('#202c30'),iris:material('#4b5144'),eyeWhite:material('#fff8e9'),glint:material('#fffbea'),mouth:material('#966953','skin')
+  eye:material('#28231f'),iris:material('#66503c'),eyeWhite:material('#fff8e9'),glint:material('#fffbea'),mouth:material('#966953','skin')
  };
  // Tiny stitching and facial details remain visible without their own shadow draws.
  for(const key of ['thread','clothThread','brass','metalDark','packEdge','capSeam','lace','eyeWhite','eye','iris','glint','mouth','hairFine','blush','scarfLight','overallLight'])M[key].userData.castShadow=false;
@@ -159,8 +159,8 @@ export function createFarmer(scene){
  const scarfRing=new T.Mesh(new T.TorusGeometry(.166,.028,10,38),M.scarf);scarfRing.rotation.x=Math.PI/2;scarfRing.scale.set(1.08,1,.91);scarf.add(scarfRing);
  seam(scarf,M.scarfLight,[[-.15,-.009,.115],[-.08,-.03,.16],[.06,-.026,.17],[.15,.008,.12]],.004);
  seam(scarf,M.scarfShade,[[-.16,.018,.1],[-.08,.008,.18],[.10,.013,.164]],.0045);
- const knot=ellipsoid(scarf,M.scarfLight,.092,-.012,.218,.049,.041,.038);knot.rotation.z=.4;
- scarf.scale.setScalar(.9);const tail=new T.Group();tail.scale.setScalar(.78);tail.position.set(.048,.918,.245);tail.rotation.z=-.28;body.add(tail);
+ const knot=ellipsoid(scarf,M.scarfLight,.092,-.012,.218,.036,.029,.028);knot.rotation.z=.4;
+ scarf.scale.setScalar(.9);const tail=new T.Group();tail.scale.setScalar(.62);tail.position.set(.048,.918,.245);tail.rotation.z=-.28;body.add(tail);
  add(tail,lockGeometry([[0,0,0],[-.010,-.09,.035],[-.057,-.181,.022]],.046,.011),M.scarf);
  add(tail,lockGeometry([[.035,0,0],[.072,-.055,.018],[.096,-.123,.011]],.035,.010),M.scarfShade);
  seam(tail,M.scarfLight,[[-.021,-.025,.017],[-.033,-.095,.04],[-.060,-.157,.032]],.0024);
@@ -179,13 +179,13 @@ export function createFarmer(scene){
  // Every eye layer remains under its original blink pivot (.083 vertically).
  const eyes=[];
  for(const side of [-1,1]){
-  const e=new T.Group();e.position.set(side*.125,-.013,.271);e.scale.y=.083;head.add(e);eyes.push(e);
+  const e=new T.Group();e.position.set(side*.125,-.013,.265);e.scale.y=.083;head.add(e);eyes.push(e);
   const eyeArt=new T.Group();eyeArt.position.set(0,.005/.083,0);eyeArt.rotation.y=side*.12;e.add(eyeArt);
-  ellipsoid(eyeArt,M.eyeWhite,0,0,0,.046,.91,.014);
-  ellipsoid(eyeArt,M.iris,-side*.006,.035,.012,.041,.96,.012);
-  ellipsoid(eyeArt,M.eye,-side*.008,.10,.022,.025,.73,.008);
-  ellipsoid(eyeArt,M.glint,-.010,.38,.033,.0075,.15,.0035);
-  ellipsoid(eyeArt,M.glint,.010,-.36,.032,.003,.05,.002);
+  ellipsoid(eyeArt,M.eyeWhite,0,0,0,.041,.82,.009);
+  ellipsoid(eyeArt,M.iris,-side*.005,.030,.009,.037,.85,.009);
+  ellipsoid(eyeArt,M.eye,-side*.006,.080,.017,.025,.68,.006);
+  ellipsoid(eyeArt,M.glint,-.009,.34,.025,.006,.12,.0025);
+  ellipsoid(eyeArt,M.glint,.009,-.31,.024,.0025,.045,.0018);
   // The upper lid sits on the face; the sclera is exposed mainly at the side.
   seam(headArt,M.hair,[[side*.125-.041,.035,.278],[side*.125-.030,.065,.280],[side*.125,.073,.280],[side*.125+.030,.063,.275],[side*.125+.041,.035,.269]],.0031,18);
   seam(headArt,M.hair,[[side*.090,.105,.267],[side*.122,.113,.262],[side*.153,.109,.252]],.0040,12);
@@ -226,8 +226,8 @@ export function createFarmer(scene){
  const arms=[],legs=[],knees=[],feet=[];
  for(const side of [-1,1]){
   const arm=new T.Group();arm.position.set(side*.287,.914,0);body.add(arm);arms.push(arm);const armArt=new T.Group();arm.add(armArt);
-  const sleeve=ellipsoid(armArt,M.shirt,side*.008,-.067,-.008,.101,.116,.100);sleeve.rotation.z=side*.12;
-  const cuff=ellipsoid(armArt,M.shirtLight,side*.012,-.152,.005,.093,.020,.096);cuff.rotation.z=side*.055;
+  const sleeve=ellipsoid(armArt,M.shirt,side*.008,-.075,-.008,.087,.102,.086);sleeve.rotation.z=side*.12;
+  const cuff=ellipsoid(armArt,M.shirtLight,side*.012,-.154,.005,.082,.016,.085);cuff.rotation.z=side*.055;
   // A visible short forearm, then a padded cream work glove with a rolled cuff.
   ellipsoid(armArt,M.skin,0,-.201,.014,.067,.083,.070);
   ellipsoid(armArt,M.gloveShade,0,-.272,.015,.075,.018,.079);
