@@ -1,12 +1,13 @@
 const STORAGE_KEY='harvestao-camera-zoom';
 export function mountZoomControls(canvas,world,isPaused){
- const out=document.getElementById('zoomOut'),reset=document.getElementById('zoomReset'),into=document.getElementById('zoomIn');
+ const out=document.getElementById('zoomOut'),reset=document.getElementById('zoomReset'),into=document.getElementById('zoomIn'),slider=document.getElementById('zoomSlider');
  let saveTimer;
  function apply(value,persist=true){
   const target=world.setZoom(value),{min,max}=world.zoom;
-  reset.textContent=Math.round(target*100)+'%';out.disabled=target<=min+.001;into.disabled=target>=max-.001;
+  reset.textContent=Math.round(target*100)+'%';if(slider){slider.min=Math.round(min*100);slider.max=Math.round(max*100);slider.value=Math.round(target*100);slider.setAttribute('aria-valuetext',Math.round(target*100)+'%');}out.disabled=target<=min+.001;into.disabled=target>=max-.001;
   if(persist){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(STORAGE_KEY,String(world.zoom.target))}catch{}},150)}
  }
+ slider?.addEventListener('input',()=>{if(!isPaused())apply(Number(slider.value)/100)});
  try{const stored=Number.parseFloat(localStorage.getItem(STORAGE_KEY));if(Number.isFinite(stored))apply(stored,false)}catch{}
  apply(world.zoom.target,false);
  out.addEventListener('click',()=>apply(world.zoom.target/1.2));into.addEventListener('click',()=>apply(world.zoom.target*1.2));reset.addEventListener('click',()=>apply(1));
