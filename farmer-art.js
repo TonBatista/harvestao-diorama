@@ -86,9 +86,9 @@ function bakePart(root){
 
 export function createFarmer(scene){
  const M={
-  skin:material('#edc9a3','skin'),ear:material('#dba789','skin'),nose:material('#e8bd96','skin'),blush:material('#d99f83','skin'),
+  skin:material('#f1c9a0','skin'),ear:material('#dba789','skin'),nose:material('#e8bd96','skin'),blush:material('#d99f83','skin'),
   hair:material('#4d3322'),hairLight:material('#6c492d'),hairFine:material('#8d6740'),
-  cap:material('#6e846e','fabric'),capShade:material('#576b57','fabric'),capSeam:material('#829780','fabric'),
+  cap:material('#788b73','fabric'),capShade:material('#5d735b','fabric'),capSeam:material('#899b80','fabric'),
   shirt:material('#eee7d3','fabric'),shirtShade:material('#d5cbb1','fabric'),shirtLight:material('#f4eedc','fabric'),
   glove:material('#f2eddf','fabric'),gloveShade:material('#d4ccba','fabric'),
   overall:material('#7c8b76','fabric'),overallDark:material('#616f5d','fabric'),overallLight:material('#8c9a83','fabric'),
@@ -97,23 +97,20 @@ export function createFarmer(scene){
   boot:material('#64442f'),bootDark:material('#503a2b'),bootLight:material('#806044'),sole:material('#494236'),lace:material('#c1ae85','fabric'),
   brass:material('#b4a073','metal'),metalDark:material('#8b8065','metal'),
   pack:material('#ad7e5e','fabric'),packFade:material('#bb9170','fabric'),packShade:material('#8f6d53','fabric'),packEdge:material('#b09878','fabric'),patch:material('#c3b08b','fabric'),
-  eye:material('#282b25'),iris:material('#5a4a36'),eyeWhite:material('#f4edda'),glint:material('#fffbea'),mouth:material('#966953','skin')
+  eye:material('#202c30'),iris:material('#4b5144'),eyeWhite:material('#fff8e9'),glint:material('#fffbea'),mouth:material('#966953','skin')
  };
  // Tiny stitching and facial details remain visible without their own shadow draws.
  for(const key of ['thread','clothThread','brass','metalDark','packEdge','capSeam','lace','eyeWhite','eye','iris','glint','mouth','hairFine','blush','scarfLight','overallLight'])M[key].userData.castShadow=false;
  const packMap=wornCanvas();for(const key of ['pack','packFade','packShade']){M[key].map=M[key].bumpMap=packMap;M[key].bumpScale=.002}
  const leatherMap=nubuck();for(const key of ['boot','bootDark','bootLight']){M[key].map=M[key].bumpMap=leatherMap;M[key].bumpScale=.002}
- M.glint.roughness=.24;M.eye.roughness=.29;M.iris.roughness=.31;M.hair.roughness=M.hairLight.roughness=.48;
- const farmer=new T.Group(),body=new T.Group(),torso=new T.Group();farmer.name='farmer';farmer.scale.setScalar(.82);farmer.add(body);body.add(torso);torso.scale.set(.94,.83,.96);torso.position.y=.08;scene.add(farmer);
+ M.glint.roughness=.16;M.eye.roughness=.19;M.iris.roughness=.25;M.hair.roughness=M.hairLight.roughness=.43;M.skin.roughness=.64;
+ const farmer=new T.Group(),body=new T.Group(),torso=new T.Group();farmer.name='farmer';farmer.scale.setScalar(.82);farmer.add(body);body.add(torso);torso.scale.set(.97,.91,.96);torso.position.y=.015;scene.add(farmer);
  // Short, softly gathered overalls follow the compact miniature silhouette.
- const torsoGeometry=new T.LatheGeometry([new T.Vector2(.20,.57),new T.Vector2(.25,.62),new T.Vector2(.258,.73),new T.Vector2(.25,.92),new T.Vector2(.237,1.045),new T.Vector2(.18,1.10),new T.Vector2(.12,1.115)],36);
+ const torsoGeometry=new T.LatheGeometry([new T.Vector2(.20,.67),new T.Vector2(.25,.70),new T.Vector2(.258,.73),new T.Vector2(.25,.92),new T.Vector2(.237,1.045),new T.Vector2(.18,1.10),new T.Vector2(.12,1.115)],36);
  const shirt=add(torso,torsoGeometry,M.shirt);shirt.scale.z=.77;
  ellipsoid(torso,M.skin,0,1.13,0,.12,.13,.12);
- const waistGeometry=new T.LatheGeometry([new T.Vector2(0,.52),new T.Vector2(.19,.53),new T.Vector2(.243,.59),new T.Vector2(.261,.71),new T.Vector2(.269,.82),new T.Vector2(.261,.845),new T.Vector2(0,.845)],32);const waist=add(torso,waistGeometry,M.overall);waist.scale.z=.79;
- // Curved bib, a real sewn pocket, and straps that wrap over both shoulders.
- softBox(torso,M.overall,0,.846,.193,.339,.329,.050,.025);
- softBox(torso,M.overallDark,0,.802,.231,.142,.103,.012,.005);
- softBox(torso,M.overall,0,.806,.238,.130,.092,.008,.003);
+ clothPanel(torso,M.overall,0,.810,.216,.126,.091,.008,.022);
+ seam(torso,M.overallLight,[[-.056,.847,.224],[-.055,.784,.227],[0,.775,.227],[.055,.784,.227],[.056,.847,.224]],.0019,20);
  for(const side of [-1,1]){
   const x=side*.151;
   ribbon(torso,M.overallDark,[[x,.86,.212],[x,.99,.188],[x,1.091,.094],[x,1.093,-.055],[x,.99,-.166],[x,.78,-.19]],.058,.005);
@@ -169,51 +166,54 @@ export function createFarmer(scene){
  seam(tail,M.scarfLight,[[-.021,-.025,.017],[-.033,-.095,.04],[-.060,-.157,.032]],.0024);
  // The head is deliberately sculpted around the reference: a huge rounded
  // backwards cap, an open adjustment arch, and just two sweeping chestnut locks.
- const head=new T.Group();head.position.y=1.30;head.scale.setScalar(1.16);body.add(head);const headArt=new T.Group();head.add(headArt);
+ const head=new T.Group();head.position.y=1.30;head.scale.setScalar(1.11);body.add(head);const headArt=new T.Group();head.add(headArt);
  const faceGeo=new T.SphereGeometry(1,32,24),fp=faceGeo.attributes.position;
- for(let i=0;i<fp.count;i++){const x=fp.getX(i),y=fp.getY(i),z=fp.getZ(i),cheek=1+.065*Math.exp(-Math.pow((y+.25)*3,2));fp.setXYZ(i,x*.346*cheek,Math.sign(y)*Math.pow(Math.abs(y),.91)*.312-.016,z*(z>0?.288:.279))}faceGeo.computeVertexNormals();const faceMaterial=M.skin.clone();faceMaterial.map=complexion();add(headArt,faceGeo,faceMaterial);
+ for(let i=0;i<fp.count;i++){const x=fp.getX(i),y=fp.getY(i),z=fp.getZ(i),cheek=1+.030*Math.exp(-Math.pow((y+.12)*3,2)),jaw=1-.10*T.MathUtils.smoothstep(-y,.15,.95);fp.setXYZ(i,x*.333*cheek*jaw,Math.sign(y)*Math.pow(Math.abs(y),.90)*.300-.016,z*(z>0?.286:.273))}faceGeo.computeVertexNormals();const faceMaterial=M.skin.clone();faceMaterial.map=complexion();add(headArt,faceGeo,faceMaterial);
  for(const side of [-1,1]){
-  const ear=ellipsoid(headArt,M.skin,side*.349,-.015,-.004,.069,.085,.055);ear.rotation.z=side*-.16;
-  ellipsoid(headArt,M.ear,side*.381,-.016,.033,.021,.040,.014);
+  const ear=ellipsoid(headArt,M.skin,side*.330,-.015,-.004,.063,.078,.055);ear.rotation.z=side*-.16;
+  ellipsoid(headArt,M.ear,side*.359,-.016,.033,.018,.036,.014);
  }
- ellipsoid(headArt,M.nose,0,-.078,.283,.025,.024,.023);
- ellipsoid(headArt,M.skin,-.006,-.072,.298,.014,.012,.010);
- seam(headArt,M.mouth,[[-.038,-.164,.264],[-.018,-.176,.267],[.015,-.176,.267],[.037,-.162,.264]],.0045,16);
+ ellipsoid(headArt,M.nose,0,-.067,.284,.022,.021,.020);
+ ellipsoid(headArt,M.skin,-.005,-.061,.297,.011,.009,.007);
+ seam(headArt,M.mouth,[[-.033,-.153,.262],[-.015,-.163,.266],[.014,-.163,.266],[.033,-.152,.262]],.0033,16);
  // Every eye layer remains under its original blink pivot (.083 vertically).
  const eyes=[];
  for(const side of [-1,1]){
-  const e=new T.Group();e.position.set(side*.133,-.024,.277);e.scale.y=.083;head.add(e);eyes.push(e);
-  const eyeArt=new T.Group();eyeArt.position.set(-side*.004,.009/.083,-.005);e.add(eyeArt);
-  ellipsoid(eyeArt,M.eyeWhite,0,0,0,.040,1.06,.009);
-  ellipsoid(eyeArt,M.iris,-side*.003,-.035,.008,.035,.99,.009);
-  ellipsoid(eyeArt,M.eye,-side*.004,-.030,.014,.029,.90,.007);
-  ellipsoid(eyeArt,M.glint,-.009,.37,.022,.008,.16,.004);
-  ellipsoid(eyeArt,M.glint,.008,-.41,.022,.0035,.055,.002);
-  seam(headArt,M.hair,[[side*.098,.096,.265],[side*.130,.102,.259],[side*.160,.096,.249]],.0044,12);
+  const e=new T.Group();e.position.set(side*.125,-.013,.271);e.scale.y=.083;head.add(e);eyes.push(e);
+  const eyeArt=new T.Group();eyeArt.position.set(0,.005/.083,0);eyeArt.rotation.y=side*.12;e.add(eyeArt);
+  ellipsoid(eyeArt,M.eyeWhite,0,0,0,.046,.91,.014);
+  ellipsoid(eyeArt,M.iris,-side*.006,.035,.012,.041,.96,.012);
+  ellipsoid(eyeArt,M.eye,-side*.008,.10,.022,.025,.73,.008);
+  ellipsoid(eyeArt,M.glint,-.010,.38,.033,.0075,.15,.0035);
+  ellipsoid(eyeArt,M.glint,.010,-.36,.032,.003,.05,.002);
+  // The upper lid sits on the face; the sclera is exposed mainly at the side.
+  seam(headArt,M.hair,[[side*.125-.041,.035,.278],[side*.125-.030,.065,.280],[side*.125,.073,.280],[side*.125+.030,.063,.275],[side*.125+.041,.035,.269]],.0031,18);
+  seam(headArt,M.hair,[[side*.090,.105,.267],[side*.122,.113,.262],[side*.153,.109,.252]],.0040,12);
  }
  const hairGeo=new T.SphereGeometry(1,32,20,0,Math.PI*2,0,Math.PI*.77);
- add(headArt,hairGeo,M.hair,0,.136,-.037,.352,.230,.292);
+ add(headArt,hairGeo,M.hair,0,.136,-.047,.341,.215,.281);
  for(const side of [-1,1]){
   add(headArt,lockGeometry([[side*.301,.186,.088],[side*.324,.070,.086],[side*.305,-.014,.061]],.046,.028),M.hair);
   add(headArt,lockGeometry([[side*.269,.147,-.157],[side*.302,.038,-.184],[side*.245,-.053,-.205]],.049,.023),M.hair);
  }
- // Short rounded curls emerge naturally from the opening of the cap.
- add(headArt,lockGeometry([[.040,.200,.245],[-.110,.245,.310],[-.275,.207,.339],[-.390,.092,.305]],.105,.092),M.hairLight);
- add(headArt,lockGeometry([[-.111,.145,.293],[-.218,.105,.353],[-.255,.010,.350],[-.235,-.080,.299]],.086,.080),M.hairLight);
- add(headArt,lockGeometry([[-.031,.180,.240],[-.098,.238,.311],[-.198,.258,.329],[-.265,.210,.305]],.066,.061),M.hairLight);
+ // The dark hair backing is visible through the cap opening.
+ ellipsoid(headArt,M.hair,0,.205,.292,.121,.074,.018);
+ // Two pointed forelocks sweep out beside the adjustment window.
+ add(headArt,lockGeometry([[-.124,.143,.260],[-.228,.218,.316],[-.354,.191,.332],[-.447,.075,.296]],.055,.041),M.hairLight);
+ add(headArt,lockGeometry([[-.164,.123,.277],[-.262,.106,.337],[-.300,.002,.339],[-.268,-.080,.303]],.047,.035),M.hairLight);
  // Parametric crown: the opening at the front is actual missing cloth. Its
  // little bridge and snap holes sit over the dark hair, as on a backward cap.
  const capPos=[],capUv=[],capIndex=[],around=48,rows=24;
- function capHem(a){const x=Math.sin(a)*.428;return .166+(Math.cos(a)>0?.108*Math.exp(-Math.pow(x/.112,4)):0)}
+ function capHem(a){const x=Math.sin(a)*.413;return .154+(Math.cos(a)>0?.100*Math.exp(-Math.pow(x/.108,4)):0)}
  for(let j=0;j<=rows;j++)for(let i=0;i<=around;i++){
-  const a=i/around*Math.PI*2,t=j/rows*Math.acos((capHem(a)-.239)/.425);capPos.push(Math.sin(a)*Math.sin(t)*.428,.239+Math.cos(t)*.425,-.042+Math.cos(a)*Math.sin(t)*.365);capUv.push(i/around,j/rows);
+  const a=i/around*Math.PI*2,t=j/rows*Math.acos((capHem(a)-.193)/.352);capPos.push(Math.sin(a)*Math.sin(t)*.413,.193+Math.cos(t)*.352,-.036+Math.cos(a)*Math.sin(t)*.359);capUv.push(i/around,j/rows);
  }
  for(let j=0;j<rows;j++)for(let i=0;i<around;i++){const a=j*(around+1)+i,b=a+around+1;capIndex.push(a,b,a+1,b,b+1,a+1)}
  const capGeo=new T.BufferGeometry();capGeo.setAttribute('position',new T.Float32BufferAttribute(capPos,3));capGeo.setAttribute('uv',new T.Float32BufferAttribute(capUv,2));capGeo.setIndex(capIndex);capGeo.computeVertexNormals();add(headArt,capGeo,M.cap);
- const band=[];for(let i=0;i<=64;i++){const a=i/64*Math.PI*2,t=Math.acos((capHem(a)-.239)/.425);band.push([Math.sin(a)*Math.sin(t)*.428,capHem(a),-.042+Math.cos(a)*Math.sin(t)*.365])}seam(headArt,M.capShade,band,.0085,72);
- for(let i=0;i<6;i++){const a=i/6*Math.PI*2,points=[],end=Math.acos((capHem(a)-.239)/.425);for(let j=0;j<=12;j++){const t=j/12*end;points.push([Math.sin(a)*Math.sin(t)*.429,.239+Math.cos(t)*.426,-.042+Math.cos(a)*Math.sin(t)*.366])}seam(headArt,M.capSeam,points,.0016,30)}
- ellipsoid(headArt,M.capShade,0,.663,-.042,.024,.013,.024);
- ellipsoid(headArt,M.cap,0,.670,-.042,.018,.008,.018);
+ const band=[];for(let i=0;i<=64;i++){const a=i/64*Math.PI*2,t=Math.acos((capHem(a)-.193)/.352);band.push([Math.sin(a)*Math.sin(t)*.413,capHem(a),-.036+Math.cos(a)*Math.sin(t)*.359])}seam(headArt,M.capShade,band,.0065,72);
+ for(let i=0;i<6;i++){const a=i/6*Math.PI*2,points=[],end=Math.acos((capHem(a)-.193)/.352);for(let j=0;j<=12;j++){const t=j/12*end;points.push([Math.sin(a)*Math.sin(t)*.414,.193+Math.cos(t)*.353,-.036+Math.cos(a)*Math.sin(t)*.360])}seam(headArt,M.capSeam,points,.0013,30)}
+ ellipsoid(headArt,M.capShade,0,.546,-.036,.022,.011,.022);
+ ellipsoid(headArt,M.cap,0,.552,-.036,.016,.007,.016);
  const brimPositions=[],brimUv=[],brimIndex=[],nx=32,ny=6;
  for(let j=0;j<=ny;j++)for(let i=0;i<=nx;i++){const a=(i/nx-.5)*Math.PI*.94,u=j/ny,r=.182+u*.17,x=Math.sin(a)*r,z=-.241-Math.cos(a)*r*.85,y=.171-u*.024+Math.sin(a)**2*.014;brimPositions.push(x,y,z);brimUv.push(i/nx,u)}
  for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const a=j*(nx+1)+i,b=a+nx+1;brimIndex.push(a,b,a+1,b,b+1,a+1)}
@@ -226,14 +226,14 @@ export function createFarmer(scene){
  const arms=[],legs=[],knees=[],feet=[];
  for(const side of [-1,1]){
   const arm=new T.Group();arm.position.set(side*.287,.914,0);body.add(arm);arms.push(arm);const armArt=new T.Group();arm.add(armArt);
-  const sleeve=ellipsoid(armArt,M.shirt,side*.008,-.067,-.008,.105,.111,.105);sleeve.rotation.z=side*.12;
-  const cuff=ellipsoid(armArt,M.shirtLight,side*.012,-.141,.005,.099,.023,.101);cuff.rotation.z=side*.055;
+  const sleeve=ellipsoid(armArt,M.shirt,side*.008,-.067,-.008,.101,.116,.100);sleeve.rotation.z=side*.12;
+  const cuff=ellipsoid(armArt,M.shirtLight,side*.012,-.152,.005,.093,.020,.096);cuff.rotation.z=side*.055;
   // A visible short forearm, then a padded cream work glove with a rolled cuff.
   ellipsoid(armArt,M.skin,0,-.201,.014,.067,.083,.070);
-  ellipsoid(armArt,M.gloveShade,0,-.263,.015,.082,.022,.084);
-  ellipsoid(armArt,M.glove,0,-.266,.018,.084,.020,.086);
-  ellipsoid(armArt,M.glove,0,-.328,.023,.091,.082,.090);
-  const thumb=ellipsoid(armArt,M.glove,-side*.075,-.317,.066,.035,.048,.035);thumb.rotation.z=side*.3;
+  ellipsoid(armArt,M.gloveShade,0,-.272,.015,.075,.018,.079);
+  ellipsoid(armArt,M.glove,0,-.275,.018,.077,.018,.081);
+  ellipsoid(armArt,M.glove,0,-.326,.023,.078,.075,.082);
+  const thumb=ellipsoid(armArt,M.glove,-side*.063,-.317,.060,.031,.043,.031);thumb.rotation.z=side*.3;
   bakePart(armArt);
   const leg=new T.Bone();leg.position.set(side*.155,.49,0);body.add(leg);legs.push(leg);const thighArt=new T.Group();leg.add(thighArt);
   const knee=new T.Bone();knee.position.y=-.22;leg.add(knee);knees.push(knee);const shinArt=new T.Group();knee.add(shinArt);
@@ -245,13 +245,36 @@ export function createFarmer(scene){
   ellipsoid(foot,M.boot,0,.073,-.012,.105,.094,.108);
   seam(foot,M.bootLight,[[-.102,-.025,.17],[0,-.032,.236],[.102,-.025,.17]],.0021,20);
   for(let j=0;j<2;j++){const z=.041+j*.038,y=.125-j*.012;seam(foot,M.bootDark,[[-.038,y,z],[0,y+.005,z+.018],[.038,y,z+.024]],.0032,8)}
-  // One continuous cloth mesh bends across both original leg joints.
-  const trousers=new T.LatheGeometry([new T.Vector2(0,.135),new T.Vector2(.103,.135),new T.Vector2(.106,.20),new T.Vector2(.112,.29),new T.Vector2(.120,.415),new T.Vector2(.111,.53),new T.Vector2(0,.544)],28),tp=trousers.attributes.position,skinIndices=[],skinWeights=[];
-  for(let j=0;j<tp.count;j++){tp.setX(j,tp.getX(j)+side*.155);tp.setZ(j,tp.getZ(j)*1.04);const low=T.MathUtils.smoothstep(.365-tp.getY(j),0,.18);skinIndices.push(0,1,0,0);skinWeights.push(1-low,low,0,0)}
-  trousers.setAttribute('skinIndex',new T.Uint16BufferAttribute(skinIndices,4));trousers.setAttribute('skinWeight',new T.Float32BufferAttribute(skinWeights,4));trousers.computeVertexNormals();
-  const trouserMesh=new T.SkinnedMesh(trousers,M.overall);trouserMesh.name='continuous-trouser-'+side;trouserMesh.castShadow=trouserMesh.receiveShadow=true;body.add(trouserMesh);body.updateWorldMatrix(true,true);trouserMesh.bind(new T.Skeleton([leg,knee]));
   bakePart(foot);
  }
+ // Sew the bib, seat and both trouser legs into the same deforming garment.
+ // The lower waist ring and both leg openings share positions and normals.
+ const garmentPositions=[],garmentUv=[],garmentIndices=[],garmentSkin=[],garmentWeights=[];
+ const garmentSides=48,garmentRows=24,legRows=24;
+ const baseLocalY=(.56-.015)/.91,baseRadius=.249+.020*Math.sin(Math.PI*((baseLocalY-.55)/.45)),waistRx=baseRadius*.97,waistRz=baseRadius*.79*.96;
+ function vertex(x,y,z,u,v,indices=[0,0,0,0],weights=[1,0,0,0]){garmentPositions.push(x,y,z);garmentUv.push(u,v);garmentSkin.push(...indices);garmentWeights.push(...weights)}
+ function rings(start,rows){for(let j=0;j<rows;j++)for(let i=0;i<garmentSides;i++){const k=start+j*(garmentSides+1)+i;garmentIndices.push(k,k+1,k+garmentSides+2,k,k+garmentSides+2,k+garmentSides+1)}}
+ for(let j=0;j<=garmentRows;j++)for(let i=0;i<=garmentSides;i++){
+  const a=i/garmentSides*Math.PI*2,u=j/garmentRows,top=.843+.158*T.MathUtils.smoothstep(Math.cos(a),.67,.83),y=baseLocalY+u*(top-baseLocalY),radius=.249+.020*Math.sin(Math.PI*T.MathUtils.clamp((y-.55)/.45,0,1));
+  vertex(Math.sin(a)*radius*.97,y*.91+.015,Math.cos(a)*radius*.79*.96,i/garmentSides,u*.6+.4);
+ }
+ rings(0,garmentRows);
+ for(let sideIndex=0;sideIndex<2;sideIndex++){
+  const side=sideIndex===0?-1:1,start=garmentPositions.length/3,hipIndex=sideIndex===0?1:3,kneeIndex=hipIndex+1;
+  for(let j=0;j<=legRows;j++)for(let i=0;i<=garmentSides;i++){
+   const a=i/garmentSides*Math.PI*2,u=j/legRows,sn=Math.sin(a),cs=Math.cos(a),y=.135+u*(.56-.135),r=.104+.014*Math.sin(Math.PI*u),loft=T.MathUtils.smoothstep(u,.58,1),inner=sn*side<0;
+   const targetX=inner?0:sn*waistRx,targetY=inner?.475+.085*Math.abs(cs):.56,targetZ=cs*waistRz;
+   const x=T.MathUtils.lerp(side*.155+sn*r,targetX,loft),yy=T.MathUtils.lerp(y,targetY,loft),z=T.MathUtils.lerp(cs*r*1.05+.012*T.MathUtils.smoothstep(u,.3,.8),targetZ,loft);
+   const fixed=T.MathUtils.smoothstep(u,.58,1),kneeWeight=T.MathUtils.smoothstep(.365-y,0,.18),hipWeight=(1-fixed)*(1-kneeWeight),shinWeight=(1-fixed)*kneeWeight;
+   vertex(x,yy,z,i/garmentSides,u*.4,[0,hipIndex,kneeIndex,0],[fixed,hipWeight,shinWeight,0]);
+  }
+  rings(start,legRows);
+ }
+ const garmentGeo=new T.BufferGeometry();garmentGeo.setAttribute('position',new T.Float32BufferAttribute(garmentPositions,3));garmentGeo.setAttribute('uv',new T.Float32BufferAttribute(garmentUv,2));garmentGeo.setAttribute('skinIndex',new T.Uint16BufferAttribute(garmentSkin,4));garmentGeo.setAttribute('skinWeight',new T.Float32BufferAttribute(garmentWeights,4));garmentGeo.setIndex(garmentIndices);garmentGeo.computeVertexNormals();
+ const normalGroups=new Map(),normals=garmentGeo.attributes.normal;
+ for(let j=0;j<garmentPositions.length/3;j++){const key=garmentPositions.slice(j*3,j*3+3).map(v=>Math.round(v*1e5)).join('/');if(!normalGroups.has(key))normalGroups.set(key,[]);normalGroups.get(key).push(j)}
+ for(const points of normalGroups.values()){if(points.length<2)continue;const normal=new T.Vector3();for(const j of points)normal.add(new T.Vector3().fromBufferAttribute(normals,j));normal.normalize();for(const j of points)normals.setXYZ(j,normal.x,normal.y,normal.z)}
+ const pelvis=new T.Bone();body.add(pelvis);const garment=new T.SkinnedMesh(garmentGeo,M.overall);garment.name='continuous-overalls-and-trousers';garment.castShadow=garment.receiveShadow=true;body.add(garment);body.updateWorldMatrix(true,true);garment.bind(new T.Skeleton([pelvis,legs[0],knees[0],legs[1],knees[1]]));
  bakePart(torso);bakePart(headArt);bakePart(scarf);bakePart(tail);
  return {farmer,body,head,eyes,scarf,tail,arms,legs,knees,feet};
 }

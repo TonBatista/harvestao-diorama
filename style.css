@@ -16,3 +16,12 @@
 
 /* The lens already provides the vignette; keep the scene colors clear. */
 #shade{box-shadow:none;background:linear-gradient(#394b2910,transparent 25%,transparent 80%,#493f3010)}
+
+/* Camera controls stay alongside the bag, away from the movement controls. */
+.top-actions{display:grid;grid-template-columns:35px 35px;align-items:start}
+.zoom-controls{grid-column:1/-1;display:flex;width:max-content;align-items:center;margin-top:4px;padding:2px;background:#f5edd9eb;border:1px solid #e9ddbd;border-radius:11px;box-shadow:0 3px 12px #25352520}
+.top-actions .zoom-controls button{width:35px;height:35px;border:0;box-shadow:none;background:transparent;font-size:22px;border-radius:8px}
+.top-actions .zoom-controls #zoomReset{width:52px;font-size:10px;font-variant-numeric:tabular-nums}
+.top-actions .zoom-controls button:disabled{opacity:.32;cursor:default}
+.top-actions .zoom-controls button:active:not(:disabled){background:#cad2b677}
+@media(pointer:coarse){.top-actions .zoom-controls button{width:40px;height:40px}}

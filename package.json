@@ -1,10 +1,10 @@
 {
   "name": "harvestao",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test simulation.test.js",
-    "check": "node --check game.js && node --check world.js && node --check art-direction.js && node --check farmer-art.js && node --check crop-art.js && node --check miniature-materials.js && node --check terrain-materials.js && node --check simulation.js && node --check controls.js"
+    "check": "node --check game.js && node --check world.js && node --check art-direction.js && node --check farmer-art.js && node --check crop-art.js && node --check miniature-materials.js && node --check terrain-materials.js && node --check simulation.js && node --check controls.js && node --check camera-controls.js"
   }
 }
