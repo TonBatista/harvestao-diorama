@@ -1,7 +1,7 @@
 import * as T from './three.module.js';
 import {artisanMaterial,cottage} from './art-direction.js';
 const shared=g=>{g.userData.shared=true;return g},G={box:shared(new T.BoxGeometry(1,1,1)),ball:shared(new T.SphereGeometry(1,16,12)),cylinder:shared(new T.CylinderGeometry(1,1,1,14)),rock:shared(new T.IcosahedronGeometry(1,2))},materials=new Map();
-function material(color,kind='plain'){if(typeof color!=='string')return color;const key=kind+color;if(!materials.has(key))materials.set(key,kind==='plain'?new T.MeshStandardMaterial({color,roughness:.85}):artisanMaterial(color,kind));return materials.get(key)}
+function material(color,kind='plain'){if(color?.isMaterial)return color;const key=kind+color;if(!materials.has(key))materials.set(key,kind==='plain'?new T.MeshStandardMaterial({color,roughness:.85}):artisanMaterial(color,kind));return materials.get(key)}
 export function createKit(){
  const root=new T.Group(),fixed=new T.Group(),dynamic=new T.Group(),colliders=[],portals=[],interactions=[],updates=[];root.add(fixed,dynamic);
  function mesh(p,g,c,x=0,y=0,z=0,sx=1,sy=sx,sz=sx,kind='plain'){const o=new T.Mesh(g,material(c,kind));o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=Math.max(sx,sy,sz)>.13&&!o.material.transparent;o.receiveShadow=true;(p||fixed).add(o);return o}
