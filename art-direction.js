@@ -9,8 +9,15 @@ function surfaceTexture(kind){
  for(let i=0;i<6000;i++){q.fillStyle=i%2?'#ffffff14':'#30261916';q.fillRect(random(i)*256,random(i+8000)*256,1+random(i+40)*2,1)}
  if(kind==='wood')for(let i=0;i<100;i++){q.strokeStyle=i%3?'#604b2920':'#fff5db28';q.lineWidth=.4+random(i+10);q.beginPath();for(let y=0;y<=256;y+=8){const x=i*2.6+Math.sin(y*.025+i)*1.4+Math.sin(y*.07+i)*.5;y?q.lineTo(x,y):q.moveTo(x,y)}q.stroke()}
  if(kind==='leaf')for(let i=0;i<800;i++){q.fillStyle=i%3?'#78915c2e':'#ffffff30';q.beginPath();q.ellipse(random(i)*256,random(i+20)*256,2+random(i+42)*4,1+random(i+56)*3,random(i+30)*6,0,Math.PI*2);q.fill()}
+ if(kind==='cottageStone'){
+ q.fillStyle='#8d8a7b';q.fillRect(0,0,256,256);const shades=['#c4c1af','#bbb8a5','#d0cbb7','#b2b09f','#c9c6b5'];
+ for(let row=0;row<6;row++)for(let col=-1;col<5;col++){const n=row*7+col+101,x=col*64+(row%2)*32,y=row*256/6,h=256/6;q.fillStyle=shades[Math.floor(random(n)*shades.length)];q.beginPath();q.roundRect(x+2.1,y+2.1,59.8,h-4.2,4+random(n+8)*3);q.fill();q.strokeStyle='#f3ecd333';q.lineWidth=1.4;q.beginPath();q.moveTo(x+7,y+4);q.lineTo(x+56,y+4);q.stroke();q.strokeStyle='#4e4b3b2b';q.beginPath();q.moveTo(x+60,y+8);q.lineTo(x+60,y+h-5);q.lineTo(x+7,y+h-5);q.stroke()}
+ for(let i=0;i<5000;i++){q.fillStyle=i%3?'#ffffff13':'#4c4b3a12';q.fillRect(random(i+200)*256,random(i+7200)*256,1+random(i+55)*2,1)}
+ }
  const map=new T.CanvasTexture(c);map.colorSpace=T.SRGBColorSpace;map.wrapS=map.wrapT=T.RepeatWrapping;textures.set(kind,map);return map;
 }
+const archedDoorShape=new T.Shape();archedDoorShape.moveTo(-.41,0);archedDoorShape.lineTo(.41,0);archedDoorShape.lineTo(.41,1.19);archedDoorShape.absarc(0,1.19,.41,0,Math.PI,false);archedDoorShape.lineTo(-.41,0);
+const archedDoorGeometry=new T.ExtrudeGeometry(archedDoorShape,{depth:.06,bevelEnabled:true,bevelSegments:1,steps:1,bevelSize:.014,bevelThickness:.012});archedDoorGeometry.userData.shared=true;
 export function artisanMaterial(color,kind='stone'){
  const key=kind+color;if(!materials.has(key)){
   const photograph=miniatureTexture(kind==='siding'?'wood':kind);let map=photograph||surfaceTexture(kind==='siding'?'wood':kind);const tint=new T.Color(color);
@@ -35,24 +42,24 @@ function round(p,color,x,y,z,sx,sy,sz,kind='stone'){return add(p,sphere,artisanM
 export function cottage(x,z,w,d,color,roof){
  const g=new T.Group();g.position.set(x,0,z);
  const wallBase=new T.Color(color).lerp(new T.Color('#dfdfd0'),.72),wallPalette=[-.035,0,.035].map(v=>'#'+wallBase.clone().offsetHSL(-.012,-.06,v).getHexString());
- const frame='#8e856d',door='#baa88a';
- block(g,'#b4b09d',0,.16,0,w+.2,.32,d+.2,'stone');
+ const frame='#8a6b46',door='#b89561',houseSeed=x*3.17+z*1.83;
+ block(g,'#a7a18b',0,.16,0,w+.2,.32,d+.2,'stone');
  for(const side of [-1,1])for(let i=0;i<Math.ceil(d/.55);i++){const stone=block(g,i%2?'#c8c3b0':'#aaa998',side*(w/2+.04),.17,-d/2+(i+.5)*d/Math.ceil(d/.55),.15,.24,d/Math.ceil(d/.55)-.03,'stone');stone.rotation.z=(random(i+13)-.5)*.025}
- block(g,wallPalette[1],0,1.37,0,w,2.36,d);
- for(let i=0;i<10;i++){
-  const y=.3+i*.23,plank=wallPalette[i%3];block(g,plank,0,y,d/2+.035,w,.215,.07,'siding');
-  for(const side of [-1,1])block(g,wallPalette[(i+(side>0?1:0))%3],side*(w/2+.035),y,0,.07,.215,d,'siding');
- }
- for(const sx of [-1,1])for(const sz of [-1,1])block(g,frame,sx*(w/2-.035),1.37,sz*(d/2+.04),.16,2.38,.17);
+ block(g,wallPalette[1],0,1.37,0,w,2.36,d,'cottageStone');
+ for(const sx of [-1,1])for(const sz of [-1,1])block(g,frame,sx*(w/2-.035),1.37,sz*(d/2+.04),.18,2.4,.19);
+ block(g,'#92724d',0,.39,d/2+.035,w,.12,.11);block(g,frame,0,2.49,d/2+.055,w+.12,.16,.16);
+ for(const side of [-1,1]){block(g,frame,side*(w/2+.035),2.49,0,.14,.16,d);block(g,'#92724d',side*(w/2+.035),.39,0,.11,.12,d)}
  // Roof slabs follow the same pitch as the overlapping shingles.
  const half=w/2+.34,rise=1.14,angle=Math.atan2(rise,half),length=Math.hypot(half,rise),depth=d+.68;
  for(const side of [-1,1]){
   const slab=block(g,'#6e503a',side*half/2,3.12,0,length,.13,depth);slab.rotation.z=-side*angle;
   const rows=6,cols=Math.ceil(depth/.43),roofBase=new T.Color(roof).lerp(new T.Color('#b6aa98'),.36);
   const roofPalette=Array.from({length:6},(_,i)=>artisanMaterial('#'+roofBase.clone().offsetHSL((i%3-1)*.012,-.09,(i-2.5)*.022).getHexString(),'clay'));
+  const mossPalette=['#829363','#9ca66b'].map(c=>artisanMaterial(c,'moss'));
   for(let row=0;row<rows;row++)for(let col=0;col<cols;col++){
    const n=row*31+col+side*173,u=(row+.5)/rows,xx=side*half*u,zz=-depth/2+(col+.5)*depth/cols+(random(n+20)-.5)*.025;
-   const tile=add(g,roofTile,roofPalette[Math.floor(random(n)*roofPalette.length)],xx,3.69-rise*u+.06+(random(n+10)-.5)*.032,zz,length/rows*1.16,.075,depth/cols-.012);tile.rotation.z=-side*(angle+.045)+(random(n+9)-.5)*.02;tile.rotation.x=(random(n+14)-.5)*.025;
+   const moss=Math.sin(col*.76+row*.53+houseSeed)*.42+Math.cos(col*.39-row*.61+houseSeed*.4)*.35,tileMaterial=moss>.24+(side>0?.08:-.06)?mossPalette[(col+row)%2]:roofPalette[Math.floor(random(n)*roofPalette.length)];
+   const tile=add(g,roofTile,tileMaterial,xx,3.69-rise*u+.06+(random(n+10)-.5)*.032,zz,length/rows*1.16,.075,depth/cols-.012);tile.rotation.z=-side*(angle+.045)+(random(n+9)-.5)*.02;tile.rotation.x=(random(n+14)-.5)*.025;
   }
   for(const sz of [-1,1]){const fascia=block(g,'#795b3c',side*half/2,3.1,sz*(depth/2+.025),length+.08,.14,.11);fascia.rotation.z=-side*angle}
   block(g,'#765a3d',side*half,2.55,0,.14,.17,depth+.1);
@@ -60,12 +67,17 @@ export function cottage(x,z,w,d,color,roof){
  for(let i=0;i<Math.ceil(depth/.3);i++){const ridge=add(g,cylinder,artisanMaterial(roof,'clay'),0,3.74,-depth/2+(i+.5)*depth/Math.ceil(depth/.3),.11,.31,.11);ridge.rotation.x=Math.PI/2}
  // Wooden gables and a small round attic vent.
  const gable=new T.BufferGeometry();gable.setAttribute('position',new T.Float32BufferAttribute([-w/2,2.55,d/2, w/2,2.55,d/2, 0,3.65,d/2, -w/2,2.55,-d/2, 0,3.65,-d/2, w/2,2.55,-d/2],3));gable.setAttribute('uv',new T.Float32BufferAttribute([0,0,1,0,.5,.8,0,0,.5,.8,1,0],2));gable.computeVertexNormals();const ends=new T.Mesh(gable,artisanMaterial(wallPalette[1],'wood'));g.add(ends);
+ for(const side of [-1,1]){const brace=block(g,frame,side*w*.21,2.99,d/2+.07,Math.hypot(w*.42,1.02),.095,.1);brace.rotation.z=-side*Math.atan2(1.02,w*.42)}
+ block(g,frame,0,3.01,d/2+.08,.12,1.12,.13);
  round(g,'#735938',0,2.98,d/2+.045,.23,.23,.04,'wood');round(g,'#4b5744',0,2.98,d/2+.083,.16,.16,.02);block(g,'#cab78b',0,2.98,d/2+.11,.026,.3,.022);
- // Recessed plank door, brass handle, doorstep and shuttered window.
- block(g,frame,-.5,.91,d/2+.09,1.02,1.83,.18);block(g,door,-.5,.87,d/2+.19,.79,1.64,.08);
- for(let i=0;i<4;i++)block(g,'#80613c',-.79+i*.19,.87,d/2+.24,.012,1.56,.014);
- block(g,'#c5ad7a',-.5,1.52,d/2+.255,.7,.08,.035);round(g,'#d4ba74',-.22,.89,d/2+.285,.04,.04,.04);
- block(g,'#a3a18c',-.5,.07,d/2+.34,1.1,.12,.46,'stone');
+ // Arched plank door with a stone surround.
+ add(g,archedDoorGeometry,artisanMaterial('#72563b','wood'),-.5,.18,d/2+.085,1.2,1.14,1);
+ add(g,archedDoorGeometry,artisanMaterial(door,'wood'),-.5,.23,d/2+.19,1,1,1);
+ for(let i=0;i<4;i++)block(g,'#80613c',-.79+i*.19,.84,d/2+.275,.012,1.15,.014);
+ block(g,'#c5ad7a',-.5,.48,d/2+.285,.71,.07,.035);round(g,'#d4ba74',-.22,.91,d/2+.3,.042,.042,.034);
+ for(let i=0;i<7;i++){const a=(i+.5)*Math.PI/7,stone=block(g,i%2?'#c5bd9f':'#b3aa90',-.5+Math.cos(a)*.555,1.42+Math.sin(a)*.555,d/2+.15,.21,.21,.22,'stone');stone.rotation.z=a-Math.PI/2}
+ for(const side of [-1,1])for(let i=0;i<4;i++)block(g,i%2?'#c5bd9f':'#b3aa90',-.5+side*.565,.38+i*.26,d/2+.14,.19,.235,.2,'stone');
+ block(g,'#a3a18c',-.5,.07,d/2+.34,1.28,.12,.46,'stone');
  const wx=w*.28;block(g,'#68553c',wx,1.53,d/2+.09,1.03,1.01,.17);add(g,softBox,windowGlass,wx,1.53,d/2+.19,.79,.77,.035);
  for(const sx of [-1,1]){block(g,'#687957',wx+sx*.62,1.53,d/2+.13,.23,.99,.09);for(let j=0;j<5;j++)block(g,'#82916a',wx+sx*.62,1.19+j*.16,d/2+.19,.24,.04,.025)}
  block(g,'#e3d4b3',wx,1.53,d/2+.24,.045,.81,.04);block(g,'#e3d4b3',wx,1.53,d/2+.24,.82,.045,.04);
