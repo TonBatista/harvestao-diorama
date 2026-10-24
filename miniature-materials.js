@@ -1,4 +1,4 @@
-import * as T from './three.module.js?v=0.16';
+import * as T from './three.module.js';
 const sources=new Map(),maps=new Map();
 export async function loadMiniatureMaterials(){
  const definitions=[['./material-atlas-v07.png',['earth','bark','moss','leaf']],['./cottage-atlas-v07.png',['stone','wood','clay','fabric']]];

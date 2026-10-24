@@ -1,8 +1,8 @@
 # Harvestão — a vida no campo
 
-Versão 0.16. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.17. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.16)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.17)
 
 ## Cuidar dos animais
 
@@ -37,4 +37,13 @@ O zoom fica discreto à esquerda: apenas + e − claros quando inativo. Toque ou
 
 Sirva esta pasta por HTTP. Exige WebGL e não precisa instalar dependências para jogar. `npm test` executa regras de cultivo, estações e cuidados; `npm run check` verifica sintaxe. Saves da versão 2 continuam compatíveis. Os interiores pausam o relógio. Esta é uma implementação própria dos sistemas de cuidado e mercado: rotinas sociais completas, festivais e mineração profunda ainda não estão implementados.
 
-Código editado em `outputs/harvestao-v016`. Three.js: licença MIT em `THREE-LICENSE.txt`.
+Código editado em `outputs/harvestao-v017`. Three.js: licença MIT em `THREE-LICENSE.txt`.
+## Câmera, aves e encontros
+
+Equipe a câmera (ferramenta 8) e enquadre uma ave ou animal. A/Espaço ou o obturador fotografa. P ou o botão do caderno abre o registro: cada espécie recebe um check, uma miniatura real do jogo, data, local e contagem. Os registros acompanham o save e podem ser exportados no menu.
+
+Procure o Urutau no toco do bosque da Montanha da Lua. Bem-te-vis e sabiás aparecem em poleiros na fazenda, vila, montanha e caminho da praia; gaivotas passam pelo cais. Os animais do celeiro, a cobra e a aranha do bosque também podem ser fotografados. A coleção começa com 9 entradas, das quais 4 são aves. O catálogo utiliza IDs estáveis, busca e paginação para ampliar a lista depois; não contém milhares de modelos nesta versão.
+
+Cantos naturais gravados são carregados sob demanda quando há uma ave próxima, após o primeiro toque/tecla. Quando o canto começa, um ! aparece por cerca de 1,5 segundo sobre o personagem. Cobra e aranha geram o aviso visual quando encontradas de perto; não têm ataques nesta versão. O botão ♫ permite desligar os cantos. Os áudios dependem de conexão com Wikimedia Commons: [autores, licenças e fontes](AUDIO-CREDITS.md).
+
+Para manter o save leve, metadados de espécies são preservados, mas as miniaturas têm limite de quantidade e tamanho. Novas fotografias não geram cópias ilimitadas da mesma espécie.

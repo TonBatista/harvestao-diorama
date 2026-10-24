@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ANIMALS,migrateAnimalCare,pickHay,returnHay,feedAnimal,petAnimal,animalStatus,advanceAnimalDay} from './animal-care.js?v=0.16';
+import {ANIMALS,migrateAnimalCare,pickHay,returnHay,feedAnimal,petAnimal,animalStatus,advanceAnimalDay} from './animal-care.js?v=0.17';
 const fresh=()=>({version:2,year:1,season:0,day:1,held:null});
 test('old saves receive eight independent care records without losing the legacy feeding day',()=>{const s=fresh();s.animalCare={feedDay:'1-0-1',lastPet:'Mimosa'};migrateAnimalCare(s);assert.equal(ANIMALS.length,8);assert.equal(s.version,2);for(const a of ANIMALS){assert.equal(animalStatus(s,a.id).fed,true);assert.equal(animalStatus(s,a.id).happiness,50)}assert.equal(animalStatus(s,'mimosa').petted,false)});
 test('one free hand portion feeds only its matching station and cannot be reused',()=>{const s=fresh();s.held='turnip';assert.equal(pickHay(s).changed,false);s.held=null;assert.equal(pickHay(s).changed,true);assert.equal(pickHay(s).changed,false);assert.equal(feedAnimal(s,'missing').changed,false);assert.equal(s.carryingHay,true);assert.equal(feedAnimal(s,'mimosa').changed,true);assert.equal(s.carryingHay,false);assert.equal(animalStatus(s,'mimosa').happiness,58);assert.equal(animalStatus(s,'estrela').hungry,true);assert.equal(feedAnimal(s,'estrela').changed,false);pickHay(s);assert.equal(feedAnimal(s,'mimosa').changed,false);assert.equal(s.carryingHay,true);assert.equal(returnHay(s).changed,true);assert.equal(returnHay(s).changed,false)});

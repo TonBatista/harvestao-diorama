@@ -1,0 +1,25 @@
+import * as T from './three.module.js';
+// One body draw call plus one blinking face; geometry is shared by future encounters.
+const shared=g=>{g.userData.shared=true;return g},shapes={oval:shared(new T.SphereGeometry(1,12,8)),spot:shared(new T.IcosahedronGeometry(1,1)),cone:shared(new T.ConeGeometry(1,1,7)),cylinder:shared(new T.CylinderGeometry(1,1,1,8))};
+const plumage=new T.MeshStandardMaterial({color:0xffffff,vertexColors:true,roughness:.92});
+export function part(parent,shape,color,x,y,z,sx,sy=sx,sz=sx){const mesh=new T.Mesh(shapes[shape],plumage);mesh.position.set(x,y,z);mesh.scale.set(sx,sy,sz);mesh.userData.featherColor=color;parent.add(mesh);return mesh}
+export function mergeParts(group){group.updateMatrixWorld(true);const inverse=group.matrixWorld.clone().invert(),position=[],normal=[],color=[],indices=[],p=new T.Vector3(),n=new T.Vector3();group.traverse(mesh=>{if(!mesh.isMesh)return;const m=new T.Matrix4().multiplyMatrices(inverse,mesh.matrixWorld),nm=new T.Matrix3().getNormalMatrix(m),g=mesh.geometry,a=g.attributes.position,b=g.attributes.normal,c=new T.Color(mesh.userData.featherColor),base=position.length/3;for(let i=0;i<a.count;i++){p.fromBufferAttribute(a,i).applyMatrix4(m);n.fromBufferAttribute(b,i).applyMatrix3(nm).normalize();position.push(p.x,p.y,p.z);normal.push(n.x,n.y,n.z);color.push(c.r,c.g,c.b)}if(g.index){for(let i=0;i<g.index.count;i++)indices.push(base+g.index.getX(i))}else{for(let i=0;i<a.count;i++)indices.push(base+i)}});const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(position,3));geometry.setAttribute('normal',new T.Float32BufferAttribute(normal,3));geometry.setAttribute('color',new T.Float32BufferAttribute(color,3));geometry.setIndex(indices);geometry.computeBoundingSphere();group.clear();const mesh=new T.Mesh(geometry,plumage);mesh.castShadow=true;mesh.receiveShadow=true;group.add(mesh);return mesh}
+export function buildUrutau(k,x,z){
+ // A broken, bark-covered perch keeps the natural camouflage readable at game scale.
+ k.cyl(k.fixed,'#8f7a60',x,.57,z,.25,1.14,'bark');k.cyl(k.fixed,'#b0a17b',x,1.145,z,.24,.025,'wood');
+ for(let i=0;i<5;i++){const a=i*2.4,branch=k.ball(k.fixed,'#8e7d60',x+Math.sin(a)*.20,.10,z+Math.cos(a)*.20,.32,.10,.075,'bark');branch.rotation.y=-a}k.beam(k.fixed,'#938369',[x+.1,.65,z],[x+.38,1.08,z-.08],.065,'bark');k.roundSolid(x,z,.29);
+ const bird=new T.Group();bird.name='wildlife-urutau';bird.position.set(x,1.63,z);bird.rotation.y=.78;k.dynamic.add(bird);const body=new T.Group();bird.add(body);
+ part(body,'oval','#8a8475',0,-.06,0,.28,.43,.225);part(body,'oval','#b7b09b',0,.025,.145,.22,.31,.125);
+ for(const side of[-1,1]){const wing=part(body,'oval','#736f65',side*.21,-.04,-.045,.105,.37,.195);wing.rotation.z=side*-.14;for(let i=0;i<4;i++){const feather=part(body,'oval',i%2?'#918a76':'#696a60',side*(.19+i*.014),-.16-i*.047,-.115+i*.027,.035,.20,.048);feather.rotation.z=side*-.15}}
+ for(let i=0;i<3;i++){const tail=part(body,'oval',i%2?'#827c6b':'#66675e',(i-1)*.055,-.49,-.12,.045,.26,.075);tail.rotation.x=-.13}
+ part(body,'oval','#a49b87',0,.31,.025,.355,.29,.27);part(body,'oval','#c2b79c',0,.29,.194,.28,.17,.095);
+ for(const side of[-1,1]){part(body,'oval','#8c8572',side*.19,.37,.225,.152,.146,.078);part(body,'oval','#cfc2a1',side*.158,.35,.266,.123,.12,.025);const brow=part(body,'oval','#8a806b',side*.155,.442,.265,.145,.036,.041);brow.rotation.z=side*.09;part(body,'oval','#706d60',side*.29,.50,.012,.065,.065,.07)}
+ // Broad flattened beak and tiny nostrils distinguish a potoo from an owl.
+ part(body,'oval','#5e6159',0,.245,.315,.137,.042,.142);part(body,'oval','#8a856e',0,.267,.328,.116,.023,.13);part(body,'oval','#b9b092',0,.204,.271,.145,.045,.056);for(const side of[-1,1])part(body,'spot','#474f48',side*.05,.281,.406,.012,.008,.012);
+ for(let i=0;i<24;i++){const a=i*2.39996,yy=-.28+(i%7)*.073,width=.19*Math.sqrt(Math.max(.12,1-((yy+.015)/.36)**2)),xx=Math.sin(a)*width;const spot=part(body,'spot',i%4===0?'#d4c8a7':i%3?'#696d63':'#958c74',xx,yy,.234-Math.abs(xx)*.12,.018+(i%3)*.007,.031+(i%2)*.009,.008);spot.rotation.z=Math.sin(a)*.4}
+ for(const side of[-1,1]){part(body,'cylinder','#77715d',side*.09,-.46,.035,.023,.13,.023);for(let i=0;i<3;i++){const toe=part(body,'oval','#756d58',side*.09+(i-1)*.026,-.525,.09,.018,.02,.09);toe.rotation.y=(i-1)*.32}}
+ mergeParts(body);
+ const eyes=new T.Group();eyes.position.set(0,.35,.285);bird.add(eyes);for(const side of[-1,1]){part(eyes,'oval','#d5bb65',side*.16,0,0,.090,.097,.022);part(eyes,'oval','#353f39',side*.16,.004,.021,.047,.067,.014);part(eyes,'oval','#f7edc3',side*.142,.04,.034,.021,.023,.009);part(eyes,'oval','#ae9a53',side*.177,-.051,.02,.018,.012,.009)}mergeParts(eyes);
+ k.animate((dt,time)=>{const sway=Math.sin(time*.8)*.018;bird.rotation.z=sway;body.scale.y=1+Math.sin(time*1.8)*.008;const blink=time%6.7;eyes.scale.y=blink>6.47?Math.max(.07,Math.abs((blink-6.585)/.115)):1});
+ bird.userData.speciesId='urutau';return bird;
+}
