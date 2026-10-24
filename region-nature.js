@@ -1,5 +1,5 @@
-import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.15';
+import * as T from './three.module.js?v=0.16';
+import {createKit} from './region-kit.js?v=0.16';
 const TAU=Math.PI*2;
 function ownedMaterial(options){const m=new T.MeshStandardMaterial(options);m.userData.regionOwned=true;return m}
 function rng(seed){return ()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}}
