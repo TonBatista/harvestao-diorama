@@ -1,8 +1,8 @@
 # Harvestão — a vida no campo
 
-Versão 0.17. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.18. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.17)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.18)
 
 ## Cuidar dos animais
 
@@ -37,7 +37,7 @@ O zoom fica discreto à esquerda: apenas + e − claros quando inativo. Toque ou
 
 Sirva esta pasta por HTTP. Exige WebGL e não precisa instalar dependências para jogar. `npm test` executa regras de cultivo, estações e cuidados; `npm run check` verifica sintaxe. Saves da versão 2 continuam compatíveis. Os interiores pausam o relógio. Esta é uma implementação própria dos sistemas de cuidado e mercado: rotinas sociais completas, festivais e mineração profunda ainda não estão implementados.
 
-Código editado em `outputs/harvestao-v017`. Three.js: licença MIT em `THREE-LICENSE.txt`.
+Código editado em `outputs/harvestao-v018`. Three.js: licença MIT em `THREE-LICENSE.txt`.
 ## Câmera, aves e encontros
 
 Equipe a câmera (ferramenta 8) e enquadre uma ave ou animal. A/Espaço ou o obturador fotografa. P ou o botão do caderno abre o registro: cada espécie recebe um check, uma miniatura real do jogo, data, local e contagem. Os registros acompanham o save e podem ser exportados no menu.
@@ -47,3 +47,11 @@ Procure o Urutau no toco do bosque da Montanha da Lua. Bem-te-vis e sabiás apar
 Cantos naturais gravados são carregados sob demanda quando há uma ave próxima, após o primeiro toque/tecla. Quando o canto começa, um ! aparece por cerca de 1,5 segundo sobre o personagem. Cobra e aranha geram o aviso visual quando encontradas de perto; não têm ataques nesta versão. O botão ♫ permite desligar os cantos. Os áudios dependem de conexão com Wikimedia Commons: [autores, licenças e fontes](AUDIO-CREDITS.md).
 
 Para manter o save leve, metadados de espécies são preservados, mas as miniaturas têm limite de quantidade e tamanho. Novas fotografias não geram cópias ilimitadas da mesma espécie.
+
+## Sons do vale — versão 0.18
+
+Dez temas originais acompanham as quatro estações, vila, interiores, bosque, praia, noite e chuva. Instrumentação suave de flauta, cordas dedilhadas, baixo e percussão leve, com variações entre ciclos e transições de volume ao mudar de lugar. As composições são próprias, com clima de jogos de fazenda clássicos.
+
+Vento, água corrente, ondas, chuva e lareira são ambientes procedurais leves. Música e ambientes são sintetizados em tempo real por Web Audio, sem downloads de trilha. Os cantos naturais continuam usando os arquivos e créditos em AUDIO-CREDITS.md.
+
+Clique ou toque para iniciar o som. Abra Menu → Som e música para ajustar volume geral, música e ambiente, silenciar tudo ou desligar os cantos. Preferências ficam salvas. Menus reduzem o volume, e a aba oculta suspende a síntese.
