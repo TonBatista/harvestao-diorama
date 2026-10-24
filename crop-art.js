@@ -1,6 +1,6 @@
-import * as T from './three.module.js';
-import {CROPS} from './simulation.js';
-import {miniatureTexture} from './miniature-materials.js';
+import * as T from './three.module.js?v=0.16';
+import {CROPS} from './simulation.js?v=0.16';
+import {miniatureTexture} from './miniature-materials.js?v=0.16';
 
 // Every shape and material is shared: world.js can merge a whole field by material.
 const random=n=>{const v=Math.sin(n*127.1+34.2)*43758.5453;return v-Math.floor(v)};
@@ -91,6 +91,11 @@ export function createCropArt(){
  const cucumberMap=fruitTexture('cucumber'),cucumber=new T.MeshStandardMaterial({map:cucumberMap,bumpMap:cucumberMap,bumpScale:.003,roughness:.73});
  const tomatoRed=new T.MeshStandardMaterial({color:'#c24328',roughness:.54});
  const tomatoGreen=new T.MeshStandardMaterial({color:'#8ca351',roughness:.72});
+ const onionSkin=new T.MeshStandardMaterial({color:'#caa264',roughness:.86});
+ const carrotSkin=new T.MeshStandardMaterial({color:'#cf792e',roughness:.83});
+ const pumpkinSkin=new T.MeshStandardMaterial({color:'#c57e38',roughness:.77});
+ const eggplantSkin=new T.MeshStandardMaterial({color:'#65506e',roughness:.55});
+ const leekWhite=new T.MeshStandardMaterial({color:'#e8e6c4',roughness:.88});
  const seedMaterial=new T.MeshStandardMaterial({color:'#b9925d',roughness:1});
  const shapes=Object.fromEntries(['turnip','strawberry','oval','lance','vine','corn','sepal'].map(kind=>[kind,leafGeometry(kind)]));
  const sphere=new T.SphereGeometry(1,12,8),smallSphere=new T.SphereGeometry(1,8,6),stemGeometry=new T.CylinderGeometry(.8,1,1,5,1),cone=new T.ConeGeometry(1,1,7);
@@ -101,6 +106,10 @@ export function createCropArt(){
   sp.setXYZ(i,sp.getX(i)*taper*ridge,y,sp.getZ(i)*taper*ridge);
  }
  strawberryGeometry.computeVertexNormals();
+ // One shared ribbed mesh gives every pumpkin a carved silhouette without extra pieces.
+ const pumpkinGeometry=sphere.clone(),pp=pumpkinGeometry.attributes.position;
+ for(let i=0;i<pp.count;i++){const a=Math.atan2(pp.getZ(i),pp.getX(i)),rib=1+.09*Math.cos(a*8);pp.setXYZ(i,pp.getX(i)*rib,pp.getY(i),pp.getZ(i)*rib)}
+ pumpkinGeometry.computeVertexNormals();
  const up=new T.Vector3(0,1,0),direction=new T.Vector3();
  function mesh(parent,g,material,x,y,z,sx=1,sy=sx,sz=sx){const m=new T.Mesh(g,material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=m.receiveShadow=true;parent.add(m);return m}
  function stem(parent,a,b,r=.007,material=stems){direction.set(b[0]-a[0],b[1]-a[1],b[2]-a[2]);const m=mesh(parent,stemGeometry,material,(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2,r,direction.length(),r);m.quaternion.setFromUnitVectors(up,direction.normalize());return m}
@@ -186,8 +195,78 @@ export function createCropArt(){
   }
   if(stage>.8)for(let j=0;j<7;j++){const a=j*2.4;stem(parent,[x,h-.1,z],[x+Math.sin(a)*.085,h+.10+random(seed+j)*.04,z+Math.cos(a)*.085],.004,gold)}
  }
+ function seasonalRoot(parent,x,y,z,kind,size=1){
+  if(kind==='onion'){
+   mesh(parent,sphere,onionSkin,x,y,z,.16*size,.15*size,.16*size);
+   const neck=mesh(parent,cone,onionSkin,x,y+.17*size,z,.065*size,.18*size,.065*size);neck.rotation.z=.13;
+   mesh(parent,cone,purpleStem,x,y-.15*size,z,.026*size,.07*size,.026*size).rotation.z=Math.PI;
+  }else if(kind==='carrot'){
+   mesh(parent,cone,carrotSkin,x,y-.04*size,z,.075*size,.33*size,.075*size).rotation.z=Math.PI;
+   mesh(parent,sphere,carrotSkin,x,y+.10*size,z,.076*size,.055*size,.076*size);
+  }else{
+   mesh(parent,sphere,root,x,y,z,.10*size,.18*size,.10*size);
+   mesh(parent,cone,root,x,y-.19*size,z,.045*size,.16*size,.045*size).rotation.z=Math.PI;
+  }
+ }
+ function rootPlant(parent,x,z,stage,seed,kind){
+  const growth=.25+stage*.75;
+  if(stage>.48)seasonalRoot(parent,x,kind==='carrot'?.08:.13,z,kind,(stage-.25)/.75);
+  const count=kind==='carrot'?6:kind==='onion'?5:7;
+  for(let i=0;i<count;i++){
+   const a=i*2.399+random(seed)*3,h=(.34+random(seed+i)*.13)*growth;
+   if(kind==='carrot'){
+    stem(parent,[x,.14,z],[x+Math.sin(a)*.06,h,z+Math.cos(a)*.06],.008);
+    for(let j=0;j<3;j++)leaf(parent,'lance',x+Math.sin(a)*.03,.20*growth+j*.065,z+Math.cos(a)*.03,.18*growth,a+(j%2?1:-1)*.8,-.55,i,.65);
+   }else leaf(parent,kind==='onion'?'corn':'turnip',x,.16,z,h,a,-.75-random(seed+i)*.35,i,kind==='onion'?.48:.87);
+  }
+ }
+ function pumpkin(parent,x,y,z,size=1){
+  mesh(parent,pumpkinGeometry,pumpkinSkin,x,y,z,.28*size,.20*size,.28*size);
+  const stalk=mesh(parent,stemGeometry,purpleStem,x,y+.22*size,z,.028*size,.11*size,.028*size);stalk.rotation.z=.2;
+ }
+ function pumpkinPlant(parent,x,z,stage,seed){
+  const growth=.24+stage*.76;
+  for(let i=0;i<6;i++){const a=i*2.399+random(seed)*2,r=.17*growth,xx=x+Math.sin(a)*r,zz=z+Math.cos(a)*r;stem(parent,[x,.08,z],[xx,.13,zz],.009);leaf(parent,'vine',xx,.14,zz,(.32+random(seed+i)*.05)*growth,a,-.24,i,1.14)}
+  if(stage>.72)pumpkin(parent,x+.08,.17,z-.02,stage>=1?1:.65);
+  else if(stage>.56)flower(parent,x+.18,.18,z,.05);
+ }
+ function pineapple(parent,x,y,z,size=1){
+  mesh(parent,sphere,gold,x,y,z,.14*size,.24*size,.14*size);
+  // Tiny shared scales catch the light; no extra texture allocation per fruit.
+  for(let row=0;row<3;row++)for(let j=0;j<6;j++){const a=(j+(row%2)*.5)*Math.PI/3;mesh(parent,smallSphere,onionSkin,x+Math.sin(a)*.135*size,y+(row-1)*.105*size,z+Math.cos(a)*.135*size,.028*size,.038*size,.028*size)}
+  for(let j=0;j<5;j++)leaf(parent,'corn',x,y+.20*size,z,.25*size,j*2.399,-.88,j,.75);
+ }
+ function pineapplePlant(parent,x,z,stage,seed){
+  const growth=.3+stage*.7;
+  for(let j=0;j<9;j++)leaf(parent,'corn',x,.08,z,.46*growth,j*2.399+random(seed),j<5?-.27:-.73,j,1.35);
+  if(stage>.78){stem(parent,[x,.12,z],[x,.45,z],.025);pineapple(parent,x,.50,z,stage>=1?1:.64)}
+ }
+ function eggplant(parent,x,y,z,size=1){
+  const fruit=mesh(parent,sphere,eggplantSkin,x,y,z,.105*size,.21*size,.10*size);fruit.rotation.z=.18;
+  calyx(parent,x-.02*size,y+.19*size,z,.10*size);
+ }
+ function eggplantPlant(parent,x,z,stage,seed){
+  const growth=.26+stage*.74,h=.64*growth;stem(parent,[x,.05,z],[x,h,z],.017,purpleStem);
+  for(let j=0;j<7;j++){const a=j*2.399+random(seed),y=.14+j*.064*growth;leaf(parent,'vine',x,y,z,.28*growth,a,-.25,j,.92)}
+  if(stage>.68)for(let j=0;j<3;j++){const a=j*2.1+seed,xx=x+Math.sin(a)*.17,zz=z+Math.cos(a)*.17,y=.25+(j%2)*.14;stem(parent,[x,y+.17,z],[xx,y+.14,zz],.006);if(stage>=1)eggplant(parent,xx,y,zz,.83);else flower(parent,xx,y+.1,zz,.025)}
+ }
+ function leafyPlant(parent,x,z,stage,seed,kale=false){
+  const growth=.25+stage*.75,count=kale?9:7;
+  if(kale)stem(parent,[x,.05,z],[x,.32*growth,z],.023);
+  for(let j=0;j<count;j++){const a=j*2.399+random(seed),inner=j>4,y=kale?(.07+j*.025)*growth:.07;leaf(parent,kale?'turnip':'oval',x,y,z,(inner?.29:.39)*growth,a,inner?-.95:-.35,j,kale?1.10:.94,(random(seed+j)-.5)*.3)}
+ }
+ function leekPlant(parent,x,z,stage,seed){
+  const growth=.25+stage*.75;
+  for(let j=0;j<3;j++){const a=j*2.1,xx=x+Math.sin(a)*.055,zz=z+Math.cos(a)*.055;stem(parent,[xx,.035,zz],[xx,.34*growth,zz],.025,leekWhite);for(let k=0;k<2;k++)leaf(parent,'corn',xx,.25*growth,zz,.49*growth,a+k*2.0+random(seed),-.72-k*.16,j,1.1)}
+ }
  function heldCrop(parent,id,x,z){
   if(id==='turnip'){bulb(parent,x,.15,z,1.05);turnipLeaves(parent,x,z,1,2,.28,true);return}
+  if(id==='onion'||id==='carrot'||id==='winterradish'){seasonalRoot(parent,x,.18,z,id,1.15);for(let j=0;j<4;j++)leaf(parent,id==='onion'?'corn':'turnip',x,.32,z,.29,j*2.399,-.88,j,id==='onion'?.5:.75);return}
+  if(id==='pumpkin'){pumpkin(parent,x,.20,z,1.1);return}
+  if(id==='pineapple'){pineapple(parent,x,.25,z,1.05);return}
+  if(id==='eggplant'){eggplant(parent,x,.23,z,1.3);return}
+  if(id==='spinach'||id==='kale'){leafyPlant(parent,x,z,1,2,id==='kale');return}
+  if(id==='leek'){leekPlant(parent,x,z,1,2);return}
   if(id==='strawberry'){strawberry(parent,x,.17,z,.21);return}
   if(id==='tomato'){mesh(parent,sphere,tomatoRed,x,.14,z,.22,.19,.22);calyx(parent,x,.32,z,.13);return}
   if(id==='potato'||id==='sweetpotato'){const m=mesh(parent,sphere,id==='potato'?potato:sweet,x,.13,z,id==='potato'?.23:.13,id==='potato'?.15:.29,.16);m.rotation.z=id==='potato'?.14:.9;return}
@@ -207,6 +286,12 @@ export function createCropArt(){
   else if(p.crop==='cucumber'||p.crop==='sweetpotato')vinePlant(parent,x,z,stage,seed,p.crop==='sweetpotato');
   else if(p.crop==='tomato')tomatoPlant(parent,x,z,stage,seed);
   else if(p.crop==='corn')cornPlant(parent,x,z,stage,seed);
+  else if(p.crop==='onion'||p.crop==='carrot'||p.crop==='winterradish')rootPlant(parent,x,z,stage,seed,p.crop);
+  else if(p.crop==='pumpkin')pumpkinPlant(parent,x,z,stage,seed);
+  else if(p.crop==='pineapple')pineapplePlant(parent,x,z,stage,seed);
+  else if(p.crop==='eggplant')eggplantPlant(parent,x,z,stage,seed);
+  else if(p.crop==='spinach'||p.crop==='kale')leafyPlant(parent,x,z,stage,seed,p.crop==='kale');
+  else if(p.crop==='leek')leekPlant(parent,x,z,stage,seed);
  }
  function weedModel(parent,x,z){
   const seed=x*17+z*11;

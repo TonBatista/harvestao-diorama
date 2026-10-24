@@ -1,10 +1,10 @@
 {
   "name": "harvestao",
-  "version": "0.14.0",
+  "version": "0.16.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test simulation.test.js",
-    "check": "node --check game.js && node --check world.js && node --check art-direction.js && node --check farmer-art.js && node --check crop-art.js && node --check miniature-materials.js && node --check terrain-materials.js && node --check simulation.js && node --check controls.js && node --check camera-controls.js && node --check region-kit.js && node --check region-manager.js && node --check region-interiors.js && node --check region-village.js && node --check region-nature.js"
+    "test": "node --test simulation.test.js seasonal.test.js animal-care.test.js",
+    "check": "node --check game.js && node --check world.js && node --check region-market.js && node --check region-interiors.js && node --check animal-care.js && node --check simulation.js && node --check camera-controls.js"
   }
 }
