@@ -76,3 +76,9 @@ test('all crop graphics and held models have finite shared geometry at every gro
   for(const [id,c] of Object.entries(CROPS)){const group=new T.Group();cropModel(group,{crop:id,age:c.days},0,0,true);assert.ok(group.children.length>0,id+' held')}
  }finally{if(previous===undefined)delete globalThis.document;else globalThis.document=previous}
 });
+test('sleep grows watered crops on every property exactly once and preserves independent fields',()=>{
+ const s=freshState(false),other=freshState(false).plots;s.homePlots=s.plots;s.homesteads={lots:{willow:{plots:other}}};
+ for(const field of[s.plots,other])Object.assign(field[0],{crop:'turnip',age:1,wet:true,tilled:true});
+ sleep(s);assert.equal(s.plots[0].age,2);assert.equal(other[0].age,2);assert.equal(other[0].wet,false);
+ s.day=30;s.season=0;sleep(s);assert.equal(s.plots[0].crop,null);assert.equal(other[0].crop,null);
+});
