@@ -1,8 +1,8 @@
 # Harvestão — a vida no campo
 
-Versão 0.20. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.21. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.20)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.21)
 
 ## Cuidar dos animais
 
@@ -37,7 +37,7 @@ O zoom fica discreto à esquerda: apenas + e − claros quando inativo. Toque ou
 
 Sirva esta pasta por HTTP. Exige WebGL e não precisa instalar dependências para jogar. `npm test` executa regras de cultivo, estações e cuidados; `npm run check` verifica sintaxe. Saves da versão 2 continuam compatíveis. Os interiores pausam o relógio. Esta é uma implementação própria dos sistemas de cuidado e mercado: rotinas sociais completas, festivais e mineração profunda ainda não estão implementados.
 
-Código editado em `outputs/harvestao-v020`. Three.js: licença MIT em `THREE-LICENSE.txt`.
+Código editado em `outputs/harvestao-v021`. Three.js: licença MIT em `THREE-LICENSE.txt`.
 ## Câmera, aves e encontros
 
 Equipe a câmera (ferramenta 8) e enquadre uma ave ou animal. A/Espaço ou o obturador fotografa. P ou o botão do caderno abre o registro: cada espécie recebe um check, uma miniatura real do jogo, data, local e contagem. Os registros acompanham o save e podem ser exportados no menu.
@@ -64,3 +64,9 @@ O trator verde já está estacionado no acesso leste da fazenda, perto do poço.
 Clique na plaquinha pequena do celeiro, ou aproxime-se e use B/E, para abrir Celeiro e pasto. O sininho chama os animais para fora; toque novamente após a caminhada para recolher. Eles caminham pela porta e pelo acesso lateral até o pasto, com pernas animadas e saídas escalonadas. Animais na carretinha ou em outras propriedades não são chamados. A caminhada é salva e retoma ao recarregar. O som respeita os volumes e silenciar tudo.
 
 Ao desembarcar da carretinha, escolha Levar para o celeiro ou Deixar no pasto. Cada terreno mantém seus próprios animais dentro ou fora. Os cuidados e a amizade permanecem. Placas dos imóveis ficaram menores: clique nelas para ler o texto; não há mais texto grande sobre os edifícios. As placas do celeiro também mostram o sininho.
+## Agenda, paisagem e movimento — versão 0.21
+Os atalhos superiores ficam pequenos e translúcidos após alguns segundos, sem perder o primeiro toque ou a área de clique. Hover, foco pelo teclado e toque revelam os botões. Direcional, A/B e ferramentas mantêm a visibilidade. Clique no relógio para abrir a Agenda do vale: 30 dias, navegação pelas quatro estações e anos, hoje, previsão de chuva, coleta diária às17h e últimos dias de plantio calculados pelo crescimento. Anote, edite e apague compromissos pessoais; a agenda acompanha o progresso. Os marcadores correspondem às regras atuais do jogo, sem anunciar festivais ainda não implementados.
+
+Terrenos do lago usam o mesmo atlas e relevo de terra e relva da fazenda principal, cercados por vegetação, trilhas e margens mais densas. Entrar em uma propriedade ainda vazia mostra terra a limpar, mato, pedras e galhos. Casa e celeiro só aparecem quando construídos; poço e entregas são liberados com a casa. A visão do lago acompanha a limpeza e as construções de cada terreno. Relva instanciada, materiais compartilhados e menor densidade em telas de toque mantêm a paisagem leve.
+
+A carreta tem eixo independente ligado ao engate por uma barra articulada de comprimento fixo; acompanha as curvas com atraso natural e mantém posição ao estacionar/desacoplar. Animais usam fila e distâncias conforme o tamanho do corpo, aguardam passagem livre e voltam aos oito lugares corretos do celeiro. Do lado de fora exploram os espaços livres da fazenda, evitando plantas, obstáculos, o personagem e os outros animais. Rotas e posições permanecem no save.

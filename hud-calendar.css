@@ -1,0 +1,84 @@
+/* Compact upper HUD. All hit targets remain at least 44px and retain their handlers. */
+body{--hud-action-top:135px;--hud-action-left:25px}
+.top-actions.hud-discreet{top:var(--hud-action-top);left:var(--hud-action-left);display:grid;grid-template-columns:repeat(4,44px);gap:1px;z-index:13}
+.top-actions.hud-discreet button{position:relative;box-sizing:border-box;min-width:44px;min-height:44px;width:44px;height:44px;border:0;border-radius:13px;background:transparent;box-shadow:none;color:#36502d;touch-action:manipulation;cursor:pointer;transition:background .18s,box-shadow .18s}
+.top-actions.hud-discreet button:before{content:'';position:absolute;inset:8px;border-radius:10px;background:#f9f0d652;transition:opacity .18s}.top-actions.hud-discreet.hud-awake button:before,.top-actions.hud-discreet:has(:focus-visible) button:before,.top-actions.hud-discreet:hover button:before{opacity:0}
+.top-actions.hud-discreet svg{position:relative;width:16px;height:16px;opacity:.62;transition:width .18s,height .18s,opacity .18s}
+.top-actions.hud-discreet:not(.hud-awake) .photo-album-badge{opacity:.65;right:2px;top:1px;min-width:12px;padding:1px;font-size:8px}
+.top-actions.hud-discreet.hud-awake button,.top-actions.hud-discreet:has(:focus-visible) button,.top-actions.hud-discreet:hover button{background:#f8efdaed;box-shadow:0 2px 10px #25352524}
+.top-actions.hud-discreet.hud-awake svg,.top-actions.hud-discreet:has(:focus-visible) svg,.top-actions.hud-discreet:hover svg{width:20px;height:20px;opacity:1}
+#held:not([hidden])~.top-actions.hud-discreet{top:calc(var(--hud-action-top) + 44px)}
+#herdButton.hud-discreet,.vehicle-button.hud-discreet,.fauna-audio.hud-discreet{box-sizing:border-box;min-height:44px;min-width:44px;border:1px solid transparent;background:#f8efda38;box-shadow:none;font-size:0;padding:0 12px;border-radius:13px;color:#36502d;touch-action:manipulation;cursor:pointer;transition:background .18s,box-shadow .18s,color .18s}
+#herdButton.hud-discreet{left:var(--hud-action-left);top:calc(var(--hud-action-top) + 48px);z-index:12}
+.vehicle-button.hud-discreet{left:var(--hud-action-left);top:calc(var(--hud-action-top) + 48px);z-index:12}
+.hud-has-herd .vehicle-button.hud-discreet{top:calc(var(--hud-action-top) + 96px)}
+.hud-carrying #herdButton.hud-discreet,.hud-carrying .vehicle-button.hud-discreet{top:calc(var(--hud-action-top) + 92px)}
+#held:not([hidden])~#herdButton.hud-discreet{top:calc(var(--hud-action-top) + 92px)}
+.hud-carrying.hud-has-herd .vehicle-button.hud-discreet{top:calc(var(--hud-action-top) + 140px)}
+#herdButton.hud-discreet:before,.vehicle-button.hud-discreet:before,.fauna-audio.hud-discreet:before{display:inline-block;font:18px/1 Georgia,serif;opacity:.62;vertical-align:middle}
+#herdButton.hud-discreet:before{content:'♡'}
+.vehicle-button.hud-discreet:before{content:'🚜'}
+.fauna-audio.hud-discreet:before{content:'♫'}
+#herdButton.hud-discreet:not(.hud-awake) #herdSummary{display:none}
+#herdButton.hud-discreet.hud-awake,.vehicle-button.hud-discreet.hud-awake,.fauna-audio.hud-discreet.hud-awake,#herdButton.hud-discreet:focus-visible,.vehicle-button.hud-discreet:focus-visible,.fauna-audio.hud-discreet:focus-visible{font-size:11px;background:#f8efdaed;border-color:#fff4d6;box-shadow:0 2px 10px #25352524}
+#herdButton.hud-discreet.hud-awake:before,.vehicle-button.hud-discreet.hud-awake:before,.fauna-audio.hud-discreet.hud-awake:before{opacity:1;margin-right:7px}
+#herdButton.hud-discreet.hud-awake:before{display:none}
+.vehicle-button.hud-discreet.driving:not(.hud-awake){color:#285b2d;background:#d8e4bb70}
+.hud-discreet button:focus-visible,button.hud-discreet:focus-visible,.calendar[role=button]:focus-visible{outline:3px solid #3b684b;outline-offset:3px}
+.calendar[role=button]{pointer-events:auto;cursor:pointer;touch-action:manipulation}
+.calendar[role=button]:hover{filter:brightness(1.04)}
+/* The agenda is a native modal: Escape, focus containment and game pause share existing behavior. */
+#calendarDialog{box-sizing:border-box;max-width:820px;width:calc(100% - 28px);padding:26px;max-height:calc(100dvh - 24px)}
+#calendarDialog h2{font-size:30px;margin:13px 0 6px}
+#calendarDialog .agenda-intro{margin:0 0 17px}
+#calendarDialog .agenda-close{min-width:44px;min-height:44px;right:7px;top:4px;cursor:pointer}
+.agenda-navigation{display:grid;grid-template-columns:44px 44px minmax(0,1fr) 44px 44px;align-items:center;gap:4px;margin-bottom:16px}
+.agenda-navigation button,.agenda-today,.agenda-entry-actions button{min-height:44px;border:1px solid #c7c9ab;border-radius:10px;background:#eee9d5;color:#526341;cursor:pointer}
+.agenda-navigation button{min-width:44px;font:25px Georgia}
+.agenda-navigation strong{text-align:center;font:22px Georgia;color:#4c6343}
+.agenda-navigation small{display:block;font:10px Arial,sans-serif;letter-spacing:1px;margin-top:5px;color:#8c7f60}
+.agenda-body{display:grid;grid-template-columns:minmax(300px,1fr) minmax(0,1fr);gap:22px}
+.agenda-month{min-width:0}
+.agenda-weekdays,.agenda-days{display:grid;grid-template-columns:repeat(7,minmax(40px,1fr));column-gap:4px;min-width:304px}
+.agenda-weekdays{font-size:8px;letter-spacing:.8px;text-align:center;color:#837b62;margin:0 0 8px}
+.agenda-days{row-gap:5px}
+.agenda-day{box-sizing:border-box;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;min-width:40px;min-height:48px;padding:7px 2px 5px;border:1px solid #d7cfb6;border-radius:9px;background:#f1e9d4;color:#666b4c;cursor:pointer}
+.agenda-day b{font:17px Georgia}
+.agenda-day.is-today{border:2px solid #9c7842;background:#eee0b8;color:#604b2d}
+.agenda-day[aria-pressed=true]{box-shadow:inset 0 0 0 2px #6b8056;background:#dce6c7;color:#3e5733}
+.agenda-day:focus-visible,#calendarDialog button:focus-visible,#calendarDialog input:focus-visible,#calendarDialog textarea:focus-visible{outline:3px solid #456c4c;outline-offset:2px}
+.agenda-marks{display:flex;align-items:center;justify-content:center;gap:3px;height:5px}
+.agenda-dot{display:inline-block;flex:none;width:5px;height:5px;border-radius:50%;background:#8a9666}
+.agenda-dot.seasonal{background:#ae8346}
+.agenda-dot.rain{background:#6b97a7}
+.agenda-dot.personal{background:#a07188}
+.agenda-legend{display:flex;gap:7px 12px;flex-wrap:wrap;margin:14px 0;font-size:9px;line-height:1.5;color:#7d785f}
+.agenda-legend span{display:flex;align-items:center;gap:5px}
+#calendarDialog .agenda-routine{font-size:10px;line-height:1.5;margin:12px 0;color:#7c775e}
+.agenda-today{display:block;width:100%;font-size:11px;padding:8px}
+.agenda-details{min-width:0}
+.agenda-details h3{font:19px/1.3 Georgia;color:#556847;margin:0 0 11px}
+.agenda-details h3 span{font:9px Arial,sans-serif;background:#dce5c6;color:#667a4b;border-radius:8px;padding:3px 6px;margin-left:3px}
+.agenda-event-list{list-style:none;margin:0;padding:0}
+.agenda-event{border-top:1px solid #ded5be;padding:11px 0}
+.agenda-event strong{font-size:11px;line-height:1.5;color:#626849}
+#calendarDialog .agenda-event p{font-size:10px;line-height:1.6;margin:4px 0 0;color:#83785e;white-space:pre-wrap;overflow-wrap:anywhere}
+.agenda-event.custom strong{color:#8c5e75}
+.agenda-event.weather strong{color:#5a8491}
+.agenda-entry-actions{display:flex;gap:5px;margin-top:6px}
+.agenda-entry-actions button{font-size:10px;min-height:40px;padding:4px 11px}
+#agendaForm{border-top:1px solid #d6ccb1;margin-top:4px;padding-top:3px}
+#agendaForm h4{font:17px Georgia;margin:12px 0;color:#586b47}
+#agendaForm label{display:block;font-size:10px;color:#77715b;margin-top:10px}
+#agendaForm label small{color:#9b8c71;font-size:9px}
+#agendaForm input,#agendaForm textarea{box-sizing:border-box;display:block;width:100%;max-width:100%;min-height:40px;padding:10px;margin-top:5px;border:1px solid #c8c6a7;border-radius:8px;background:#fff9e9;color:#586045;font:12px Arial,sans-serif;touch-action:auto}
+#agendaForm textarea{resize:vertical;line-height:1.5}
+.agenda-form-actions{display:flex;gap:6px}
+.agenda-form-actions button{min-height:44px;cursor:pointer}
+.agenda-save-hint{display:block;font-size:9px;line-height:1.5;color:#8c8469;margin-top:9px}
+#calendarDialog .agenda-status{font-size:11px;color:#506c43;margin:12px 0 0;min-height:0}
+#calendarDialog .agenda-status:empty{display:none}
+@media(max-width:700px){.agenda-body{grid-template-columns:1fr;gap:22px}.agenda-month{overflow-x:auto}.agenda-weekdays,.agenda-days{min-width:304px}.agenda-details h3{border-top:1px solid #ded5be;padding-top:18px}}
+@media(max-width:500px){body{--hud-action-top:126px;--hud-action-left:18px}.top-actions.hud-discreet{grid-template-columns:repeat(4,44px)}.fauna-audio.hud-discreet{right:13px}.agenda-navigation{gap:2px;grid-template-columns:40px 40px minmax(0,1fr) 40px 40px}.agenda-navigation button{min-width:40px;min-height:44px}.agenda-navigation strong{font-size:19px}#calendarDialog{width:calc(100% - 8px);max-height:calc(100dvh - 12px);padding:22px 10px 16px;border-radius:17px}#calendarDialog h2{font-size:27px}.agenda-weekdays,.agenda-days{column-gap:1px;min-width:286px}.agenda-day{min-height:46px}.agenda-legend{font-size:8px;gap:6px 9px}}
+@media(max-height:550px){body{--hud-action-top:62px}.hud-discreet.fauna-audio{top:154px}#calendarDialog{padding:16px 10px}.agenda-details h3{padding-top:0;border-top:0}}
+@media(prefers-reduced-motion:reduce){.hud-discreet,.hud-discreet *,.calendar[role=button]{transition:none!important;animation:none!important}}
