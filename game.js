@@ -1,7 +1,7 @@
 import {mountHudCalendar} from './hud-calendar.js?v=0.21';
-import {mountExpansionUI} from './expansion-ui.js?v=0.21';
+import {mountExpansionUI} from './expansion-ui.js?v=0.21.1';
 import {migrateHomesteads,selectLot,lotState} from './homestead-rules.js?v=0.19';
-import {migrateTransport,advanceHerd} from './transport-rules.js?v=0.21';
+import {migrateTransport,advanceHerd} from './transport-rules.js?v=0.21.1';
 import {freshState,validSave,CROPS,SEASONS,TOOLS,frontTile,useTool,pick,ship,sleep,buy,advanceTime,stash,retrieve,BAG_CAPACITY} from './simulation.js?v=0.19';
 import {ANIMALS,migrateAnimalCare,pickHay,returnHay,feedAnimal,petAnimal,animalStatus,advanceAnimalDay} from './animal-care.js?v=0.17';
 import {mountSoundscape} from './soundscape.js?v=0.20';
@@ -10,7 +10,7 @@ import {mountPhotographyUI} from './photo-ui.js?v=0.17';
 import {migrateBirding} from './birding.js?v=0.17';
 import {mountJoystick} from './controls.js?v=0.17';
 import {mountZoomControls} from './camera-controls.js?v=0.17';
-import {createWorld} from './world.js?v=0.21';
+import {createWorld} from './world.js?v=0.21.1';
 const $=id=>document.getElementById(id),KEY='harvestao-v2';let state=freshState(),storageOK=true;
 try{const data=JSON.parse(localStorage.getItem(KEY));if(validSave(data))state=data}catch{}
 state.inventory??=[];migrateAnimalCare(state);migrateBirding(state);migrateHomesteads(state);migrateTransport(state);

@@ -48,3 +48,7 @@ test('wander explores broad walkable farm space while avoiding obstacles, player
  const saved=JSON.parse(JSON.stringify(s));migrateTransport(saved);for(const a of ANIMALS){assert.equal(saved.animalWander[a.id].x,s.animalWander[a.id].x);assert.equal(saved.animalLocations[a.id],'farm')}
  const before=Object.fromEntries(ANIMALS.map(a=>[a.id,[s.animalWander[a.id].x,s.animalWander[a.id].z]]));ringHerd(s,'farm');for(const a of ANIMALS){const p=herdPose(s,a.id,'farm');assert.deepEqual([p.x,p.z],before[a.id])}
 });
+test('return queue routes around waiting animals and admits those closest to the door first',()=>{
+ const s=fresh();s.animalLocations.mimosa=s.animalLocations.estrela='farm';s.animalWander={mimosa:{property:'farm',x:0,z:10,angle:0},estrela:{property:'farm',x:-3.75,z:1.975,angle:0}};
+ assert.equal(ringHerd(s,'farm').changed,true);assert.ok(s.herdRoutes.estrela.order<s.herdRoutes.mimosa.order);tick(s,60);assert.equal(Object.keys(s.herdRoutes).length,0);assert.equal(s.animalLocations.mimosa,'barn');assert.equal(s.animalLocations.estrela,'barn');
+});

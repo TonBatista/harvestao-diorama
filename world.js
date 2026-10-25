@@ -1,10 +1,10 @@
-import {propertyKey} from './transport-rules.js?v=0.21';
+import {propertyKey} from './transport-rules.js?v=0.21.1';
 import {solveTrailer} from './trailer-physics.js?v=0.21';
 import * as T from './three.module.js';
 import {createTractor} from './tractor-art.js?v=0.21';
 import {ANIMALS} from './animal-care.js?v=0.17';
-import {createTransportDisplay} from './transport-art.js?v=0.21';
-import {createRegionManager} from './region-manager.js?v=0.21';
+import {createTransportDisplay} from './transport-art.js?v=0.21.1';
+import {createRegionManager} from './region-manager.js?v=0.21.1';
 import {terrainTexture} from './terrain-materials.js?v=0.17';
 import {loadMiniatureMaterials,miniatureTexture,miniatureLens,contactTexture,soilEdgeTexture} from './miniature-materials.js?v=0.17';
 import {artisanMaterial,cottage,canopyGeometry,meadowGeometry,treeCrown} from './art-direction.js?v=0.17';
