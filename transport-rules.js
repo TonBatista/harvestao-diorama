@@ -1,0 +1,15 @@
+import {ANIMALS} from './animal-care.js?v=0.17';
+const ids=new Set(ANIMALS.map(a=>a.id)),record=x=>x&&typeof x==='object'&&!Array.isArray(x);
+export function transportArea(state,area=state.region||'farm'){return area==='homestead'?'homestead:'+state.homesteads?.selected:area}
+export function migrateTransport(state){
+ state.tractor=record(state.tractor)?state.tractor:{};state.tractor.trailer=state.tractor.trailer===true;state.tractor.cargo=ids.has(state.tractor.cargo)?state.tractor.cargo:null;if(state.tractor.cargo)state.tractor.trailer=true;
+ const old=record(state.animalLocations)?state.animalLocations:{};
+ state.animalLocations=Object.fromEntries(ANIMALS.map(a=>{const value=old[a.id],valid=value==='barn'||value==='farm'||(typeof value==='string'&&/^homestead:[a-z0-9_-]+$/.test(value));return[a.id,state.tractor.cargo===a.id?'trailer':valid?value:'barn']}));return state.animalLocations;
+}
+export function hitchTrailer(state){migrateTransport(state);if(state.tractor.trailer&&state.tractor.cargo)return{changed:false,message:'Desembarque o animal antes de desacoplar a carretinha.'};state.tractor.trailer=!state.tractor.trailer;return{changed:true,message:state.tractor.trailer?'Carretinha acoplada. Leve um animal por vez.':'Carretinha estacionada.'}}
+export function loadAnimal(state,id,area=state.region||'barn'){
+ migrateTransport(state);const animal=ANIMALS.find(a=>a.id===id);if(!animal)return{changed:false,message:'Escolha um animal do seu rebanho.'};if(!state.tractor.trailer)return{changed:false,message:'Acople a carretinha antes de embarcar um animal.'};if(state.tractor.cargo)return{changed:false,message:'A carretinha já transporta um animal. Desembarque primeiro.'};if(state.animalLocations[id]!==transportArea(state,area))return{changed:false,message:animal.name+' está em outro lugar.'};if(state.carryingHay||state.held)return{changed:false,message:'Libere as mãos antes de embarcar o animal.'};state.tractor.cargo=id;state.animalLocations[id]='trailer';return{changed:true,message:animal.name+' embarcou com segurança na carretinha.'};
+}
+export function unloadAnimal(state,area=state.region||'farm'){
+ migrateTransport(state);const id=state.tractor.cargo;if(!id)return{changed:false,message:'A carretinha está vazia.'};if(!['barn','farm','homestead'].includes(area))return{changed:false,message:'Desembarque em sua fazenda, no celeiro ou em um terreno com celeiro.'};if(area==='homestead'){const selected=state.homesteads?.selected,lot=state.homesteads?.lots?.[selected];if(!state.homesteads?.owned?.includes(selected)||!lot?.barn)return{changed:false,message:'Construa o celeiro deste terreno antes de trazer animais.'}}state.animalLocations[id]=transportArea(state,area);state.tractor.cargo=null;return{changed:true,message:ANIMALS.find(a=>a.id===id).name+' desembarcou. Fome e amizade foram preservadas.'};
+}

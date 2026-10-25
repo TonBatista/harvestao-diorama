@@ -1,10 +1,10 @@
 {
   "name": "harvestao",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test simulation.test.js seasonal.test.js animal-care.test.js birding.test.js",
-    "check": "node --check soundscape.js && node --check audio-score.js && node --check game.js && node --check world.js && node --check region-market.js && node --check region-interiors.js && node --check animal-care.js && node --check simulation.js && node --check camera-controls.js"
+    "test": "node --test simulation.test.js seasonal.test.js animal-care.test.js birding.test.js homestead-rules.test.js transport-rules.test.js",
+    "check": "node --check game.js && node --check world.js && node --check expansion-ui.js && node --check region-manager.js && node --check region-homesteads.js && node --check tractor-art.js && node --check transport-art.js && node --check simulation.js"
   }
 }

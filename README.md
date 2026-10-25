@@ -1,8 +1,8 @@
 # Harvestão — a vida no campo
 
-Versão 0.18. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.19. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.18)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.19)
 
 ## Cuidar dos animais
 
@@ -37,7 +37,7 @@ O zoom fica discreto à esquerda: apenas + e − claros quando inativo. Toque ou
 
 Sirva esta pasta por HTTP. Exige WebGL e não precisa instalar dependências para jogar. `npm test` executa regras de cultivo, estações e cuidados; `npm run check` verifica sintaxe. Saves da versão 2 continuam compatíveis. Os interiores pausam o relógio. Esta é uma implementação própria dos sistemas de cuidado e mercado: rotinas sociais completas, festivais e mineração profunda ainda não estão implementados.
 
-Código editado em `outputs/harvestao-v018`. Three.js: licença MIT em `THREE-LICENSE.txt`.
+Código editado em `outputs/harvestao-v019`. Three.js: licença MIT em `THREE-LICENSE.txt`.
 ## Câmera, aves e encontros
 
 Equipe a câmera (ferramenta 8) e enquadre uma ave ou animal. A/Espaço ou o obturador fotografa. P ou o botão do caderno abre o registro: cada espécie recebe um check, uma miniatura real do jogo, data, local e contagem. Os registros acompanham o save e podem ser exportados no menu.
@@ -55,3 +55,8 @@ Dez temas originais acompanham as quatro estações, vila, interiores, bosque, p
 Vento, água corrente, ondas, chuva e lareira são ambientes procedurais leves. Música e ambientes são sintetizados em tempo real por Web Audio, sem downloads de trilha. Os cantos naturais continuam usando os arquivos e créditos em AUDIO-CREDITS.md.
 
 Clique ou toque para iniciar o som. Abra Menu → Som e música para ajustar volume geral, música e ambiente, silenciar tudo ou desligar os cantos. Preferências ficam salvas. Menus reduzem o volume, e a aba oculta suspende a síntese.
+
+## Lago, terrenos e trator — versão 0.19
+Abra o mapa para visitar o Lago dos Ipês, ligado à Montanha da Lua. Há três terrenos de 24 × 26: Recanto dos Salgueiros (300 G), Margem do Amanhecer (1.800 G) e Clareira dos Pinheiros (2.400 G). Aproxime-se da placa e use B/E para comprar. Cada propriedade tem seus próprios 144 canteiros persistentes. Limpe ervas com mãos/foice, galhos com machado e pedras com martelo. O lenhador Tomé tem uma oficina junto ao lago e pode ser chamado pela caixa de encomendas do terreno. Casa: 450 G + 12 madeiras; celeiro: 650 G + 18 madeiras. Limpe os quatro obstáculos do local antes de construir. A casa e o celeiro abrem interiores; poço e caixa de vendas funcionam na nova fazenda. Todas as plantações continuam crescendo ao dormir.
+
+O trator verde já está estacionado no acesso leste da fazenda, perto do poço. B/E entra e sai; direcional/WASD dirigem; A/Espaço alterna a roçadeira. Ela corta apenas ervas e preserva culturas. O botão Trator e carreta permite acoplar a carretinha e transportar um animal por vez. Aproxime-se do portão do celeiro para embarcar; desembarque na fazenda ou em uma propriedade com celeiro construído. Animais transferidos ficam visíveis no pasto, mantêm fome/amizade e podem ser alimentados, acariciados e fotografados. Leve o trator aos terrenos pelo mapa. O progresso permanece no save, sem substituir a fazenda original. Veículos e pastos usam geometrias compartilhadas e só a região ativa é desenhada.
