@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.17';
+import {createKit} from './region-kit.js?v=0.20';
 import {LOTS,BUILDINGS,DEBRIS,migrateHomesteads,lotState} from './homestead-rules.js?v=0.19';
 const TAU=Math.PI*2;
 const owned=options=>{const m=new T.MeshStandardMaterial(options);m.userData.regionOwned=true;return m};

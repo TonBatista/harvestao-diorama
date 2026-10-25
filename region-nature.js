@@ -1,6 +1,6 @@
 import {addMapFauna} from './fauna-art.js?v=0.17';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.17';
+import {createKit} from './region-kit.js?v=0.20';
 import {buildUrutau} from './wildlife-art.js?v=0.17';
 const TAU=Math.PI*2;
 function ownedMaterial(options){const m=new T.MeshStandardMaterial(options);m.userData.regionOwned=true;return m}
