@@ -1,14 +1,19 @@
-import {buildLake,buildHomestead} from './region-homesteads.js?v=0.22';
-import {migrateHomesteads,lotState} from './homestead-rules.js?v=0.22';
-import {addMapFauna} from './fauna-art.js?v=0.22';
-import {createKit} from './region-kit.js?v=0.22';
-import {buildHouse,buildBarn} from './region-interiors.js?v=0.22';
-import {buildVillage} from './region-village.js?v=0.22';
-import {buildMountain,buildBeach} from './region-nature.js?v=0.22';
-import {buildMarket} from './region-market.js?v=0.22';
+import {INTERIOR_DESTINATIONS} from './interior-catalog.js?v=0.23';
+import {buildChapel,buildLibrary,buildClinic} from './interiors-civic.js?v=0.23';
+import {buildInn,buildRosaHouse,buildFisherHouse} from './interiors-homes.js?v=0.23';
+import {buildSmithy,buildCarpenter,buildMine,buildLighthouse} from './interiors-workshops.js?v=0.23';
+import {buildLake,buildHomestead} from './region-homesteads.js?v=0.23';
+import {migrateHomesteads,lotState} from './homestead-rules.js?v=0.23';
+import {addMapFauna} from './fauna-art.js?v=0.23';
+import {createKit} from './region-kit.js?v=0.23';
+import {buildHouse,buildBarn} from './region-interiors.js?v=0.23';
+import {buildVillage} from './region-village.js?v=0.23';
+import {buildMountain,buildBeach} from './region-nature.js?v=0.23';
+import {buildMarket} from './region-market.js?v=0.23';
 export const DESTINATIONS=[{id:'farm',label:'Sua fazenda',description:'Plantação, poço e caixa de vendas',icon:'✿'},{id:'house',label:'Sua casa',description:'Cozinha, lareira, quarto e descanso',icon:'⌂'},{id:'barn',label:'Celeiro',description:'Vacas, ovelhas, galinhas e cuidados',icon:'♧'},{id:'village',label:'Vila Mineral',description:'Praça, lojas, igreja e moradores',icon:'♜'},{id:'market',label:'Mercado da Vila',description:'Prateleiras e sementes das quatro estações',icon:'♧'},{id:'mountain',label:'Montanha da Lua',description:'Bosque, riacho, mina e águas termais',icon:'▲'},{id:'beach',label:'Praia das Conchas',description:'Mar, píer, barco e pescador',icon:'≈'}];
 DESTINATIONS.push({id:'lake',label:'Lago dos Ipês',description:'Terrenos à venda e oficina do lenhador',icon:'≈'},{id:'homestead',label:'Sua fazenda do lago',description:'Limpar, plantar e construir do zero',icon:'⌂'});
-const builders={lake:buildLake,homestead:buildHomestead,market:buildMarket,house:buildHouse,barn:buildBarn,village:buildVillage,mountain:buildMountain,beach:buildBeach};
+DESTINATIONS.push(...INTERIOR_DESTINATIONS);
+const builders={chapel:buildChapel,library:buildLibrary,clinic:buildClinic,inn:buildInn,rosaHouse:buildRosaHouse,fisherHouse:buildFisherHouse,smithy:buildSmithy,carpenter:buildCarpenter,mine:buildMine,lighthouse:buildLighthouse,lake:buildLake,homestead:buildHomestead,market:buildMarket,house:buildHouse,barn:buildBarn,village:buildVillage,mountain:buildMountain,beach:buildBeach};
 export function createRegionManager({scene,state,bake,farmRoot,farmColliders,onChange,onLeave}){
  migrateHomesteads(state);state.homePlots??=state.plots;if(state.region==='homestead'&&lotState(state))lotState(state).plots=state.plots;else state.homePlots=state.plots;
  const farmKit=createKit();farmKit.sign(.2,-7.1,'Sua casa');farmKit.sign(-6.6,-6.2,'Celeiro');farmKit.sign(12.7,-4.7,'Vila Mineral →');farmKit.sign(-8.6,11.3,'← Montanha');farmKit.sign(12.4,8.4,'Praia →');farmKit.path(12,-5.3,4,1.6);farmKit.path(12.4,8,2.4,3);farmKit.path(-8.8,11.6,1.6,3);

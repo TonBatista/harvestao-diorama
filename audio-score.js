@@ -21,7 +21,7 @@ export const SCORES=Object.freeze({
  rain:score('rain','Chuva no telhado',78,62,minor,[0,3,5,4,1,3,4,0],[[2,4,1],[0,2],[3,5,4],[2,1],[0,3,2],[4,2],[1,3,4],[2,0]],true)
 });
 export function chooseScore(area='farm',season=0,minutes=360,weather='sun'){
- if(area==='house'||area==='barn'||area==='market')return 'interior';
+ if(['house','barn','market','chapel','library','clinic','inn','rosaHouse','fisherHouse','smithy','carpenter','mine','lighthouse'].includes(area))return 'interior';
  if(minutes>=1080||minutes<360)return 'night';
  if(weather==='rain')return 'rain';
  if(area==='village')return 'village';

@@ -1,7 +1,7 @@
 import * as T from './three.module.js';
-import {miniatureTexture} from './miniature-materials.js?v=0.22';
-import {meadowGeometry} from './art-direction.js?v=0.22';
-import {FIELD,TILE} from './simulation.js?v=0.22';
+import {miniatureTexture} from './miniature-materials.js?v=0.23';
+import {meadowGeometry} from './art-direction.js?v=0.23';
+import {FIELD,TILE} from './simulation.js?v=0.23';
 
 const rand=n=>{const v=Math.sin(n*127.1+34.2)*43758.5453;return v-Math.floor(v)};
 const owned=options=>{const m=new T.MeshStandardMaterial(options);m.userData.regionOwned=true;return m};
