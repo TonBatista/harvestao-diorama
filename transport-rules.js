@@ -1,4 +1,4 @@
-import {ANIMALS} from './animal-care.js?v=0.23';
+import {ANIMALS} from './animal-care.js?v=0.24';
 const ids=new Set(ANIMALS.map(a=>a.id)),record=x=>x&&typeof x==='object'&&!Array.isArray(x),byId=new Map(ANIMALS.map(a=>[a.id,a]));
 export const ANIMAL_STALLS=Object.freeze({mimosa:{x:-4.85,z:-3.08,angle:Math.PI/2},estrela:{x:-4.85,z:.07,angle:Math.PI/2},amora:{x:4.9,z:-3.1,angle:-Math.PI/2},nuvem:{x:4.37,z:.02,angle:-Math.PI/2},algodao:{x:5.65,z:.72,angle:-Math.PI*.65},pipoca:{x:-4.6,z:3.4,angle:0},pacoca:{x:-3.45,z:2.8,angle:2},canela:{x:4,z:3.15,angle:3}});
 const pasture=[[-8.7,8.8],[-8.7,6.1],[-8.7,3.4],[-8.7,1.3],[-8.7,-.3],[-8.7,-1.5],[-8.7,-2.6],[-8.7,-3.7]],GAP=.10,SPEED=2.45,callbacks=new WeakMap();

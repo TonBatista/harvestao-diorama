@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {miniatureTexture} from './miniature-materials.js?v=0.23';
+import {miniatureTexture} from './miniature-materials.js?v=0.24';
 
 // The original movement controller animates the same articulated hierarchy.
 // The portrait and shoulders are repositioned to match the miniature proportions.
@@ -84,7 +84,7 @@ function bakePart(root){
  for(const [mat,parts] of byMaterial){const g=new T.BufferGeometry(),count=parts.reduce((n,p)=>n+p.attributes.position.count,0);for(const [name,width] of [['position',3],['normal',3],['uv',2]]){const data=new Float32Array(count*width);let cursor=0;for(const p of parts){if(p.attributes[name])data.set(p.attributes[name].array,cursor);cursor+=p.attributes.position.count*width}g.setAttribute(name,new T.BufferAttribute(data,width))}g.computeBoundingSphere();add(root,g,mat);parts.forEach(g=>g.dispose())}
 }
 
-export function createFarmer(scene){
+export function createFarmer(scene,profile={}){
  const M={
   skin:material('#f1c9a0','skin'),ear:material('#dba789','skin'),nose:material('#e8bd96','skin'),blush:material('#d99f83','skin'),
   hair:material('#4d3322'),hairLight:material('#6c492d'),hairFine:material('#8d6740'),
@@ -276,5 +276,15 @@ export function createFarmer(scene){
  for(const points of normalGroups.values()){if(points.length<2)continue;const normal=new T.Vector3();for(const j of points)normal.add(new T.Vector3().fromBufferAttribute(normals,j));normal.normalize();for(const j of points)normals.setXYZ(j,normal.x,normal.y,normal.z)}
  const pelvis=new T.Bone();body.add(pelvis);const garment=new T.SkinnedMesh(garmentGeo,M.overall);garment.name='continuous-overalls-and-trousers';garment.castShadow=garment.receiveShadow=true;body.add(garment);body.updateWorldMatrix(true,true);garment.bind(new T.Skeleton([pelvis,legs[0],knees[0],legs[1],knees[1]]));
  bakePart(torso);bakePart(headArt);bakePart(scarf);bakePart(tail);
- return {farmer,body,head,eyes,scarf,tail,arms,legs,knees,feet};
+ const longHair=new T.Group();longHair.name='avatar-braids';head.add(longHair);
+ for(const side of[-1,1]){
+  add(longHair,lockGeometry([[side*.28,.08,-.12],[side*.34,-.13,-.10],[side*.32,-.43,.035],[side*.28,-.61,.09]],.064,.039),M.hair);
+  for(let i=0;i<6;i++){const braid=ellipsoid(longHair,i%2?M.hairLight:M.hair,side*(.325+Math.sin(i*2.1)*.018),-.12-i*.072,-.09+i*.029,.056,.061,.047);braid.rotation.z=side*(i%2?.21:-.18)}
+  ellipsoid(longHair,M.scarfLight,side*.29,-.55,.083,.061,.024,.052);
+  add(longHair,lockGeometry([[side*.29,-.56,.09],[side*.27,-.64,.12],[side*.30,-.68,.12]],.036,.022),M.hairLight);
+ }
+ bakePart(longHair);M.hair.name='avatar-hair';M.hairLight.name='avatar-hair-light';M.hairFine.name='avatar-hair-fine';
+ function setAppearance(value={}){const sex=value.sex==='female'?'female':'male',color=/^#[0-9a-f]{6}$/i.test(value.hairColor||'')?value.hairColor:'#6c492d';const base=new T.Color(color);M.hair.color.copy(base).multiplyScalar(.70);M.hairLight.color.copy(base);M.hairFine.color.copy(base).lerp(new T.Color('#ead7b1'),.25);longHair.visible=sex==='female';headArt.scale.x=sex==='female'?.98:1;farmer.userData.avatar={sex,hairColor:color};return farmer.userData.avatar}
+ setAppearance(profile);
+ return {farmer,body,head,eyes,scarf,tail,arms,legs,knees,feet,setAppearance,get appearance(){return {...farmer.userData.avatar}}};
 }

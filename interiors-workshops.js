@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.23';
+import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.24';
 
 function info(k,x,z,name,text,radius=1.5){k.interact({x,z,label:name,type:'info',radius,data:{name,text}})}
 function barrel(k,x,z,scale=1){const g=group(k.fixed,x,0,z);k.cyl(g,'#a0835a',0,.45*scale,0,.34*scale,.88*scale,'wood');for(const y of [.12,.45,.77])k.cyl(g,'#6d756b',0,y*scale,0,.35*scale,.045*scale);k.cyl(g,'#c4a579',0,.90*scale,0,.31*scale,.04*scale,'wood');k.roundSolid(x,z,.35*scale);return g}

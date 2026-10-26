@@ -1,4 +1,4 @@
-import {CROPS,SEASONS} from './simulation.js?v=0.23';
+import {CROPS,SEASONS} from './simulation.js?v=0.24';
 export const SEASON_DAYS=30, MAX_AGENDA_ITEMS=120, MAX_CALENDAR_YEAR=9999;
 const plain=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
 export function validDate(value){return plain(value)&&Number.isInteger(value.year)&&value.year>=1&&value.year<=MAX_CALENDAR_YEAR&&Number.isInteger(value.season)&&value.season>=0&&value.season<SEASONS.length&&Number.isInteger(value.day)&&value.day>=1&&value.day<=SEASON_DAYS}

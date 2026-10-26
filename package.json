@@ -1,10 +1,10 @@
 {
   "name": "harvestao",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test simulation.test.js seasonal.test.js animal-care.test.js birding.test.js homestead-rules.test.js transport-rules.test.js herd-rules.test.js calendar-rules.test.js trailer-physics.test.js seasonal-scenery.test.js seasonal-particles.test.js interiors.test.js",
-    "check": "node --check game.js && node --check world.js && node --check expansion-ui.js && node --check region-manager.js && node --check region-homesteads.js && node --check tractor-art.js && node --check transport-art.js && node --check simulation.js && node --check hud-calendar.js && node --check calendar-rules.js && node --check trailer-physics.js && node --check farm-landscape.js && node --check seasonal-scenery.js && node --check seasonal-particles.js && node --check rural-room.js && node --check interior-catalog.js && node --check interiors-civic.js && node --check interiors-homes.js && node --check interiors-workshops.js"
+    "test": "node --test simulation.test.js seasonal.test.js animal-care.test.js birding.test.js homestead-rules.test.js transport-rules.test.js herd-rules.test.js calendar-rules.test.js trailer-physics.test.js seasonal-scenery.test.js seasonal-particles.test.js interiors.test.js profile.test.js farmer-avatar.test.js companion-dog.test.js companion-threats.test.js tractor-tracks.test.js",
+    "check": "node --check game.js && node --check world.js && node --check expansion-ui.js && node --check region-manager.js && node --check region-homesteads.js && node --check tractor-art.js && node --check transport-art.js && node --check simulation.js && node --check hud-calendar.js && node --check calendar-rules.js && node --check trailer-physics.js && node --check farm-landscape.js && node --check seasonal-scenery.js && node --check seasonal-particles.js && node --check rural-room.js && node --check interior-catalog.js && node --check interiors-civic.js && node --check interiors-homes.js && node --check interiors-workshops.js && node --check profile-rules.js && node --check profile-menu.js && node --check companion-dog.js && node --check companion-threats.js && node --check tractor-tracks.js && node --check soundscape.js"
   }
 }
