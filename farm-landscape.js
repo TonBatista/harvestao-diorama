@@ -1,13 +1,13 @@
 import * as T from './three.module.js';
-import {miniatureTexture} from './miniature-materials.js?v=0.17';
-import {meadowGeometry} from './art-direction.js?v=0.17';
-import {FIELD,TILE} from './simulation.js?v=0.17';
+import {miniatureTexture} from './miniature-materials.js?v=0.22';
+import {meadowGeometry} from './art-direction.js?v=0.22';
+import {FIELD,TILE} from './simulation.js?v=0.22';
 
 const rand=n=>{const v=Math.sin(n*127.1+34.2)*43758.5453;return v-Math.floor(v)};
 const owned=options=>{const m=new T.MeshStandardMaterial(options);m.userData.regionOwned=true;return m};
 // Region-owned clones preserve the shared main-farm atlas during travel/disposal.
 function atlas(kind,repeat){const map=miniatureTexture(kind,repeat)?.clone()||null;if(map){map.needsUpdate=true;map.anisotropy=8}return map}
-function surface(kind,repeat,color,bumpScale){const map=atlas(kind,repeat),m=owned({map,bumpMap:map,color,roughness:1,bumpScale});m.userData.noShadow=true;return m}
+function surface(kind,repeat,color,bumpScale){const map=atlas(kind,repeat),m=owned({map,bumpMap:map,color,roughness:1,bumpScale});m.userData.noShadow=true;m.userData.seasonSurface=({moss:'ground',earth:'soil',bark:'wood'})[kind]||kind;return m}
 function add(k,geometry,material,x,y,z){const m=new T.Mesh(geometry,material);m.position.set(x,y,z);m.receiveShadow=true;k.fixed.add(m);return m}
 export function farmGround(k,width=70,depth=70,x=0,z=0){return add(k,new T.BoxGeometry(width,.4,depth),surface('moss',32,'#bbd2a2',.09),x,-.22,z)}
 export function farmSoil(k,x=.875,z=3.875,size=16.8){
@@ -17,10 +17,10 @@ export function farmSoil(k,x=.875,z=3.875,size=16.8){
 }
 export function countryTrack(k,x,z,width,depth){
  const map=atlas('earth',6);if(map)map.repeat.set(width/2.3,depth/2.3);
- const material=owned({map,bumpMap:map,bumpScale:.065,roughness:1,color:'#d7c7ac'});material.userData.noShadow=true;
+ const material=owned({map,bumpMap:map,bumpScale:.065,roughness:1,color:'#d7c7ac'});material.userData.noShadow=true;material.userData.seasonSurface='path';
  const geometry=new T.PlaneGeometry(width,depth);geometry.rotateX(-Math.PI/2);const m=add(k,geometry,material,x,.042,z);m.name='worn-earth-track';return m;
 }
-function instances(k,geometry,material,items,name){const mesh=new T.InstancedMesh(geometry,material,items.length),dummy=new T.Object3D(),color=new T.Color();items.forEach((p,i)=>{dummy.position.set(p.x,p.y||0,p.z);dummy.rotation.set(p.rx||0,p.a||0,p.rz||0);dummy.scale.set(p.sx||1,p.sy||p.sx||1,p.sz||p.sx||1);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);if(p.color)mesh.setColorAt(i,color.set(p.color));else if(p.hue!==undefined)mesh.setColorAt(i,color.setHSL(p.hue,p.sat,p.light))});mesh.name=name;mesh.receiveShadow=true;mesh.castShadow=false;mesh.computeBoundingSphere();k.fixed.add(mesh);return mesh}
+function instances(k,geometry,material,items,name){const mesh=new T.InstancedMesh(geometry,material,items.length),dummy=new T.Object3D(),color=new T.Color();items.forEach((p,i)=>{dummy.position.set(p.x,p.y||0,p.z);dummy.rotation.set(p.rx||0,p.a||0,p.rz||0);dummy.scale.set(p.sx||1,p.sy||p.sx||1,p.sz||p.sx||1);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);if(p.color)mesh.setColorAt(i,color.set(p.color));else if(p.hue!==undefined)mesh.setColorAt(i,color.setHSL(p.hue,p.sat,p.light))});mesh.name=name;if(/meadow|weeds|reed-beds/.test(name))material.userData.seasonSurface='grass';if(/pebbles|stones/.test(name))material.userData.seasonSurface='stone';if(name==='stump-endgrain')material.userData.seasonSurface='wood';mesh.receiveShadow=true;mesh.castShadow=false;mesh.computeBoundingSphere();k.fixed.add(mesh);return mesh}
 export function farmMeadow(k,{x=0,z=0,width=29,depth=29,count=21000,seed=0,exclude=()=>false}={}){
  if(typeof matchMedia==='function'&&matchMedia('(pointer: coarse)').matches)count=Math.floor(count*.60);const items=[];for(let i=0;i<count*8&&items.length<count;i++){const n=i+seed,xx=x+(rand(n*3)-.5)*width,zz=z+(rand(n*3+1)-.5)*depth;if(exclude(xx,zz))continue;items.push({x:xx,y:-.015,z:zz,a:rand(n+30)*6,rx:(rand(n+18)-.5)*.4,rz:(rand(n+20)-.5)*.4,sx:.72+rand(n+28)*.55,sy:.72+rand(n+29)*.68,sz:.72+rand(n+31)*.55,hue:.25+rand(n)*.035,sat:.60,light:.34+rand(n+2)*.14})}
  return instances(k,meadowGeometry(),owned({color:'#acc779',roughness:1,side:T.DoubleSide}),items,'farm-meadow');

@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {CROPS} from './simulation.js?v=0.17';
-import {miniatureTexture} from './miniature-materials.js?v=0.17';
+import {CROPS} from './simulation.js?v=0.22';
+import {miniatureTexture} from './miniature-materials.js?v=0.22';
 
 // Every shape and material is shared: world.js can merge a whole field by material.
 const random=n=>{const v=Math.sin(n*127.1+34.2)*43758.5453;return v-Math.floor(v)};

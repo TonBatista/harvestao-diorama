@@ -1,16 +1,16 @@
-import {mountHudCalendar} from './hud-calendar.js?v=0.21';
-import {mountExpansionUI} from './expansion-ui.js?v=0.21.1';
-import {migrateHomesteads,selectLot,lotState} from './homestead-rules.js?v=0.19';
-import {migrateTransport,advanceHerd} from './transport-rules.js?v=0.21.1';
-import {freshState,validSave,CROPS,SEASONS,TOOLS,frontTile,useTool,pick,ship,sleep,buy,advanceTime,stash,retrieve,BAG_CAPACITY} from './simulation.js?v=0.19';
-import {ANIMALS,migrateAnimalCare,pickHay,returnHay,feedAnimal,petAnimal,animalStatus,advanceAnimalDay} from './animal-care.js?v=0.17';
-import {mountSoundscape} from './soundscape.js?v=0.20';
-import {mountFaunaEncounters} from './fauna-sounds.js?v=0.18';
-import {mountPhotographyUI} from './photo-ui.js?v=0.17';
-import {migrateBirding} from './birding.js?v=0.17';
-import {mountJoystick} from './controls.js?v=0.17';
-import {mountZoomControls} from './camera-controls.js?v=0.17';
-import {createWorld} from './world.js?v=0.21.1';
+import {mountHudCalendar} from './hud-calendar.js?v=0.22';
+import {mountExpansionUI} from './expansion-ui.js?v=0.22';
+import {migrateHomesteads,selectLot,lotState} from './homestead-rules.js?v=0.22';
+import {migrateTransport,advanceHerd} from './transport-rules.js?v=0.22';
+import {freshState,validSave,CROPS,SEASONS,TOOLS,frontTile,useTool,pick,ship,sleep,buy,advanceTime,stash,retrieve,BAG_CAPACITY} from './simulation.js?v=0.22';
+import {ANIMALS,migrateAnimalCare,pickHay,returnHay,feedAnimal,petAnimal,animalStatus,advanceAnimalDay} from './animal-care.js?v=0.22';
+import {mountSoundscape} from './soundscape.js?v=0.22';
+import {mountFaunaEncounters} from './fauna-sounds.js?v=0.22';
+import {mountPhotographyUI} from './photo-ui.js?v=0.22';
+import {migrateBirding} from './birding.js?v=0.22';
+import {mountJoystick} from './controls.js?v=0.22';
+import {mountZoomControls} from './camera-controls.js?v=0.22';
+import {createWorld} from './world.js?v=0.22';
 const $=id=>document.getElementById(id),KEY='harvestao-v2';let state=freshState(),storageOK=true;
 try{const data=JSON.parse(localStorage.getItem(KEY));if(validSave(data))state=data}catch{}
 state.inventory??=[];migrateAnimalCare(state);migrateBirding(state);migrateHomesteads(state);migrateTransport(state);
@@ -25,7 +25,7 @@ let toastTimer,joy={x:0,y:0},keys=new Set(),clock=0,saveClock=0,context='';const
 mountZoomControls($('farm'),world,paused);
 function notify(message){$('toast').textContent=message;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3400)}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state));storageOK=true}catch{storageOK=false}$('saveStatus').textContent=storageOK?'Progresso salvo neste navegador.':'Salvamento indisponível. Use Baixar progresso para guardar sua fazenda.'}
-function hud(){document.querySelector(".place").textContent=world.region.label;const weekday=['SEG','TER','QUA','QUI','SEX','SÁB','DOM'][(state.day-1)%7];$('date').textContent=`${state.day} ${weekday}`;$('time').textContent=String(Math.floor(state.minutes/60)%24).padStart(2,'0')+':'+String(Math.floor(state.minutes%60/10)*10).padStart(2,'0');$('season').textContent=`${SEASONS[state.season]} · Ano ${state.year}`;$('weather').textContent=state.weather==='rain'?'☁':'☀';$('money').textContent=state.money.toLocaleString('pt-BR');$('energy').textContent=state.stamina;$('energyFill').style.width=state.stamina+'%';$('water').textContent=state.water;$('held').hidden=!state.held&&!state.carryingHay;$('stashButton').hidden=!state.held;if(state.carryingHay)$('held').textContent='Carregando: fardo de feno · leve ao cocho';else if(state.held)$('held').textContent='Carregando: '+CROPS[state.held].name;document.querySelectorAll('[data-tool]').forEach(b=>{b.classList.toggle('selected',b.dataset.tool===state.tool);b.setAttribute('aria-pressed',b.dataset.tool===state.tool?'true':'false')});$('toolName').textContent=state.tool==='seed'?`${CROPS[state.seed].name} · ${state.bags[state.seed]||0} sacos`:names[state.tool];$('actionLabel').textContent=world.driving?'Roçadeira':state.tool==='camera'?'Fotografar':(world.area!=='farm'&&world.area!=='homestead')?'Interagir':state.tool==='hand'?'Pegar':'Usar';$('herdButton').hidden=world.area!=='barn';if(world.area==='barn'){$('herdSummary').textContent=ANIMALS.filter(a=>animalStatus(state,a.id).fed).length+'/'+ANIMALS.length+' alimentados · Ver cuidados'}}
+function hud(){document.querySelector(".place").textContent=world.region.label;const weekday=['SEG','TER','QUA','QUI','SEX','SÁB','DOM'][(state.day-1)%7];$('date').textContent=`${state.day} ${weekday}`;$('time').textContent=String(Math.floor(state.minutes/60)%24).padStart(2,'0')+':'+String(Math.floor(state.minutes%60/10)*10).padStart(2,'0');$('season').textContent=`${SEASONS[state.season]} · Ano ${state.year}`;$('weather').textContent=state.season===3?'❄':state.weather==='rain'?'☁':'☀';$('money').textContent=state.money.toLocaleString('pt-BR');$('energy').textContent=state.stamina;$('energyFill').style.width=state.stamina+'%';$('water').textContent=state.water;$('held').hidden=!state.held&&!state.carryingHay;$('stashButton').hidden=!state.held;if(state.carryingHay)$('held').textContent='Carregando: fardo de feno · leve ao cocho';else if(state.held)$('held').textContent='Carregando: '+CROPS[state.held].name;document.querySelectorAll('[data-tool]').forEach(b=>{b.classList.toggle('selected',b.dataset.tool===state.tool);b.setAttribute('aria-pressed',b.dataset.tool===state.tool?'true':'false')});$('toolName').textContent=state.tool==='seed'?`${CROPS[state.seed].name} · ${state.bags[state.seed]||0} sacos`:names[state.tool];$('actionLabel').textContent=world.driving?'Roçadeira':state.tool==='camera'?'Fotografar':(world.area!=='farm'&&world.area!=='homestead')?'Interagir':state.tool==='hand'?'Pegar':'Usar';$('herdButton').hidden=world.area!=='barn';if(world.area==='barn'){$('herdSummary').textContent=ANIMALS.filter(a=>animalStatus(state,a.id).fed).length+'/'+ANIMALS.length+' alimentados · Ver cuidados'}}
 function select(id){state.tool=id;world.toolModel(id);hud();save()}
 function result(r,action){notify(r.message);if(r.changed){if(world.area==='farm'||world.area==='homestead')world.rebuild();if(action)world.act(action);if(r.effect)world.effect(r.effect);save();hud()}}
 function distance(loc){return Math.hypot(state.player.x-loc.x,state.player.z-loc.z)}

@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {miniatureTexture} from './miniature-materials.js?v=0.17';
+import {miniatureTexture} from './miniature-materials.js?v=0.22';
 
 const random=n=>{const v=Math.sin(n*127.1+34.2)*43758.5453;return v-Math.floor(v)};
 const textures=new Map(),materials=new Map();
@@ -25,7 +25,8 @@ export function artisanMaterial(color,kind='stone'){
   // The atlas already supplies the material's natural color. A light tint
   // retains the palette without multiplying dark wood and stone twice.
   if(photograph)tint.lerp(new T.Color('#fff9ee'),kind==='leaf'?.38:kind==='bark'?.38:kind==='wood'||kind==='siding'?.64:kind==='clay'?.57:.58);
-  materials.set(key,new T.MeshStandardMaterial({color:tint,map,bumpMap:map,bumpScale:kind==='fabric'?.007:kind==='leaf'?.011:kind==='wood'||kind==='siding'?.026:kind==='bark'?.055:.033,roughness:kind==='clay'?.98:1}));
+  const material=new T.MeshStandardMaterial({color:tint,map,bumpMap:map,bumpScale:kind==='fabric'?.007:kind==='leaf'?.011:kind==='wood'||kind==='siding'?.026:kind==='bark'?.055:.033,roughness:kind==='clay'?.98:1});
+  material.userData.seasonSurface=({leaf:'leaf',moss:'grass',clay:'roof',wood:'wood',siding:'wood',bark:'wood',stone:'stone',cottageStone:'stone',earth:'soil',fabric:'fabric'})[kind]||kind;materials.set(key,material);
  }return materials.get(key);
 }
 const square=new T.Shape();square.moveTo(-.46,-.46);square.lineTo(.46,-.46);square.lineTo(.46,.46);square.lineTo(-.46,.46);square.closePath();
@@ -117,7 +118,7 @@ const branchGeometry=new T.CylinderGeometry(1,1,1,7);
 export function treeCrown(seed=0){
  if(!crownPalette){
   const source=miniatureTexture('leaf')||surfaceTexture('leaf'),canvas=document.createElement('canvas');canvas.width=canvas.height=512;const q=canvas.getContext('2d');q.filter='contrast(.8) saturate(.9)';q.drawImage(source.image,0,0,512,512);const leaf=new T.CanvasTexture(canvas);leaf.colorSpace=T.SRGBColorSpace;leaf.anisotropy=4;
-  crownPalette=['#b9cea7','#cddbb7','#d4dfb9','#a6c398'].map(color=>new T.MeshStandardMaterial({color,map:leaf,bumpMap:leaf,bumpScale:.014,roughness:.73,side:T.DoubleSide}));
+  crownPalette=['#b9cea7','#cddbb7','#d4dfb9','#a6c398'].map(color=>{const m=new T.MeshStandardMaterial({color,map:leaf,bumpMap:leaf,bumpScale:.014,roughness:.73,side:T.DoubleSide});m.userData.seasonSurface='leaf';return m});
  }
  const g=new T.Group(),up=new T.Vector3(0,1,0),normal=new T.Vector3(),start=new T.Vector3(),end=new T.Vector3(),mid=new T.Vector3(),bark=artisanMaterial('#9b8b6c','bark');
  const branch=(a,b,r)=>{start.fromArray(a);end.fromArray(b);mid.subVectors(end,start);const m=add(g,branchGeometry,bark,(start.x+end.x)/2,(start.y+end.y)/2,(start.z+end.z)/2,r,mid.length(),r*.8);m.quaternion.setFromUnitVectors(up,mid.normalize());return m};

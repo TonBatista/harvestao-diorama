@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {CROPS,SEASONS,FIELD,TILE,cropsForSeason,freshState,buy,useTool,sleep,pick,ship,validSave} from './simulation.js?v=0.17';
+import {CROPS,SEASONS,FIELD,TILE,cropsForSeason,freshState,buy,useTool,sleep,pick,ship,validSave} from './simulation.js?v=0.22';
 
 function plantingState(id){
  const s=freshState(false);s.season=CROPS[id].season;s.money=10000;s.seed=id;s.tool='seed';s.bags={};

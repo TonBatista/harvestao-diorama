@@ -1,8 +1,8 @@
-import {indoorLocation} from './transport-rules.js?v=0.21.1';
+import {indoorLocation} from './transport-rules.js?v=0.22';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.20';
-import {ANIMALS,animalStatus,migrateAnimalCare} from './animal-care.js?v=0.17';
-import {migrateTransport} from './transport-rules.js?v=0.21.1';
+import {createKit} from './region-kit.js?v=0.22';
+import {ANIMALS,animalStatus,migrateAnimalCare} from './animal-care.js?v=0.22';
+import {migrateTransport} from './transport-rules.js?v=0.22';
 const palette={oak:'#ae8c5e',dark:'#76543b',trim:'#d0ad79',cream:'#e7dbc3',stone:'#aaa48d',sage:'#829275',violet:'#87718c',iron:'#586361',terracotta:'#b78b65'},roundedCache=new Map();
 function rounded(k,p,c,x,y,z,w,h,d,r=.055,kind='plain'){r=Math.min(r,w/2,h/2,d/2);const key=[w,h,d,r].join(':');let g=roundedCache.get(key);if(!g){g=new T.BoxGeometry(w,h,d,3,3,3);const a=g.attributes.position,inner=new T.Vector3(w/2-r,h/2-r,d/2-r),v=new T.Vector3(),q=new T.Vector3();for(let i=0;i<a.count;i++){v.fromBufferAttribute(a,i);q.set(T.MathUtils.clamp(v.x,-inner.x,inner.x),T.MathUtils.clamp(v.y,-inner.y,inner.y),T.MathUtils.clamp(v.z,-inner.z,inner.z));v.sub(q).normalize().multiplyScalar(r).add(q);a.setXYZ(i,v.x,v.y,v.z)}g.computeVertexNormals();g.userData.shared=true;roundedCache.set(key,g)}const o=k.box(p,c,x,y,z,w,h,d,kind);o.geometry=g;o.scale.set(1,1,1);return o}
 function group(parent,x=0,y=0,z=0,angle=0){const g=new T.Group();g.position.set(x,y,z);g.rotation.y=angle;parent.add(g);return g}
