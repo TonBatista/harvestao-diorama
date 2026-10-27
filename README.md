@@ -1,8 +1,8 @@
 # Harvestão — a vida no campo
 
-Versão 0.26. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.27. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.26)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.27)
 
 ## Cuidar dos animais
 
@@ -88,3 +88,12 @@ Cacau, a galinha; Pingo, o pato; e Rubi, o porquinho passeiam pela fazenda e pel
 Nas noites dos dias 3, 6, 9 e assim por diante, uma raposa ou um ouriço pode visitar a borda da fazenda após alguns segundos. O cachorro percebe e dá o alerta. Use X perto dele ou do visitante para escolher entre observar e pedir que o acompanhe de volta ao bosque, sem ferir. O encontro acontece uma vez por propriedade/noite e o visitante também parte sozinho.
 
 Os três pets compartilham geometrias leves; somente um visitante aparece de cada vez. Não foram acrescentados downloads ou áudio de terceiros. Nesta rodada foi feita apenas conferência de sintaxe, sem executar a bateria de testes, conforme solicitado.
+## Novidades da versão 0.27
+
+Na Praia das Conchas, entre no Farol da Maré e suba pela escada do vigia. A galeria superior é circular, com a lanterna ao centro, piso de tábuas, janelas panorâmicas e uma luneta de latão presa à janela. Há vista do mar de dia e à noite, diário de bordo e pequenos detalhes do vigia.
+
+Use X perto da luneta para observar o mar em primeira pessoa. Arraste, use as setas laterais ou ←/→; amplie entre1× e6× com a barra, +/−, roda do mouse ou pinça no celular. A ilha distante tem árvores, rochedos, uma ruína e uma pequena queda de água. Y, Esc ou × volta à galeria. A cena da luneta só carrega enquanto é usada, tem resolução limitada e libera seus recursos ao sair.
+
+Trator: os botões mostram estado e motivos de bloqueio, atualizam carreta/carga imediatamente e evitam toque duplo. É possível acoplar e transportar pelo menu do celeiro quando o trator está estacionado perto do portão. O desembarque para o pasto usa corretamente a região externa. O cachorro acompanha pela lateral com carreta ocupada, evita a carroceria e conserva a escolha do lado quando há espaço. O assobio foi reduzido para aproximadamente32% do volume anterior, respeitando os controles de áudio.
+
+Somente conferência de sintaxe nesta rodada; não foi executada a bateria de testes, conforme pedido de priorizar publicação.

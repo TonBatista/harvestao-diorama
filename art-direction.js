@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {miniatureTexture} from './miniature-materials.js?v=0.26';
+import {miniatureTexture} from './miniature-materials.js?v=0.27';
 
 const random=n=>{const v=Math.sin(n*127.1+34.2)*43758.5453;return v-Math.floor(v)};
 const textures=new Map(),materials=new Map();

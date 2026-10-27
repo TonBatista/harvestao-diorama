@@ -1,1 +1,11 @@
 .vehicle-button{position:fixed;left:18px;top:205px;z-index:12;border:1px solid #a79875aa;background:#eee7d2e8;color:#515d41;border-radius:12px;padding:9px 12px;font:600 12px Georgia,serif;box-shadow:0 3px 12px #25301e24;cursor:pointer}.vehicle-button.driving{background:#d6dfb9}#expansionDialog{max-width:490px}#expansionBody button{width:100%;margin:6px 0}#expansionBody p{line-height:1.6}#expansionBody small{display:block;color:#82765c;margin:4px 0 14px}@media(max-width:600px){.vehicle-button{left:12px;top:190px;font-size:11px;padding:8px}}
+/* Tractor actions retain their state and show the reason for unavailable commands. */
+#expansionBody .vehicle-status{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+#expansionBody .vehicle-status span{padding:5px 8px;border-radius:8px;background:#e6e4cd;color:#556746;font-size:11px}
+#expansionBody .vehicle-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#expansionBody .vehicle-actions button{min-height:46px;margin:0;touch-action:manipulation}
+#expansionBody button:disabled{opacity:.43;cursor:default}
+#expansionBody .vehicle-feedback{margin:6px 0 13px;padding:9px 11px;background:#e8eed8;border-radius:8px;color:#52673f;font-size:12px}
+#expansionBody .vehicle-feedback:empty{display:none}
+#expansionBody button small{font-size:10px;margin:3px 0 0;color:inherit;opacity:.75}
+@media(max-width:380px){#expansionBody .vehicle-actions{grid-template-columns:1fr}}

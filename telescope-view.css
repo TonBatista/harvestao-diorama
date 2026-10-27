@@ -1,0 +1,25 @@
+#telescopeDialog{position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;border-radius:0;overflow:hidden;background:#2c5367;color:#f3e6c8;box-shadow:none;touch-action:none}
+#telescopeDialog::backdrop{background:#122a33}
+#telescopeDialog .telescope-stage{position:absolute;inset:0;overflow:hidden;touch-action:none;cursor:grab}
+#telescopeDialog .telescope-stage:active{cursor:grabbing}
+#telescopeDialog .telescope-stage canvas{width:100%;height:100%;display:block}
+.telescope-vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 110px 25px #0c202dbc;background:radial-gradient(ellipse at center,transparent 39%,#172b3440 69%,#13222ed9 100%)}
+#telescopeDialog .telescope-heading{position:absolute;top:max(22px,env(safe-area-inset-top));left:28px;right:auto;pointer-events:none;text-shadow:0 2px 10px #142f44a8;display:block;padding:0;background:none;border:0}
+.telescope-heading small{font:600 9px system-ui;letter-spacing:.27em;color:#e0c996}
+#telescopeDialog .telescope-heading h2{margin:5px 0;font:30px Georgia,serif;color:#f6edd7}
+.telescope-heading p{margin:0;font:12px Georgia,serif;color:#e1e4d6}
+#telescopeDialog button{border:1px solid #d2c19866;background:#213f49b8;color:#f6ebd3;backdrop-filter:blur(6px);box-shadow:0 3px 12px #122b3833;min-width:44px;min-height:44px;touch-action:none}
+#telescopeDialog button:hover,#telescopeDialog button:active{background:#a69569dc;color:#1f3b42}
+#telescopeDialog .telescope-close{position:absolute;right:max(24px,env(safe-area-inset-right));top:max(22px,env(safe-area-inset-top));width:46px;height:46px;padding:0;border-radius:50%;font:31px Georgia;line-height:1}
+.telescope-pan{position:absolute;bottom:max(84px,calc(env(safe-area-inset-bottom) + 76px));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:20px}
+.telescope-pan button{width:52px;height:48px;padding:0;border-radius:18px;font:37px Georgia,serif;line-height:.8}
+.telescope-pan span{font:9px system-ui;letter-spacing:.25em;text-shadow:0 2px 8px #183b4e}
+.telescope-zoom{position:absolute;right:max(28px,env(safe-area-inset-right));top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 8px;border-radius:24px;background:#17374348;border:1px solid #d2c19833}
+.telescope-zoom button{width:40px;height:40px;padding:0;border-radius:50%;font:25px Georgia,serif}
+.telescope-zoom input{writing-mode:vertical-lr;direction:rtl;appearance:slider-vertical;width:28px;height:142px;margin:0;padding:0;accent-color:#d8bf86;touch-action:none;cursor:pointer}
+.telescope-zoom output{font:12px Georgia,serif;text-shadow:0 1px 6px #173641}
+#telescopeDialog .telescope-footer{position:absolute;left:26px;right:26px;bottom:max(18px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:center;gap:10px;font:11px system-ui;text-shadow:0 2px 7px #16364a}
+#telescopeDialog .telescope-reset{padding:9px 15px;min-height:36px;border-radius:18px;font:11px system-ui}
+.telescope-error{position:absolute;left:20%;right:20%;top:42%;padding:20px;border:1px solid #cbbd97;background:#254552;color:#fff1d1;text-align:center;border-radius:18px}
+@media(max-width:600px){#telescopeDialog .telescope-heading{left:18px;top:21px}#telescopeDialog .telescope-heading h2{font-size:25px}.telescope-heading p{font-size:11px}.telescope-zoom{right:12px;padding:9px 5px}.telescope-zoom input{height:116px}.telescope-pan{gap:14px;bottom:82px}#telescopeDialog .telescope-footer{left:16px;right:16px;bottom:16px;align-items:flex-end}.telescope-footer>span{max-width:165px;font-size:9px;line-height:1.5}#telescopeDialog .telescope-reset{font-size:10px;padding:9px 11px}#telescopeDialog .telescope-close{right:17px;width:42px;height:42px;min-width:42px;min-height:42px}}
+@media(max-height:500px){.telescope-zoom input{height:78px}.telescope-zoom{padding:5px;gap:4px}.telescope-pan{left:32px;bottom:70px;transform:none;gap:10px}.telescope-pan span{display:none}#telescopeDialog .telescope-heading h2{font-size:23px}.telescope-heading p{display:none}#telescopeDialog .telescope-footer{bottom:12px}}

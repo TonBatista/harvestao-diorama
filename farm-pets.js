@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {part,mergeParts} from './wildlife-art.js?v=0.26';
+import {part,mergeParts} from './wildlife-art.js?v=0.27';
 const TAU=Math.PI*2,wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 const DEFAULTS=[{id:'chicken',name:'Galinha Cacau',speed:.68},{id:'duck',name:'Pato Pingo',speed:.72},{id:'pig',name:'Porquinho Rubi',speed:.61}];
 const cleanName=(v,fallback)=>typeof v==='string'&&v.trim()?Array.from(v.replace(/[<>\u0000-\u001f]/g,'').trim()).slice(0,24).join(''):fallback;
