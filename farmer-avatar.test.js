@@ -7,7 +7,7 @@ for(const method of ['fillRect','clearRect','strokeRect','beginPath','closePath'
 context.createLinearGradient=context.createRadialGradient=()=>({addColorStop:noop});context.measureText=text=>({width:String(text).length*8});context.createImageData=(w,h)=>({data:new Uint8ClampedArray(w*h*4)});context.putImageData=noop;
 globalThis.document={createElement(name){assert.equal(name,'canvas');return {width:256,height:256,getContext(){return context}}}};
 globalThis.Image=class{constructor(){this.width=this.height=1536}async decode(){}};
-const {loadMiniatureMaterials}=await import('./miniature-materials.js?v=0.24');await loadMiniatureMaterials();
+const {loadMiniatureMaterials}=await import('./miniature-materials.js?v=0.25');await loadMiniatureMaterials();
 const {createFarmer}=await import('./farmer-art.js');
 function materials(root){const all=new Set();root.traverse(o=>{if(o.material)for(const m of Array.isArray(o.material)?o.material:[o.material])all.add(m)});return [...all]}
 function nodes(root){const all=[];root.traverse(o=>all.push(o));return all}

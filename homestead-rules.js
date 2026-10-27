@@ -1,4 +1,4 @@
-import {FIELD,TILE} from './simulation.js?v=0.24';
+import {FIELD,TILE} from './simulation.js?v=0.25';
 export const LOTS=Object.freeze([
  {id:'willow',name:'Recanto dos Salgueiros',price:300,x:-33,z:1},
  {id:'sunrise',name:'Margem do Amanhecer',price:1800,x:33,z:1},

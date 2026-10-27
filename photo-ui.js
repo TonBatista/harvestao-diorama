@@ -1,4 +1,4 @@
-import {SPECIES,migrateBirding,recordSighting,listRecords,getBirdingProgress} from './birding.js?v=0.24';
+import {SPECIES,migrateBirding,recordSighting,listRecords,getBirdingProgress} from './birding.js?v=0.25';
 
 const cameraIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h4l2-3h6l2 3h4v14H3z"/><circle cx="12" cy="13.5" r="4"/><path d="M17.5 10h1"/></svg>';
 const bookIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1zM12 5v15M6 8h3M6 11h3"/><path d="M15.3 10.1c1.7-1.2 3.3-.2 2.7 1.3-.4 1-1.5 1.8-2.7 2.2-1.1-.4-2-1.3-2.2-2.2"/></svg>';
@@ -21,7 +21,7 @@ export function mountPhotographyUI({state,world,notify=()=>{},save=()=>{},isPaus
  const caption=element('div','photo-caption');const cameraMark=element('span','photo-camera-mark');cameraMark.innerHTML=cameraIcon;
  const captionCopy=element('div','photo-caption-copy');const captionTitle=element('strong',null,'Caderno de campo');const captionHint=element('small',null,'Enquadre uma ave ou animal');captionCopy.append(captionTitle,captionHint);caption.append(cameraMark,captionCopy);
  const targetRing=element('div','photo-target-ring');targetRing.hidden=true;targetRing.setAttribute('aria-hidden','true');targetRing.innerHTML='<i></i><i></i><i></i><i></i>';
- const shutter=button('photo-shutter',undefined,'Fotografar ave ou animal enquadrado');shutter.innerHTML=cameraIcon;shutter.title='Fotografar (Espaço ou A)';
+ const shutter=button('photo-shutter',undefined,'Fotografar ave ou animal enquadrado');shutter.innerHTML=cameraIcon;shutter.title='Fotografar (X)';
  const shutterHint=element('span','photo-shutter-hint','FOTOGRAFAR');const flash=element('div','photo-flash');flash.setAttribute('aria-hidden','true');
  finder.append(frame,caption,targetRing,shutter,shutterHint,flash);document.body.append(finder);
  const album=element('dialog','photo-album');album.id='birdAlbum';album.setAttribute('aria-labelledby','birdAlbumTitle');
