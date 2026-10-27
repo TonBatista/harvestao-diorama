@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {part,mergeParts} from './wildlife-art.js?v=0.25';
-import {migrateCompanion} from './profile-rules.js?v=0.25';
+import {part,mergeParts} from './wildlife-art.js?v=0.26';
+import {migrateCompanion} from './profile-rules.js?v=0.26';
 const TAU=Math.PI*2,wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 const finitePoint=p=>Number.isFinite(p?.x)&&Number.isFinite(p?.z);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -41,6 +41,7 @@ export function createCompanionDog(scene,state={}){
  function whistle(){followUntil=time+8;roamGoal=null;roamRest=0;path=[];repath=0;barkSerial++;mode='following';return true}
  function pet(){if(riding||Math.hypot(root.position.x-lastPlayer.x,root.position.z-lastPlayer.z)>1.7)return false;petUntil=time+2.6;followUntil=Math.max(followUntil,time+5);path=[];speed=0;mode='petting';return true}
  function defend(target){if(!target||!['snake','spider'].includes(target.speciesId)||!root.visible||(target.area&&area&&target.area!==area))return false;const id=String(target.id||target.speciesId);if((repelled.get(id)||0)>time)return false;let point=targetPoint(target);if(!point)point={x:lastPlayer.x+Math.sin(lastPlayer.angle||0)*1.8,z:lastPlayer.z+Math.cos(lastPlayer.angle||0)*1.8};if(Math.hypot(point.x-lastPlayer.x,point.z-lastPlayer.z)>4.8)return false;guard={id,point,until:time+3.4};repelled.set(id,time+12);while(repelled.size>16)repelled.delete(repelled.keys().next().value);barkSerial++;riding=false;path=[];repath=0;return true}
+ function watchVisitor(target,chase=false){if(!target||!root.visible||target.area!==area||riding&&!chase)return false;const point=targetPoint(target);if(!point)return false;if(guard&&!guard.visitor&&guard.until>time)return false;const id=String(target.id),fresh=guard?.id!==id;guard={id,point,visitor:true,chase:!!chase,until:time+.8};if(fresh){barkSerial++;path=[];repath=0}if(chase)riding=false;return true}
  function repels(id){return(repelled.get(String(id))||0)>time}
  function roamPoint(blocked){const b=lastBounds||[lastPlayer.x-10,lastPlayer.x+10,lastPlayer.z-10,lastPlayer.z+10];for(let i=0;i<24;i++){const x=b[0]+.8+Math.random()*Math.max(.1,b[1]-b[0]-1.6),z=b[2]+.8+Math.random()*Math.max(.1,b[3]-b[2]-1.6);if(!blocked(x,z)&&Math.hypot(x-root.position.x,z-root.position.z)>1)return{x,z}}return safeNear(lastPlayer,blocked)}
  function leaveTrailer(player,blocked){riding=false;jump=0;const point=safeNear({x:root.position.x,z:root.position.z,angle},blocked,true)||safeNear(player,blocked);if(point)root.position.set(point.x,0,point.z);path=[];lastGoal=null;repath=0}
@@ -52,7 +53,7 @@ export function createCompanionDog(scene,state={}){
   let goal=null;const following=time<followUntil||driving||indoors||!['farm','homestead','lake'].includes(area);
   if(time<petUntil){mode='petting';moving=false;speed=0;avatar.rotation.z+=(1.28-avatar.rotation.z)*(1-Math.exp(-dt*10));legs.forEach((leg,i)=>leg.rotation.x=Math.sin(time*12+i)*.22);tail.rotation.y=Math.sin(time*12)*.5;heart.visible=true;heart.position.set(0,1.25+(2.6-(petUntil-time))*.16,0);heart.rotation.y=-root.rotation.y+Math.PI/4;heartMat.opacity=Math.min(1,(petUntil-time)*2);return}avatar.rotation.z+=(0-avatar.rotation.z)*(1-Math.exp(-dt*10));heart.visible=false;
   if(canRide&&!guard){mode='boarding';goal={x:trailer.x,z:trailer.z};if(Math.hypot(root.position.x-goal.x,root.position.z-goal.z)<1.15){riding=true;jump=0;path=[];return}}
-  else if(guard){mode='guarding';const dx=guard.point.x-player.x,dz=guard.point.z-player.z,length=Math.hypot(dx,dz)||1,point={x:player.x+dx/length*.82,z:player.z+dz/length*.82};goal=!blocked(point.x,point.z)?point:safeNear(player,blocked,driving)}
+  else if(guard){mode='guarding';const dx=guard.point.x-player.x,dz=guard.point.z-player.z,length=Math.hypot(dx,dz)||1,point=guard.chase?{x:guard.point.x-dx/length*.9,z:guard.point.z-dz/length*.9}:{x:player.x+dx/length*.82,z:player.z+dz/length*.82};goal=!blocked(point.x,point.z)?point:safeNear(player,blocked,driving)}
   else if(following){mode='following';goal=safeNear(player,blocked,driving)}
   else{mode='roaming';roamRest=Math.max(0,roamRest-dt);if(roamGoal&&Math.hypot(roamGoal.x-root.position.x,roamGoal.z-root.position.z)<.35){roamGoal=null;roamRest=1.2+Math.random()*2.8;path=[]}if(!roamGoal&&roamRest===0)roamGoal=roamPoint(blocked);goal=roamGoal}
   if(!goal){moving=false;speed=0;tail.rotation.y=Math.sin(time*5)*.32;return}
@@ -67,5 +68,5 @@ export function createCompanionDog(scene,state={}){
  }
  function update(dt,{player=lastPlayer,area:nextArea=area,driving=false,blocked=lastBlocked,targets=[],indoors=false,bounds=lastBounds,trailer=null}={}){if(!finitePoint(player))return;lastPlayer=player;lastBlocked=typeof blocked==='function'?blocked:()=>false;lastDriving=!!driving;lastBounds=bounds;lastTrailer=trailer;appearance();if(nextArea!==area||!root.visible)travel({player,area:nextArea,blocked:lastBlocked});for(const target of targets)if(['snake','spider'].includes(target.speciesId)&&target.distance<3)defend(target);accumulator+=clamp(Number.isFinite(dt)?dt:0,0,.20);let frames=0;while(accumulator>=1/60&&frames++<12){step(1/60,player,lastBlocked,driving,indoors);accumulator-=1/60}}
  function dispose(){scene.remove(root);root.traverse(o=>{if(o.geometry&&!o.geometry.userData.shared)o.geometry.dispose()});art.shadowMaterial.dispose();heartMat.dispose();root.clear();repelled.clear()}
- return{root,update,travel,defend,repels,whistle,pet,get status(){return{area,x:root.position.x,z:root.position.z,angle,moving,guarding:!!guard,protectedId:guard?.id||null,barkSerial,name:state.companion.name,coat:state.companion.coat,mode}},dispose};
+ return{root,update,travel,defend,watchVisitor,repels,whistle,pet,get status(){return{area,x:root.position.x,z:root.position.z,angle,moving,guarding:!!guard,protectedId:guard?.id||null,barkSerial,name:state.companion.name,coat:state.companion.coat,mode}},dispose};
 }

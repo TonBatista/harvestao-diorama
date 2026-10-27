@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {miniatureTexture} from './miniature-materials.js?v=0.25';
+import {miniatureTexture} from './miniature-materials.js?v=0.26';
 
 // The original movement controller animates the same articulated hierarchy.
 // The portrait and shoulders are repositioned to match the miniature proportions.
@@ -103,13 +103,14 @@ export function createFarmer(scene,profile={}){
  for(const key of ['thread','clothThread','brass','metalDark','packEdge','capSeam','lace','eyeWhite','eye','iris','glint','mouth','hairFine','blush','scarfLight','overallLight'])M[key].userData.castShadow=false;
  const packMap=wornCanvas();for(const key of ['pack','packFade','packShade']){M[key].map=M[key].bumpMap=packMap;M[key].bumpScale=.002}
  const leatherMap=nubuck();for(const key of ['boot','bootDark','bootLight']){M[key].map=M[key].bumpMap=leatherMap;M[key].bumpScale=.002}
+ M.bib=M.overall.clone();M.bib.name='avatar-bib';
  M.glint.roughness=.16;M.eye.roughness=.19;M.iris.roughness=.25;M.hair.roughness=M.hairLight.roughness=.43;M.skin.roughness=.64;
  const farmer=new T.Group(),body=new T.Group(),torso=new T.Group();farmer.name='farmer';farmer.scale.setScalar(.82);farmer.add(body);body.add(torso);torso.scale.set(.97,.91,.96);torso.position.y=.015;scene.add(farmer);
  // Short, softly gathered overalls follow the compact miniature silhouette.
  const torsoGeometry=new T.LatheGeometry([new T.Vector2(.20,.67),new T.Vector2(.25,.70),new T.Vector2(.258,.73),new T.Vector2(.25,.92),new T.Vector2(.237,1.045),new T.Vector2(.18,1.10),new T.Vector2(.12,1.115)],36);
  const shirt=add(torso,torsoGeometry,M.shirt);shirt.scale.z=.77;
  ellipsoid(torso,M.skin,0,1.13,0,.12,.13,.12);
- clothPanel(torso,M.overall,0,.810,.216,.126,.091,.008,.022);
+ clothPanel(torso,M.bib,0,.810,.216,.126,.091,.008,.022);
  seam(torso,M.overallLight,[[-.056,.847,.224],[-.055,.784,.227],[0,.775,.227],[.055,.784,.227],[.056,.847,.224]],.0019,20);
  for(const side of [-1,1]){
   const x=side*.151;
@@ -201,6 +202,7 @@ export function createFarmer(scene,profile={}){
  // Two pointed forelocks sweep out beside the adjustment window.
  add(headArt,lockGeometry([[-.124,.143,.260],[-.228,.218,.316],[-.354,.191,.332],[-.447,.075,.296]],.055,.041),M.hairLight);
  add(headArt,lockGeometry([[-.164,.123,.277],[-.262,.106,.337],[-.300,.002,.339],[-.268,-.080,.303]],.047,.035),M.hairLight);
+ const capArt=new T.Group();capArt.name='avatar-hat-cap';head.add(capArt);
  // Parametric crown: the opening at the front is actual missing cloth. Its
  // little bridge and snap holes sit over the dark hair, as on a backward cap.
  const capPos=[],capUv=[],capIndex=[],around=48,rows=24;
@@ -209,19 +211,19 @@ export function createFarmer(scene,profile={}){
   const a=i/around*Math.PI*2,t=j/rows*Math.acos((capHem(a)-.193)/.352);capPos.push(Math.sin(a)*Math.sin(t)*.413,.193+Math.cos(t)*.352,-.036+Math.cos(a)*Math.sin(t)*.359);capUv.push(i/around,j/rows);
  }
  for(let j=0;j<rows;j++)for(let i=0;i<around;i++){const a=j*(around+1)+i,b=a+around+1;capIndex.push(a,b,a+1,b,b+1,a+1)}
- const capGeo=new T.BufferGeometry();capGeo.setAttribute('position',new T.Float32BufferAttribute(capPos,3));capGeo.setAttribute('uv',new T.Float32BufferAttribute(capUv,2));capGeo.setIndex(capIndex);capGeo.computeVertexNormals();add(headArt,capGeo,M.cap);
- const band=[];for(let i=0;i<=64;i++){const a=i/64*Math.PI*2,t=Math.acos((capHem(a)-.193)/.352);band.push([Math.sin(a)*Math.sin(t)*.413,capHem(a),-.036+Math.cos(a)*Math.sin(t)*.359])}seam(headArt,M.capShade,band,.0065,72);
- for(let i=0;i<6;i++){const a=i/6*Math.PI*2,points=[],end=Math.acos((capHem(a)-.193)/.352);for(let j=0;j<=12;j++){const t=j/12*end;points.push([Math.sin(a)*Math.sin(t)*.414,.193+Math.cos(t)*.353,-.036+Math.cos(a)*Math.sin(t)*.360])}seam(headArt,M.capSeam,points,.0013,30)}
- ellipsoid(headArt,M.capShade,0,.546,-.036,.022,.011,.022);
- ellipsoid(headArt,M.cap,0,.552,-.036,.016,.007,.016);
+ const capGeo=new T.BufferGeometry();capGeo.setAttribute('position',new T.Float32BufferAttribute(capPos,3));capGeo.setAttribute('uv',new T.Float32BufferAttribute(capUv,2));capGeo.setIndex(capIndex);capGeo.computeVertexNormals();add(capArt,capGeo,M.cap);
+ const band=[];for(let i=0;i<=64;i++){const a=i/64*Math.PI*2,t=Math.acos((capHem(a)-.193)/.352);band.push([Math.sin(a)*Math.sin(t)*.413,capHem(a),-.036+Math.cos(a)*Math.sin(t)*.359])}seam(capArt,M.capShade,band,.0065,72);
+ for(let i=0;i<6;i++){const a=i/6*Math.PI*2,points=[],end=Math.acos((capHem(a)-.193)/.352);for(let j=0;j<=12;j++){const t=j/12*end;points.push([Math.sin(a)*Math.sin(t)*.414,.193+Math.cos(t)*.353,-.036+Math.cos(a)*Math.sin(t)*.360])}seam(capArt,M.capSeam,points,.0013,30)}
+ ellipsoid(capArt,M.capShade,0,.546,-.036,.022,.011,.022);
+ ellipsoid(capArt,M.cap,0,.552,-.036,.016,.007,.016);
  const brimPositions=[],brimUv=[],brimIndex=[],nx=32,ny=6;
  for(let j=0;j<=ny;j++)for(let i=0;i<=nx;i++){const a=(i/nx-.5)*Math.PI*.94,u=j/ny,r=.182+u*.17,x=Math.sin(a)*r,z=-.241-Math.cos(a)*r*.85,y=.171-u*.024+Math.sin(a)**2*.014;brimPositions.push(x,y,z);brimUv.push(i/nx,u)}
  for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){const a=j*(nx+1)+i,b=a+nx+1;brimIndex.push(a,b,a+1,b,b+1,a+1)}
- const brim=new T.BufferGeometry();brim.setAttribute('position',new T.Float32BufferAttribute(brimPositions,3));brim.setAttribute('uv',new T.Float32BufferAttribute(brimUv,2));brim.setIndex(brimIndex);brim.computeVertexNormals();M.capShade.side=T.DoubleSide;add(headArt,brim,M.capShade);const topBrim=add(headArt,brim,M.cap);topBrim.position.y=.007;
- const brimEdge=[];for(let i=0;i<=30;i++){const a=(i/30-.5)*Math.PI*.94;brimEdge.push([Math.sin(a)*.352,.152+Math.sin(a)**2*.014,-.241-Math.cos(a)*.352*.85])}seam(headArt,M.capSeam,brimEdge,.0018,38);
- softBox(headArt,M.capShade,0,.174,.325,.221,.031,.014,.005);
- softBox(headArt,M.cap,.023,.178,.337,.169,.025,.009,.003);
- for(const x of [-.021,.011,.043])ellipsoid(headArt,M.capShade,x,.178,.344,.0038,.0045,.002);
+ const brim=new T.BufferGeometry();brim.setAttribute('position',new T.Float32BufferAttribute(brimPositions,3));brim.setAttribute('uv',new T.Float32BufferAttribute(brimUv,2));brim.setIndex(brimIndex);brim.computeVertexNormals();M.capShade.side=T.DoubleSide;add(capArt,brim,M.capShade);const topBrim=add(capArt,brim,M.cap);topBrim.position.y=.007;
+ const brimEdge=[];for(let i=0;i<=30;i++){const a=(i/30-.5)*Math.PI*.94;brimEdge.push([Math.sin(a)*.352,.152+Math.sin(a)**2*.014,-.241-Math.cos(a)*.352*.85])}seam(capArt,M.capSeam,brimEdge,.0018,38);
+ softBox(capArt,M.capShade,0,.174,.325,.221,.031,.014,.005);
+ softBox(capArt,M.cap,.023,.178,.337,.169,.025,.009,.003);
+ for(const x of [-.021,.011,.043])ellipsoid(capArt,M.capShade,x,.178,.344,.0038,.0045,.002);
  // Compact shoulders and continuous trousers keep the original leg lengths and gait.
  const arms=[],legs=[],knees=[],feet=[];
  for(const side of [-1,1]){
@@ -274,7 +276,11 @@ export function createFarmer(scene,profile={}){
  const normalGroups=new Map(),normals=garmentGeo.attributes.normal;
  for(let j=0;j<garmentPositions.length/3;j++){const key=garmentPositions.slice(j*3,j*3+3).map(v=>Math.round(v*1e5)).join('/');if(!normalGroups.has(key))normalGroups.set(key,[]);normalGroups.get(key).push(j)}
  for(const points of normalGroups.values()){if(points.length<2)continue;const normal=new T.Vector3();for(const j of points)normal.add(new T.Vector3().fromBufferAttribute(normals,j));normal.normalize();for(const j of points)normals.setXYZ(j,normal.x,normal.y,normal.z)}
- const pelvis=new T.Bone();body.add(pelvis);const garment=new T.SkinnedMesh(garmentGeo,M.overall);garment.name='continuous-overalls-and-trousers';garment.castShadow=garment.receiveShadow=true;body.add(garment);body.updateWorldMatrix(true,true);garment.bind(new T.Skeleton([pelvis,legs[0],knees[0],legs[1],knees[1]]));
+ const pelvis=new T.Bone();body.add(pelvis);const bibIndexCount=garmentRows*garmentSides*6;garmentGeo.clearGroups();garmentGeo.addGroup(0,bibIndexCount,0);garmentGeo.addGroup(bibIndexCount,garmentIndices.length-bibIndexCount,1);const garment=new T.SkinnedMesh(garmentGeo,[M.bib,M.overall]);garment.name='continuous-overalls-and-trousers';garment.castShadow=garment.receiveShadow=true;body.add(garment);body.updateWorldMatrix(true,true);garment.bind(new T.Skeleton([pelvis,legs[0],knees[0],legs[1],knees[1]]));
+ const strawHat=new T.Group();strawHat.name='avatar-hat-straw';head.add(strawHat);const strawMat=material('#c8ad76','fabric'),strawEdge=material('#b59762','fabric');add(strawHat,new T.CylinderGeometry(.59,.61,.038,40),strawMat,0,.17,-.03);ellipsoid(strawHat,strawMat,0,.32,-.03,.37,.25,.33);add(strawHat,new T.CylinderGeometry(.368,.375,.07,36),M.scarf,0,.235,-.03);seam(strawHat,strawEdge,Array.from({length:49},(_,i)=>{const a=i/48*Math.PI*2;return[Math.sin(a)*.60,.195,-.03+Math.cos(a)*.60]}),.006,48);bakePart(strawHat);
+ const beanie=new T.Group();beanie.name='avatar-hat-beanie';head.add(beanie);ellipsoid(beanie,M.cap,0,.32,-.035,.374,.28,.331);const hem=new T.Mesh(new T.TorusGeometry(.341,.047,10,40),M.capShade);hem.rotation.x=Math.PI/2;hem.position.set(0,.19,-.035);hem.scale.z=.94;beanie.add(hem);for(let i=0;i<16;i++){const a=i/16*Math.PI*2;seam(beanie,M.capSeam,[[Math.sin(a)*.36,.205,-.035+Math.cos(a)*.31],[Math.sin(a)*.31,.43,-.035+Math.cos(a)*.27],[Math.sin(a)*.09,.576,-.035+Math.cos(a)*.08]],.003,12)}ellipsoid(beanie,M.capSeam,0,.61,-.035,.078,.075,.078);bakePart(beanie);bakePart(capArt);
+ const uncoveredHair=new T.Group();uncoveredHair.name='avatar-uncovered-hair';head.add(uncoveredHair);ellipsoid(uncoveredHair,M.hair,0,.16,-.062,.344,.224,.284);add(uncoveredHair,lockGeometry([[-.24,.26,.08],[-.21,.31,.22],[-.09,.25,.29]],.045,.020),M.hairLight);bakePart(uncoveredHair);
+ const skirt=new T.Group();skirt.name='avatar-country-dress';body.add(skirt);add(skirt,new T.CylinderGeometry(.252,.37,.43,36,2,true),M.overall,0,.468,.005);const dressHem=new T.Mesh(new T.TorusGeometry(.363,.012,6,36),M.overallLight);dressHem.rotation.x=Math.PI/2;dressHem.position.set(0,.258,.005);skirt.add(dressHem);seam(skirt,M.overallLight,[[0,.67,.257],[-.025,.49,.32],[-.04,.27,.367]],.0025,16);bakePart(skirt);
  bakePart(torso);bakePart(headArt);bakePart(scarf);bakePart(tail);
  const longHair=new T.Group();longHair.name='avatar-braids';head.add(longHair);
  for(const side of[-1,1]){
@@ -284,7 +290,7 @@ export function createFarmer(scene,profile={}){
   add(longHair,lockGeometry([[side*.29,-.56,.09],[side*.27,-.64,.12],[side*.30,-.68,.12]],.036,.022),M.hairLight);
  }
  bakePart(longHair);M.hair.name='avatar-hair';M.hairLight.name='avatar-hair-light';M.hairFine.name='avatar-hair-fine';
- function setAppearance(value={}){const sex=value.sex==='female'?'female':'male',color=/^#[0-9a-f]{6}$/i.test(value.hairColor||'')?value.hairColor:'#6c492d';const base=new T.Color(color);M.hair.color.copy(base).multiplyScalar(.70);M.hairLight.color.copy(base);M.hairFine.color.copy(base).lerp(new T.Color('#ead7b1'),.25);longHair.visible=sex==='female';headArt.scale.x=sex==='female'?.98:1;farmer.userData.avatar={sex,hairColor:color};return farmer.userData.avatar}
+ function setAppearance(value={}){const valid=c=>/^#[0-9a-f]{6}$/i.test(c||''),sex=value.sex==='female'?'female':'male',color=valid(value.hairColor)?value.hairColor:'#6c492d',hat=['cap','straw','beanie','none'].includes(value.hat)?value.hat:'cap',outfit=['overalls','workshirt'].includes(value.outfit)||sex==='female'&&value.outfit==='dress'?value.outfit:'overalls',shirtColor=valid(value.shirtColor)?value.shirtColor:'#eee7d3',clothesColor=valid(value.clothesColor)?value.clothesColor:'#777181';const base=new T.Color(color),shirtBase=new T.Color(shirtColor),clothBase=new T.Color(clothesColor);M.hair.color.copy(base).multiplyScalar(.70);M.hairLight.color.copy(base);M.hairFine.color.copy(base).lerp(new T.Color('#ead7b1'),.25);M.shirt.color.copy(shirtBase);M.shirtShade.color.copy(shirtBase).multiplyScalar(.86);M.shirtLight.color.copy(shirtBase).lerp(new T.Color('#fff9e8'),.2);M.overall.color.copy(clothBase);M.bib.color.copy(outfit==='workshirt'?shirtBase:clothBase);M.overallDark.color.copy(outfit==='workshirt'?shirtBase:clothBase).multiplyScalar(.82);M.overallLight.color.copy(outfit==='workshirt'?shirtBase:clothBase).lerp(new T.Color('#eee2cf'),.21);longHair.visible=sex==='female';headArt.scale.x=sex==='female'?.98:1;capArt.visible=hat==='cap';strawHat.visible=hat==='straw';beanie.visible=hat==='beanie';uncoveredHair.visible=hat==='none';skirt.visible=outfit==='dress';farmer.userData.avatar={sex,hairColor:color,hat,outfit,shirtColor,clothesColor};return farmer.userData.avatar}
  setAppearance(profile);
  return {farmer,body,head,eyes,scarf,tail,arms,legs,knees,feet,setAppearance,get appearance(){return {...farmer.userData.avatar}}};
 }
