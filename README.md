@@ -1,8 +1,8 @@
 # Harvestão — a vida no campo
 
-Versão 0.28. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.28.1. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.28)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.28.1)
 
 ## Cuidar dos animais
 

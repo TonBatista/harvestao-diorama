@@ -1,4 +1,4 @@
-import {colliderContains,planAutoHop,hopPosition} from './collision-rules.js?v=0.28';
+import {colliderContains,planAutoHop,hopPosition} from './collision-rules.js?v=0.28.1';
 import {createFarmPets} from './farm-pets.js?v=0.28';
 import {createNightVisitors} from './night-visitors.js?v=0.28';
 import {createCompanionDog} from './companion-dog.js?v=0.28';
@@ -12,7 +12,7 @@ import * as T from './three.module.js';
 import {createTractor} from './tractor-art.js?v=0.28';
 import {ANIMALS} from './animal-care.js?v=0.28';
 import {createTransportDisplay} from './transport-art.js?v=0.28';
-import {createRegionManager} from './region-manager.js?v=0.28';
+import {createRegionManager} from './region-manager.js?v=0.28.1';
 import {terrainTexture} from './terrain-materials.js?v=0.28';
 import {loadMiniatureMaterials,miniatureTexture,miniatureLens,contactTexture,soilEdgeTexture} from './miniature-materials.js?v=0.28';
 import {artisanMaterial,cottage,canopyGeometry,meadowGeometry,treeCrown} from './art-direction.js?v=0.28';
