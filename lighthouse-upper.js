@@ -1,6 +1,7 @@
 import * as T from './three.module.js';
 import {createKit} from './region-kit.js?v=0.27';
-import {group,table,barrel} from './rural-room.js?v=0.27';
+import {group,table} from './rural-room.js?v=0.27';
+function barrel(k,x,z,scale=1){const g=group(k.fixed,x,0,z);k.cyl(g,'#a0835a',0,.45*scale,0,.34*scale,.88*scale,'wood');for(const y of[.12,.45,.77])k.cyl(g,'#6d756b',0,y*scale,0,.35*scale,.045*scale);k.cyl(g,'#c4a579',0,.90*scale,0,.31*scale,.04*scale,'wood');k.roundSolid(x,z,.35*scale);return g}
 const TAU=Math.PI*2;
 function seaPanorama(state){
  const night=state?.minutes>=1140||state?.minutes<360,c=document.createElement('canvas');c.width=1024;c.height=384;const q=c.getContext('2d'),sky=q.createLinearGradient(0,0,0,160);sky.addColorStop(0,night?'#36536c':'#8ec8d5');sky.addColorStop(1,night?'#8d9b9b':'#e0e4cd');q.fillStyle=sky;q.fillRect(0,0,1024,166);const sea=q.createLinearGradient(0,164,0,384);sea.addColorStop(0,night?'#577983':'#7bb5ba');sea.addColorStop(1,night?'#335b69':'#3c909e');q.fillStyle=sea;q.fillRect(0,164,1024,220);

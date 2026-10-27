@@ -1,4 +1,4 @@
-import {buildLighthouseUpper} from './lighthouse-upper.js?v=0.27';
+import {buildLighthouseUpper} from './lighthouse-upper.js?v=0.27.1';
 import {INTERIOR_DESTINATIONS} from './interior-catalog.js?v=0.27';
 import {buildChapel,buildLibrary,buildClinic} from './interiors-civic.js?v=0.27';
 import {buildInn,buildRosaHouse,buildFisherHouse} from './interiors-homes.js?v=0.27';

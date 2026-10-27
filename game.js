@@ -14,7 +14,7 @@ import {mountPhotographyUI} from './photo-ui.js?v=0.27';
 import {migrateBirding} from './birding.js?v=0.27';
 import {mountJoystick} from './controls.js?v=0.27';
 import {mountZoomControls} from './camera-controls.js?v=0.27';
-import {createWorld} from './world.js?v=0.27';
+import {createWorld} from './world.js?v=0.27.1';
 const $=id=>document.getElementById(id),KEY='harvestao-v2';let state=freshState(),storageOK=true;
 try{const data=JSON.parse(localStorage.getItem(KEY));if(validSave(data))state=data}catch{}
 state.inventory??=[];migrateAnimalCare(state);migrateBirding(state);migrateHomesteads(state);migrateTransport(state);migrateProfile(state);migrateSeedStorage(state);

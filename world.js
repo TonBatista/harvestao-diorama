@@ -11,7 +11,7 @@ import * as T from './three.module.js';
 import {createTractor} from './tractor-art.js?v=0.27';
 import {ANIMALS} from './animal-care.js?v=0.27';
 import {createTransportDisplay} from './transport-art.js?v=0.27';
-import {createRegionManager} from './region-manager.js?v=0.27';
+import {createRegionManager} from './region-manager.js?v=0.27.1';
 import {terrainTexture} from './terrain-materials.js?v=0.27';
 import {loadMiniatureMaterials,miniatureTexture,miniatureLens,contactTexture,soilEdgeTexture} from './miniature-materials.js?v=0.27';
 import {artisanMaterial,cottage,canopyGeometry,meadowGeometry,treeCrown} from './art-direction.js?v=0.27';
