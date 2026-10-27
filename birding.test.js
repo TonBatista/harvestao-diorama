@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { SPECIES, speciesById, migrateBirding, recordSighting, listRecords, getBirdingProgress, MAX_STORED_PHOTOS, MAX_RECENT_SIGHTINGS, MAX_PHOTO_DATA_URL_LENGTH, MAX_STORED_PHOTO_CHARS } from './birding.js?v=0.27';
+import { SPECIES, speciesById, migrateBirding, recordSighting, listRecords, getBirdingProgress, MAX_STORED_PHOTOS, MAX_RECENT_SIGHTINGS, MAX_PHOTO_DATA_URL_LENGTH, MAX_STORED_PHOTO_CHARS } from './birding.js?v=0.28';
 const fresh = () => ({ year: 2, season: 1, day: 8, minutes: 570, region: 'mountain' });
 const photo = 'data:image/jpeg;base64,/9j/AA==';
 const subject = (speciesId = 'urutau', score = 70, id = 'forest-urutau') => ({ speciesId, score, id, area: 'mountain' });

@@ -1,0 +1,15 @@
+# Auditoria de colisões dos exteriores — v0.28
+
+Revisão estática dos construtores `region-village`, `region-nature`, `region-homesteads`, `region-market` e `farm-landscape`. Foram comparados os volumes visíveis com os colisores explícitos; não foi feita inferência automática sobre cada malha nem executada a bateria de testes.
+
+- **Vila:** pilares das varandas, caixas do mercado externo, apoios da biblioteca, bancos com rotação, cadeiras do café, postes de iluminação e bancada/bigorna da ferraria receberam volumes. A cerca da Casa da Rosa ganhou uma abertura real de 1,5 m alinhada à porta, para que o novo bloqueio não feche a entrada.
+- **Montanha:** bancos, postes de lanterna e cercas registram o próprio volume, inclusive rotação. Os bloqueios de ponte, riacho, lago termal, mina, grandes rochas e penhascos já existentes foram preservados; as barras da ponte permanecem transitáveis entre os corrimãos.
+- **Praia:** barril, caixote e rede da varanda do pescador, pilares, balcão e assentos do quiosque, caixinha na areia, barco e base do farol ganharam volumes. A base de pedra do farol usa elipse de raios 2,3 × 2,0 m, preservando a aproximação da porta. O tronco caído da praia é um obstáculo baixo saltável com altura de 0,23 m.
+- **Mar e píer:** foram mantidas as 30 faixas que acompanham a costa sinuosa, mas removida a exclusão de uma faixa inteira de água. A passagem agora corresponde somente ao piso real do píer: centro `(5.975, 5)`, largura 11,695 m no eixo X e profundidade 2,9 m no eixo Z. O helper central encolhe a passagem pela margem dos pés; mar fora da plataforma continua bloqueado.
+- **Lago e terrenos:** cercas, bancos, pilha de lenha e mesa do lenhador têm volumes. A água deixa de usar três círculos aproximados e passa a ser uma elipse no centro `(0, 0)`, com raios `rx=17.3` e `rz=13.84`. Só o pontilhão real pode atravessar esse volume: centro `(0, -15.62)`, largura 2,1 m e comprimento 4,4 m, de Z −17,82 a −13,42; seus postes também bloqueiam.
+- **Fazendas do lago e vista dos lotes:** os tocos instanciados da borda agora têm raio e altura próprios e são saltáveis. Troncos naturais baixos também são saltáveis; pedras e galhos ligados à limpeza do terreno continuam sólidos comuns até serem removidos. Grama e ervas decorativas não viram obstáculos rígidos.
+- **Mercado interno:** móveis, prateleiras, sacos e pilhas de caixas já tinham volumes; os vasos de chão também passaram a bloquear pelo tamanho da base.
+
+Piso, soleiras baixas, flores, folhas, espuma, conchas, tapetes e miudezas ornamentais permanecem atravessáveis de propósito. Atores móveis e os sistemas próprios de rebanho/animais não foram alterados nesta parte da auditoria. Portais e trilhas foram conservados nas coordenadas dos cenários.
+
+Validação desta parte: `node --check` e ligação de importações dos cinco módulos. Nenhuma simulação ou bateria de testes executada.

@@ -1,7 +1,7 @@
 import * as T from './three.module.js';
-import {miniatureTexture} from './miniature-materials.js?v=0.27';
-import {meadowGeometry} from './art-direction.js?v=0.27';
-import {FIELD,TILE} from './simulation.js?v=0.27';
+import {miniatureTexture} from './miniature-materials.js?v=0.28';
+import {meadowGeometry} from './art-direction.js?v=0.28';
+import {FIELD,TILE} from './simulation.js?v=0.28';
 
 const rand=n=>{const v=Math.sin(n*127.1+34.2)*43758.5453;return v-Math.floor(v)};
 const owned=options=>{const m=new T.MeshStandardMaterial(options);m.userData.regionOwned=true;return m};
@@ -32,15 +32,15 @@ export function homesteadLandscape(k){
  soilFringe(k,.875,3.875);for(let i=0;i<19;i++)k.tree(-19+i*2.2,-13-rand(i)*2,1+rand(i+8)*.55);for(let i=0;i<11;i++){k.tree(-13-rand(i+17)*2,-8+i*2.6,1.1);k.tree(16+rand(i+9)*2,-7+i*2.8,.9+rand(i)*.4)}
  // A sparse rim of natural timber and stones leaves the entire field usable.
  const stones=[],bark=[],caps=[];for(let i=0;i<35;i++){const a=i*2.399963,x=i%2?-8.9:13.4,z=-4+rand(i+201)*16,size=.075+rand(i+202)*.11;stones.push({x,y:size*.36,z,a,sx:size,sy:size*.60,sz:size*.8,color:i%2?'#a4ab98':'#929b83'})}
- for(let i=0;i<12;i++){const x=i<6?-9.6:13.4,z=-3+(i%6)*2.8,h=.22+rand(i)*.12,r=.13+rand(i+8)*.06;bark.push({x,y:h/2,z,sx:r,sy:h,sz:r,a:i});caps.push({x,y:h+.006,z,sx:r*.87,sy:.012,sz:r*.87,a:i})}
+ for(let i=0;i<12;i++){const x=i<6?-9.6:13.4,z=-3+(i%6)*2.8,h=.22+rand(i)*.12,r=.13+rand(i+8)*.06;bark.push({x,y:h/2,z,sx:r,sy:h,sz:r,a:i});caps.push({x,y:h+.006,z,sx:r*.87,sy:.012,sz:r*.87,a:i});k.roundSolid(x,z,r,{jumpable:true,height:h+.012,label:'boundary-stump'})}
  instances(k,new T.IcosahedronGeometry(1,1),owned({color:'#a4ab98',roughness:1}),stones,'boundary-pebbles');instances(k,new T.CylinderGeometry(1,1,1,9),surface('bark',1,'#c7b89a',.035),bark,'natural-stumps');instances(k,new T.CylinderGeometry(1,1,1,12),owned({color:'#c6aa7c',roughness:1}),caps,'stump-endgrain');
 }
 export function lakeLotLandscape(k,lot,progress,index=0,debris=[]){
  const x=lot.x-.125,z=lot.z+3.875;farmSoil(k,x,z);soilFringe(k,x,z,index*311);
  farmMeadow(k,{x:lot.x,z:lot.z,width:22.8,depth:24.6,count:4200,seed:index*413,exclude:(xx,zz)=>(Math.abs(xx-x)<8.45&&Math.abs(zz-z)<8.45)||(Math.abs(xx-lot.x)<1.5&&zz>lot.z+9)||(progress?.house&&Math.abs(xx-(lot.x+.0))<3&&Math.abs(zz-(lot.z-10))<2.2)||(progress?.barn&&Math.abs(xx-(lot.x-8.5))<2.5&&Math.abs(zz-(lot.z-9))<2.2)});
- const rocks=[],logs=[],caps=[],tufts=[];for(let i=0;i<34;i++){const n=index*71+i,xx=lot.x-9.6+rand(n+31)*19.2,zz=lot.z-10.2+rand(n+44)*20.3;if(Math.abs(xx-x)<8.3&&Math.abs(zz-z)<8.3)continue;if(Math.abs(xx-lot.x)<1.3&&zz>lot.z+8)continue;if(progress?.house&&Math.abs(xx-lot.x)<3&&zz<lot.z-7)continue;if(progress?.barn&&xx<lot.x-5&&zz<lot.z-6)continue;const size=.09+rand(n+57)*.17;rocks.push({x:xx,y:size*.35,z:zz,a:n,sx:size,sy:size*.7,sz:size*.85,color:i%3?'#a4ab98':'#889563'});if(i%6===0){logs.push({x:xx,y:.13,z:zz,a:n,rx:Math.PI/2,sx:.075,sy:.8,sz:.075});caps.push({x:xx+.25,y:.14,z:zz-.3,a:n,sx:.18,sy:.27,sz:.18})}}
+ const rocks=[],logs=[],caps=[],tufts=[];for(let i=0;i<34;i++){const n=index*71+i,xx=lot.x-9.6+rand(n+31)*19.2,zz=lot.z-10.2+rand(n+44)*20.3;if(Math.abs(xx-x)<8.3&&Math.abs(zz-z)<8.3)continue;if(Math.abs(xx-lot.x)<1.3&&zz>lot.z+8)continue;if(progress?.house&&Math.abs(xx-lot.x)<3&&zz<lot.z-7)continue;if(progress?.barn&&xx<lot.x-5&&zz<lot.z-6)continue;const size=.09+rand(n+57)*.17;rocks.push({x:xx,y:size*.35,z:zz,a:n,sx:size,sy:size*.7,sz:size*.85,color:i%3?'#a4ab98':'#889563'});if(i%6===0){logs.push({x:xx,y:.13,z:zz,a:n,rx:Math.PI/2,sx:.075,sy:.8,sz:.075});caps.push({x:xx+.25,y:.14,z:zz-.3,a:n,sx:.18,sy:.27,sz:.18});k.solid(xx,zz,.16,.8,{jumpable:true,height:.21,label:'fallen-log'});k.roundSolid(xx+.25,zz-.3,.18,{jumpable:true,height:.28,label:'natural-stump'})}}
  // Match visible clearing progress in the lake overview instead of re-growing removed weeds.
- const obstacle=(kind,xx,zz,n)=>{if(kind==='weed')tufts.push({x:xx,y:.04,z:zz,a:n,sx:1.7,sy:1.7,sz:1.7});else if(kind==='stone')rocks.push({x:xx,y:.11,z:zz,a:n,sx:.34,sy:.25,sz:.3,color:'#a4ab98'});else if(kind==='branch')logs.push({x:xx,y:.11,z:zz,a:n,rx:Math.PI/2,sx:.075,sy:.7,sz:.075})};for(const p of progress?.plots||[])obstacle(p.obstacle,lot.x-1+FIELD.x+p.x*TILE,lot.z+FIELD.z+p.z*TILE,p.x+p.z);debris.forEach((p,i)=>{if(!progress?.cleared.includes(i))obstacle(p.kind,lot.x-1+p.x,lot.z+p.z,i)})
+ const obstacle=(kind,xx,zz,n)=>{if(kind==='weed')tufts.push({x:xx,y:.04,z:zz,a:n,sx:1.7,sy:1.7,sz:1.7});else if(kind==='stone')rocks.push({x:xx,y:.11,z:zz,a:n,sx:.34,sy:.25,sz:.3,color:'#a4ab98'}),k.roundSolid(xx,zz,.34);else if(kind==='branch'){logs.push({x:xx,y:.11,z:zz,a:n,rx:Math.PI/2,sx:.075,sy:.7,sz:.075});k.solid(xx,zz,.17,.72,{height:.19,label:'uncleared-branch'})}};for(const p of progress?.plots||[])obstacle(p.obstacle,lot.x-1+FIELD.x+p.x*TILE,lot.z+FIELD.z+p.z*TILE,p.x+p.z);debris.forEach((p,i)=>{if(!progress?.cleared.includes(i))obstacle(p.kind,lot.x-1+p.x,lot.z+p.z,i)})
  if(!progress)for(let i=0;i<110;i++){const xx=x+(rand(i+index*171)-.5)*16.1,zz=z+(rand(i+713)-.5)*16.1;tufts.push({x:xx,y:.04,z:zz,a:i,sx:1.5,sy:1.7,sz:1.5})}
  instances(k,new T.IcosahedronGeometry(1,1),owned({color:'#a4ab98',roughness:1}),rocks,'lot-natural-stones');instances(k,new T.CylinderGeometry(1,1,1,7),surface('bark',1,'#9f8d69',.025),logs,'lot-fallen-branches');instances(k,new T.CylinderGeometry(.86,1,1,9),surface('bark',1,'#c7b89a',.025),caps,'lot-old-stumps');instances(k,meadowGeometry(),owned({color:'#92a45e',roughness:1,side:T.DoubleSide}),tufts,'lot-wild-weeds');
  for(const [dx,dz,s]of[[-9.5,-10.4,.95],[9.5,-9.5,1.1],[-10.2,6,.88],[9.8,7.4,1.02]])k.tree(lot.x+dx,lot.z+dz,s);

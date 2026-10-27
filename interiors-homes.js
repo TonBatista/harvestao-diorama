@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.27';
+import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.28';
 
 // Small domestic objects reuse the room kit and are merged with its static art.
 function cup(k,p,x,y,z,color='#d9cfb3'){
@@ -12,7 +12,7 @@ function pie(k,p,x,y,z){k.cyl(p,'#98765c',x,y,z,.32,.10);k.cyl(p,'#bf825f',x,y+.
 function bed(k,x,z,color='#939680',w=2.0,d=3.05){const p=group(k.fixed,x,0,z);for(const xx of [-w*.42,w*.42])for(const zz of [-d*.43,d*.43])k.box(p,C.dark,xx,.22,zz,.12,.44,.12,'wood');k.box(p,C.oak,0,.43,0,w+.16,.20,d+.15,'wood');k.ball(p,'#ded6bf',0,.62,0,w*.49,.18,d*.48);k.box(p,color,0,.81,.45,w,.16,d*.64,'fabric');k.ball(p,'#eee4cc',0,.91,-d*.32,w*.38,.13,.35);k.box(p,C.oak,0,.89,-d*.52,w+.2,.90,.13,'wood');for(const xx of [-w*.42,w*.42])k.ball(p,C.trim,xx,1.38,-d*.52,.105,.105,.105,'wood');k.solid(x,z,w+.2,d+.2);return p}
 function basket(k,p,x,y,z){k.box(p,'#ab8d62',x,y,z,.66,.34,.46,'wood');for(let i=0;i<4;i++)k.box(p,'#c9ae7b',x,y-.12+i*.08,z+.24,.67,.025,.018,'wood');k.box(p,'#645942',x,y+.18,z,.55,.012,.36);return p}
 function teapot(k,p,x,y,z,color='#a6b092'){k.ball(p,color,x,y+.15,z,.23,.20,.20);k.cyl(p,C.cream,x,y+.32,z,.12,.035);k.ball(p,C.dark,x,y+.37,z,.045,.04,.045);k.beam(p,color,[x+.12,y+.15,z],[x+.33,y+.27,z],.055,'plain');const h=new T.Mesh(new T.TorusGeometry(.13,.03,6,16),k.box(p,color,x,y,z,.001,.001,.001).material);h.position.set(x-.20,y+.17,z);p.add(h)}
-function barrel(k,x,z,s=1){k.cyl(k.fixed,'#997b55',x,.48*s,z,.39*s,.94*s,'wood');for(const y of [.13,.48,.83])k.cyl(k.fixed,'#73756a',x,y*s,z,.405*s,.055*s);k.cyl(k.fixed,'#b99b6c',x,.965*s,z,.39*s,.04*s,'wood');k.roundSolid(x,z,.43*s)}
+function barrel(k,x,z,s=1){k.cyl(k.fixed,'#997b55',x,.48*s,z,.39*s,.94*s,'wood');for(const y of [.13,.48,.83])k.cyl(k.fixed,'#73756a',x,y*s,z,.405*s,.055*s);k.cyl(k.fixed,'#b99b6c',x,.965*s,z,.39*s,.04*s,'wood');k.roundSolid(x,z,.43*s,{height:.99*s})}
 function info(k,x,z,name,text){k.interact({x,z,type:'info',label:name,data:{name,text},radius:1.4})}
 
 export function buildInn(){
@@ -25,7 +25,7 @@ export function buildInn(){
  shelf(k,-6.05,-1.20,1.1,'jars');barrel(k,-5.8,4.25,.8);vase(k,F,-5.8,.85,4.25,'#c7ac78');
  const breakfast=table(k,-4.05,.4,3.5,1.35,.85);for(let i=0;i<3;i++){plate(k,breakfast,-1.08+i*1.0,.93,0,.29);if(i===1)pie(k,breakfast,-.06,1.00,0);else loaf(k,breakfast,-1.08+i*1.0,1.06,0)}basket(k,breakfast,1.05,1.18,.07);k.ball(breakfast,'#bb8e64',.91,1.41,.05,.11,.105,.10);k.ball(breakfast,'#a9b16f',1.12,1.40,.07,.10,.10,.10);
  const tea=table(k,3,.0,3.6,1.6,.83);for(const dx of [-1,1])for(const zz of [-1.35,1.35])chair(k,3+dx,.0+zz,zz>0?0:Math.PI);for(const dx of [-.9,.9]){plate(k,tea,dx,.91,0);cup(k,tea,dx,.94,-.45)}teapot(k,tea,0,.94,0,'#9ba98c');vase(k,tea,1.35,.93,.18,'#b59b72');
- const guest=bed(k,4.65,-3.82,'#9b8796',2.1,2.45);for(let i=0;i<4;i++)k.box(guest,'#c5acb7',-.75+i*.5,.9,.55,.022,.014,1.2);k.box(F,C.oak,2.93,1.32,-3.87,.10,2.64,2.65,'wood');for(let i=0;i<5;i++)k.box(F,'#c1b694',2.92,1.53,-4.8+i*.47,.04,1.79,.40,'fabric');
+ const guest=bed(k,4.65,-3.82,'#9b8796',2.1,2.45);for(let i=0;i<4;i++)k.box(guest,'#c5acb7',-.75+i*.5,.9,.55,.022,.014,1.2);k.box(F,C.oak,2.93,1.32,-3.87,.10,2.64,2.65,'wood');k.solid(2.93,-3.87,.12,2.65,{height:2.64});for(let i=0;i<5;i++)k.box(F,'#c1b694',2.92,1.53,-4.8+i*.47,.04,1.79,.40,'fabric');
  const clock=group(F,.5,1.97,-5.32);k.box(clock,C.dark,0,0,0,.73,1.13,.19,'wood');k.cyl(clock,'#ded3ad',0,.20,.11,.28,.035).rotation.x=Math.PI/2;k.beam(clock,C.dark,[0,.20,.135],[0,.39,.135],.012,'plain');k.beam(clock,C.dark,[0,.20,.136],[.16,.16,.136],.014,'plain');const pendulum=group(k.dynamic,.5,1.78,-5.18);k.beam(pendulum,'#b69b65',[0,0,0],[0,-.45,0],.018,'plain');k.ball(pendulum,'#c8ae70',0,-.45,0,.095,.095,.035);k.animate((dt,t)=>pendulum.rotation.z=Math.sin(t*2.4)*.15);
  lantern(k,-1.6,2.2,-5.2);lantern(k,5.8,2.2,-5.2);
  npc(k,{name:'Olívia',text:'Seja bem-vindo à Pousada Girassol! O pão acabou de sair do forno. Os viajantes deixam histórias tão boas quanto as receitas da vila.',x:-4.6,z:-4.9,shirt:'#a29079',hair:'#79604b',seed:1});

@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.27';
+import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.28';
 
 const botanicals=['#80936c','#9ea57d','#bc9b8d','#d6c68d'];
 function info(k,x,z,name,text,radius=1.35){k.interact({x,z,label:name,type:'info',data:{name,text},radius})}
@@ -58,7 +58,7 @@ export function buildClinic(){
  const k=createInteriorRoom({id:'clinic',label:'Clínica da Clara',w:12,d:10,wall:'#d8ddca',returnTo:'village',returnSpawn:[-10.7,12.5]}),F=k.fixed;
  rug(k,1.5,2.10,3.1,2.75,'#a0af9b');
  const bed=group(F,-3.72,0,-.65);for(const sx of[-.90,.90])for(const sz of[-1.36,1.36])k.cyl(bed,'#81948b',sx,.42,sz,.06,.80);k.box(bed,C.iron,0,.68,0,2.05,.12,3.08);k.box(bed,'#e3dfc7',0,.86,0,2.0,.28,3.0,'fabric');k.box(bed,'#b0bfa7',0,1.03,.42,2.04,.095,2.12,'fabric');k.box(bed,'#efe7cf',0,1.075,-1.04,1.61,.19,.65,'fabric');for(const sx of[-.92,.92])k.beam(bed,'#8b9c92',[sx,.65,-1.51],[sx,1.45,-1.51],.045,'plain');k.beam(bed,'#8b9c92',[-.92,1.43,-1.51],[.92,1.43,-1.51],.045,'plain');k.solid(-3.72,-.65,2.15,3.15);
- const screen=group(F,-2.15,0,-3.6);for(let col=0;col<3;col++){const x=-.63+col*.63,section=group(screen,x,0,(col%2)*.12);section.rotation.y=col%2?-.16:.16;for(const s of[-1,1])k.cyl(section,C.oak,s*.31,.90,0,.035,1.75);k.box(section,'#becab2',0,1.05,0,.56,1.18,.04,'fabric');for(const y of[.42,1.68])k.box(section,C.trim,0,y,0,.60,.055,.065,'wood')}k.solid(-2.15,-3.6,2.02,.48);
+ const screen=group(F,-2.15,0,-3.6);for(let col=0;col<3;col++){const x=-.63+col*.63,section=group(screen,x,0,(col%2)*.12);section.rotation.y=col%2?-.16:.16;for(const s of[-1,1])k.cyl(section,C.oak,s*.31,.90,0,.035,1.75);k.box(section,'#becab2',0,1.05,0,.56,1.18,.04,'fabric');for(const y of[.42,1.68])k.box(section,C.trim,0,y,0,.60,.055,.065,'wood');k.solid(-2.15+x,-3.6+(col%2)*.12,.69,.10,{angle:col%2?-.16:.16,height:1.78})}
  const medicines=cupboard(k,3.85,-4.33,2.8);for(let row=0;row<3;row++)for(let col=0;col<6;col++){const x=-1.05+col*.42,y=.24+row*.60; bottle(k,medicines,x,y,.08,['#8fa99a','#c0b082','#a996aa','#9bb0ab'][(row+col)%4],.08+(col%2)*.012)}
  const basin=group(F,-.10,0,-4.25);k.box(basin,'#b2b99e',0,.50,0,1.85,1,.85,'wood');k.box(basin,'#dedbc6',0,1.05,0,1.98,.12,.97,'stone');k.ball(basin,'#dce2d6',-.27,1.13,0,.59,.10,.34);k.ball(basin,'#9fbdb6',-.27,1.16,0,.42,.018,.25);k.beam(basin,'#87968f',[.36,1.14,-.21],[.36,1.48,-.21],.035,'plain');k.beam(basin,'#87968f',[.36,1.48,-.21],[.09,1.48,-.21],.035,'plain');bottle(k,basin,.69,1.14,.13,'#bdc8a7',.075);k.solid(-.10,-4.25,1.98,1.03);
  const desk=table(k,2.68,-1.88,2.36,1.28,.80);chair(k,2.68,-2.96);book(k,desk,-.46,.92,.08,'#a1ab8b',true);k.box(desk,'#ece3cb',.48,.90,.17,.53,.035,.39);k.box(desk,'#9eaa9c',.48,.95,.17,.13,.017,.34);k.box(desk,'#9eaa9c',.48,.95,.17,.34,.017,.13);k.cyl(desk,'#aaa183',.83,.99,-.32,.10,.22);for(let i=0;i<3;i++)k.beam(desk,['#918475','#839a8f','#b2997f'][i],[.77+i*.05,1.05,-.32],[.79+i*.05,1.29,-.32],.012,'plain');

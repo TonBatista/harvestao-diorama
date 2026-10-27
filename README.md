@@ -1,8 +1,8 @@
 # Harvestão — a vida no campo
 
-Versão 0.27.1. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.28. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.27.1)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.28)
 
 ## Cuidar dos animais
 
@@ -97,3 +97,8 @@ Use X perto da luneta para observar o mar em primeira pessoa. Arraste, use as se
 Trator: os botões mostram estado e motivos de bloqueio, atualizam carreta/carga imediatamente e evitam toque duplo. É possível acoplar e transportar pelo menu do celeiro quando o trator está estacionado perto do portão. O desembarque para o pasto usa corretamente a região externa. O cachorro acompanha pela lateral com carreta ocupada, evita a carroceria e conserva a escolha do lado quando há espaço. O assobio foi reduzido para aproximadamente32% do volume anterior, respeitando os controles de áudio.
 
 Somente conferência de sintaxe nesta rodada; não foi executada a bateria de testes, conforme pedido de priorizar publicação.
+## Novidades da versão 0.28
+
+Colisões revisadas na fazenda, terrenos, vila, montanha, praia, lago, mercado e interiores. Tocos baixos da borda da plantação agora provocam um pulinho automático ao correr na direção deles com as mãos livres. O personagem sobe de verdade e só salta se houver caminho e chão livre para pousar. Trator, paredes, móveis e obstáculos de limpeza continuam sólidos.
+
+Ajustadas cercas, móveis rodados, barris, pilhas, vasos, bases e veículos estacionados. A água do lago e da praia bloqueia a passagem fora das pontes e do píer. O save utiliza uma posição segura no chão durante o salto. Veja a [revisão de colisões](COLISOES.md) para os achados e os limites da análise.

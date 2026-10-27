@@ -1,20 +1,20 @@
-import {mountTelescopeView} from './telescope-view.js?v=0.27';
-import {mountFieldInventory} from './field-inventory-ui.js?v=0.27';
-import {migrateProfile} from './profile-rules.js?v=0.27';
-import {mountProfileMenu} from './profile-menu.js?v=0.27';
-import {mountHudCalendar} from './hud-calendar.js?v=0.27';
-import {mountExpansionUI} from './expansion-ui.js?v=0.27';
-import {migrateHomesteads,selectLot,lotState} from './homestead-rules.js?v=0.27';
-import {migrateTransport,advanceHerd,propertyKey} from './transport-rules.js?v=0.27';
-import {freshState,validSave,ITEMS,migrateSeedStorage,collectEgg,waterThree,CROPS,SEASONS,TOOLS,frontTile,useTool,pick,ship,sleep,buy,advanceTime,stash,retrieve,BAG_CAPACITY} from './simulation.js?v=0.27';
-import {ANIMALS,migrateAnimalCare,pickHay,returnHay,feedAnimal,petAnimal,animalStatus,advanceAnimalDay} from './animal-care.js?v=0.27';
-import {mountSoundscape} from './soundscape.js?v=0.27';
-import {mountFaunaEncounters} from './fauna-sounds.js?v=0.27';
-import {mountPhotographyUI} from './photo-ui.js?v=0.27';
-import {migrateBirding} from './birding.js?v=0.27';
-import {mountJoystick} from './controls.js?v=0.27';
-import {mountZoomControls} from './camera-controls.js?v=0.27';
-import {createWorld} from './world.js?v=0.27.1';
+import {mountTelescopeView} from './telescope-view.js?v=0.28';
+import {mountFieldInventory} from './field-inventory-ui.js?v=0.28';
+import {migrateProfile} from './profile-rules.js?v=0.28';
+import {mountProfileMenu} from './profile-menu.js?v=0.28';
+import {mountHudCalendar} from './hud-calendar.js?v=0.28';
+import {mountExpansionUI} from './expansion-ui.js?v=0.28';
+import {migrateHomesteads,selectLot,lotState} from './homestead-rules.js?v=0.28';
+import {migrateTransport,advanceHerd,propertyKey} from './transport-rules.js?v=0.28';
+import {freshState,validSave,ITEMS,migrateSeedStorage,collectEgg,waterThree,CROPS,SEASONS,TOOLS,frontTile,useTool,pick,ship,sleep,buy,advanceTime,stash,retrieve,BAG_CAPACITY} from './simulation.js?v=0.28';
+import {ANIMALS,migrateAnimalCare,pickHay,returnHay,feedAnimal,petAnimal,animalStatus,advanceAnimalDay} from './animal-care.js?v=0.28';
+import {mountSoundscape} from './soundscape.js?v=0.28';
+import {mountFaunaEncounters} from './fauna-sounds.js?v=0.28';
+import {mountPhotographyUI} from './photo-ui.js?v=0.28';
+import {migrateBirding} from './birding.js?v=0.28';
+import {mountJoystick} from './controls.js?v=0.28';
+import {mountZoomControls} from './camera-controls.js?v=0.28';
+import {createWorld} from './world.js?v=0.28';
 const $=id=>document.getElementById(id),KEY='harvestao-v2';let state=freshState(),storageOK=true;
 try{const data=JSON.parse(localStorage.getItem(KEY));if(validSave(data))state=data}catch{}
 state.inventory??=[];migrateAnimalCare(state);migrateBirding(state);migrateHomesteads(state);migrateTransport(state);migrateProfile(state);migrateSeedStorage(state);
@@ -28,7 +28,8 @@ let travelling=false;
 let toastTimer,joy={x:0,y:0},keys=new Set(),clock=0,saveClock=0,context='';const paused=()=>travelling||document.querySelector('dialog[open]')!==null;
 mountZoomControls($('farm'),world,paused);
 function notify(message){$('toast').textContent=message;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3400)}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state));storageOK=true}catch{storageOK=false}$('saveStatus').textContent=storageOK?'Progresso salvo neste navegador.':'Salvamento indisponível. Use Baixar progresso para guardar sua fazenda.'}
+function savedState(){return {...state,player:world?.safePlayer||state.player}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(savedState()));storageOK=true}catch{storageOK=false}$('saveStatus').textContent=storageOK?'Progresso salvo neste navegador.':'Salvamento indisponível. Use Baixar progresso para guardar sua fazenda.'}
 function farmLabel(){return state.profile?.farmName||'Sua fazenda'}
 function htmlText(v){return String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;')}
 function hud(){document.querySelector('.place').textContent=world.area==='farm'?farmLabel():world.region.label;document.querySelector('#menu h2').textContent=farmLabel();document.getElementById('playerGreeting').textContent='Vida no campo de '+state.profile.playerName;const weekday=['SEG','TER','QUA','QUI','SEX','SÁB','DOM'][(state.day-1)%7];$('date').textContent=`${state.day} ${weekday}`;$('time').textContent=String(Math.floor(state.minutes/60)%24).padStart(2,'0')+':'+String(Math.floor(state.minutes%60/10)*10).padStart(2,'0');$('season').textContent=`${SEASONS[state.season]} · Ano ${state.year}`;$('weather').textContent=state.season===3?'❄':state.weather==='rain'?'☁':'☀';$('money').textContent=state.money.toLocaleString('pt-BR');$('energy').textContent=state.stamina;$('energyFill').style.width=state.stamina+'%';$('water').textContent=state.water;$('held').hidden=!state.held&&!state.carryingHay;if(state.carryingHay)$('held').textContent='Carregando: fardo de feno · leve ao cocho';else if(state.held)$('held').textContent='Carregando: '+ITEMS[state.held].name;document.querySelectorAll('[data-tool]').forEach(b=>{b.classList.toggle('selected',b.dataset.tool===state.tool);b.setAttribute('aria-pressed',b.dataset.tool===state.tool?'true':'false')});$('toolName').textContent=state.tool==='seed'?`${CROPS[state.seed].name} · ${state.bags[state.seed]||0} sacos`:names[state.tool];$('actionLabel').textContent=world.driving?'Roçadeira':state.tool==='camera'?'Fotografar':(world.area!=='farm'&&world.area!=='homestead')?'Interagir':state.tool==='hand'?'Pegar':'Usar';$('herdButton').hidden=world.area!=='barn';if(world.area==='barn'){$('herdSummary').textContent=ANIMALS.filter(a=>animalStatus(state,a.id).fed).length+'/'+ANIMALS.length+' alimentados · Ver cuidados'}}
@@ -65,7 +66,7 @@ $('bagButton').onclick=()=>fieldInventory.openBag();$('menuButton').onclick=()=>
 $('action').onpointerdown=e=>{e.preventDefault();$('action').setPointerCapture?.(e.pointerId);beginX()};$('action').onpointerup=e=>{e.preventDefault();endX()};$('action').onpointercancel=()=>endX(true);$('interact').onpointerdown=e=>{e.preventDefault();cancelOrRetrieve()};
 $('start').onclick=()=>{$('welcome').close();save();notify('X pega, guarda e interage. Y cancela ou retira da mochila.')};$('saveButton').onclick=()=>{save();notify(storageOK?'Fazenda salva.':'Use Baixar progresso para salvar.')};$('helpButton').onclick=()=>{$('menu').close();open('welcome')};$('confirmSleep').onclick=()=>{$('sleepDialog').close();const paid=rest();clock=0;world.rebuild();world.travel('house',[0,3.3]);hud();save();notify(`Bom dia!${paid?` ${paid} G recebidos.`:''}`)};
 $('newButton').onclick=()=>{$('menu').close();open('newDialog')};$('confirmNew').onclick=()=>{const fresh=freshState(false);fresh.profile={...state.profile};fresh.companion={...state.companion};Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,fresh);migrateAnimalCare(state);migrateBirding(state);migrateHomesteads(state);migrateTransport(state);migrateProfile(state);migrateSeedStorage(state);world.rebuild();world.travel('farm',[state.player.x,state.player.z],true);world.setAvatar(state.profile);profileMenu.refresh();fieldInventory.refresh();select('hand');$('newDialog').close();profileMenu.open(true);notify('Sua nova fazenda está pronta.');save()};
-$('exportButton').onclick=()=>{const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));a.href=url;a.download='harvestao-progresso.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+$('exportButton').onclick=()=>{const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(savedState(),null,2)],{type:'application/json'}));a.href=url;a.download='harvestao-progresso.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
 $('importSave').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const data=JSON.parse(await file.text());if(!validSave(data))throw Error();Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,data);state.inventory??=[];migrateAnimalCare(state);migrateBirding(state);migrateHomesteads(state);migrateTransport(state);migrateProfile(state);migrateSeedStorage(state);world.rebuild();world.travel(state.region||'farm',[state.player.x,state.player.z],true);world.setAvatar(state.profile);profileMenu.refresh();fieldInventory.refresh();select(state.tool);save();$('menu').close();notify('Progresso importado.')}catch{notify('Este arquivo não contém um progresso válido.')}e.target.value=''};
 addEventListener('keydown',e=>{if(e.target instanceof Element&&e.target.closest('input,textarea,select,[contenteditable="true"]'))return;if(['KeyY','Escape'].includes(e.code)){e.preventDefault();if(!e.repeat)cancelOrRetrieve();return}if((e.code==='Space'||e.code==='Enter')&&e.target instanceof Element&&e.target.closest('button'))return;if(['KeyX','Space','KeyE'].includes(e.code)){e.preventDefault();if(!e.repeat)beginX();return}if(paused())return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();keys.add(e.code);if(e.repeat)return;if(e.code==='KeyQ')select(TOOLS[(TOOLS.indexOf(state.tool)+1)%TOOLS.length]);if(e.code==='KeyP')photography.openAlbum();if(e.code==='KeyI')fieldInventory.openBag();if(e.code==='KeyM')$('mapButton').click();if(e.code==='KeyH')$('whistleButton').click();if(e.code.startsWith('Digit')){const id=TOOLS[Number(e.code.slice(5))-1];if(id){if(id==='seed'&&!(state.bags?.[state.seed]>0)){notify('As sementes estão no baú da casa.');return}select(id)}}});
 addEventListener('keyup',e=>{keys.delete(e.code);if(['KeyX','Space','KeyE'].includes(e.code))endX()});addEventListener('blur',()=>{endX(true);keys.clear();resetJoy();world.stop();save()});document.addEventListener('visibilitychange',()=>{if(document.hidden){endX(true);keys.clear();resetJoy();world.stop();save()}});addEventListener('pagehide',save);
