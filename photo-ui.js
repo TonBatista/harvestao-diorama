@@ -1,4 +1,4 @@
-import {SPECIES,migrateBirding,recordSighting,listRecords,getBirdingProgress} from './birding.js?v=0.28';
+import {SPECIES,migrateBirding,recordSighting,listRecords,getBirdingProgress} from './birding.js?v=0.30';
 
 const cameraIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h4l2-3h6l2 3h4v14H3z"/><circle cx="12" cy="13.5" r="4"/><path d="M17.5 10h1"/></svg>';
 const bookIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1zM12 5v15M6 8h3M6 11h3"/><path d="M15.3 10.1c1.7-1.2 3.3-.2 2.7 1.3-.4 1-1.5 1.8-2.7 2.2-1.1-.4-2-1.3-2.2-2.2"/></svg>';

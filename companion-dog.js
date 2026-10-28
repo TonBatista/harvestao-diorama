@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {part,mergeParts} from './wildlife-art.js?v=0.28';
-import {migrateCompanion} from './profile-rules.js?v=0.28';
+import {part,mergeParts} from './wildlife-art.js?v=0.30';
+import {migrateCompanion} from './profile-rules.js?v=0.30';
 const TAU=Math.PI*2,wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 const finitePoint=p=>Number.isFinite(p?.x)&&Number.isFinite(p?.z);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));

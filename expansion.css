@@ -8,4 +8,9 @@
 #expansionBody .vehicle-feedback{margin:6px 0 13px;padding:9px 11px;background:#e8eed8;border-radius:8px;color:#52673f;font-size:12px}
 #expansionBody .vehicle-feedback:empty{display:none}
 #expansionBody button small{font-size:10px;margin:3px 0 0;color:inherit;opacity:.75}
-@media(max-width:380px){#expansionBody .vehicle-actions{grid-template-columns:1fr}}
+@media(max-width:380px){#expansionBody .vehicle-actions{grid-template-columns:1fr}}/* Direct transport actions in a compact menu. */
+#expansionBody .vehicle-simple-controls{display:flex;gap:7px;flex-wrap:wrap}
+#expansionBody .vehicle-simple-controls button{flex:1 1 145px;margin:0}
+#expansionBody .transport-roster{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+#expansionBody .transport-roster button{margin:0;text-align:left}
+@media(max-width:420px){#expansionBody .transport-roster{grid-template-columns:1fr}}
