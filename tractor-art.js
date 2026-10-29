@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {part,mergeParts} from './wildlife-art.js?v=0.32';
+import {part,mergeParts} from './wildlife-art.js?v=0.33';
 const boxGeometry=new T.BoxGeometry(1,1,1),dummyMaterial=new T.MeshBasicMaterial();
 function box(g,c,x,y,z,w,h,d){const m=new T.Mesh(boxGeometry,dummyMaterial);m.position.set(x,y,z);m.scale.set(w,h,d);m.userData.featherColor=c;g.add(m);return m}
 function wheel(parent,x,z,r,width){const w=new T.Group();w.position.set(x,r,z);parent.add(w);let tire=part(w,'cylinder','#383d35',0,0,0,r,width,r);tire.rotation.z=Math.PI/2;const side=Math.sign(x);let hub=part(w,'cylinder','#b68b56',side*(width/2+.006),0,0,r*.49,.025,r*.49);hub.rotation.z=Math.PI/2;for(let i=0;i<12;i++){const a=i*Math.PI/6,b=box(w,'#45483e',0,Math.cos(a)*r*.96,Math.sin(a)*r*.96,width*1.05,.065,r*.23);b.rotation.x=a}mergeParts(w);return w}

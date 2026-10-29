@@ -1,13 +1,13 @@
-import {fieldForProperty} from './cultivation-layout.js?v=0.32';
-import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.32';
-import {mountMultiplayerMenu} from './multiplayer-menu.js?v=0.32';
-import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.32';
-import {FIELD,TILE} from './simulation.js?v=0.32';
-import {validRemotePose} from './remote-farmer.js?v=0.32';
+import {fieldForProperty} from './cultivation-layout.js?v=0.33';
+import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.33';
+import {mountMultiplayerMenu} from './multiplayer-menu.js?v=0.33';
+import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.33';
+import {FIELD,TILE} from './simulation.js?v=0.33';
+import {validRemotePose} from './remote-farmer.js?v=0.33';
 const copy=value=>JSON.parse(JSON.stringify(value)),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const dayKey=s=>[s.year,s.season,s.day].join(':');
 const vehicleKeys=['x','z','angle','area','lotId','trailerX','trailerZ','trailerAngle','trailerArea','trailerLot'];
-function areaStamp(s){return JSON.stringify([s.homesteads?.owned,Object.entries(s.homesteads?.lots||{}).map(([id,l])=>[id,l.house,l.barn,l.cleared]),s.animalLocations,Object.keys(s.herdRoutes||{}).sort()])}
+function areaStamp(s){return JSON.stringify([s.homesteads?.owned,Object.entries(s.homesteads?.lots||{}).map(([id,l])=>[id,l.house,l.barn,l.cleared]),s.animalLocations,Object.keys(s.herdRoutes||{}).sort(),s.farmLayout])}
 export function mountCooperative({state,world,notify,writeLocal,refresh,beforeOpen,onProfile}){
  let connection,menu,backup=null,applying=false,pending=null,baseline=null,personalBaseline=null,revision=0,remoteRevision=-1,sequence=0,lastSeq=0,lastAck=null,lastShared='',networkTime=0,publishAt=0,lastAction=0,remoteName='',day=dayKey(state),mountPosition=null,closed=false;
  let guestId=null,flushQueued=false,statusText='Sua fazenda está pronta.',lastPose=null;
@@ -17,13 +17,14 @@ export function mountCooperative({state,world,notify,writeLocal,refresh,beforeOp
  const ui=()=>{menu?.update({role:connection?.role||'solo',ready:connection?.ready||false,code:connection?.code||'',status:statusText,remoteName});const active=connection?.role!=='solo';for(const id of ['newButton','confirmNew','importSave']){const e=document.getElementById(id);if(e)e.disabled=active}const farm=document.getElementById('profileFarmName');if(farm)farm.disabled=connection?.role==='guest'};
  function snapshot(){const value=sharedSnapshot(state),text=JSON.stringify(value);if(text!==lastShared){lastShared=text;revision++}return {snapshot:value,revision}}
  function publish(){if(connection?.role==='host'&&connection.ready)connection.send({type:'snapshot',...snapshot()})}
- function restore(){if(!backup)return;applying=true;try{const profile={...state.profile,farmName:backup.profile.farmName},birding=state.birding;world.cancelVehicleControl?.();Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,backup);state.profile=profile;if(birding)state.birding=birding;backup=null;state.coopDriver=null;refresh({restore:true,full:true});writeLocal()}finally{applying=false;pending=null;baseline=null;personalBaseline=null;remoteRevision=-1;sequence=0}}
+ function restore(){if(!backup)return;applying=true;try{const profile={...state.profile,farmName:backup.profile.farmName},birding=state.birding;world.cancelVehicleControl?.();Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,backup);state.profile=profile;if(birding)state.birding=birding;backup=null;state.coopDriver=null;world.refreshFarmLayout?.();refresh({restore:true,full:true});writeLocal()}finally{applying=false;pending=null;baseline=null;personalBaseline=null;remoteRevision=-1;sequence=0}}
  function acceptSnapshot(packet,{personal=null,full=false}={}){
   if(!packet||!Number.isSafeInteger(packet.revision)||packet.revision<remoteRevision)return false;
   if(personal&&!applyPersonal({},personal))return false;
-  const before=areaStamp(state),previousDay=dayKey(state),vehicle=world.driving&&state.coopDriver===connection.selfId?Object.fromEntries(vehicleKeys.map(k=>[k,state.tractor[k]])):null;
+  const before=areaStamp(state),previousLayout=JSON.stringify(state.farmLayout),previousDay=dayKey(state),vehicle=world.driving&&state.coopDriver===connection.selfId?Object.fromEntries(vehicleKeys.map(k=>[k,state.tractor[k]])):null;
   applying=true;try{
    if(!applyShared(state,packet.snapshot))return false;
+   if(previousLayout!==JSON.stringify(state.farmLayout))world.refreshFarmLayout?.();
    if(personal&&!applyPersonal(state,personal))return false;
    if(previousDay!==dayKey(state)){state.stamina=100;state.fatigue=0}
    if(vehicle&&state.coopDriver===connection.selfId&&world.driving)Object.assign(state.tractor,vehicle);
@@ -69,7 +70,7 @@ export function mountCooperative({state,world,notify,writeLocal,refresh,beforeOp
    else result=applyTransaction(state,packet,slot.personal);
    lastAction=networkTime;lastSeq=packet.seq;if(result.ok)slot.personal=result.personal;slot.updated=Date.now();
    const snap=snapshot();lastAck={type:'ack',seq:lastSeq,ok:result.ok,message:result.message,personal:copy(slot.personal),...snap};connection.send(lastAck);
-   if(result.ok){refresh({rebuildArea:before!==areaStamp(state)});writeLocal()}return;
+   if(result.ok){world.refreshFarmLayout?.();refresh({rebuildArea:before!==areaStamp(state)});writeLocal()}return;
   }
   if(packet.type==='snapshot'){if(!pending)acceptSnapshot(packet);return}
   if(packet.type==='ack'&&pending&&packet.seq===pending.packet.seq){const old=pending;pending=null;if(!packet.ok)applyPersonal(state,old.beforePersonal);if(!acceptSnapshot(packet,{personal:packet.personal||old.beforePersonal})){closed=true;notify('A sincronização falhou. Saia da sala para restaurar sua fazenda.');return}if(!packet.ok)notify(packet.message||'A ação foi desfeita porque a fazenda mudou. Tente novamente.');ui();return}

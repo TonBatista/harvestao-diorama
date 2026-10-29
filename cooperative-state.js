@@ -1,11 +1,12 @@
-import {MAIN_FIELD,LEGACY_FIELD,MAIN_PLOT_COUNT,LEGACY_PLOT_COUNT,migrateCultivation} from './cultivation-layout.js?v=0.32';
-import {migrateFarmStumps,validFarmStumps} from './farm-stumps.js?v=0.32';
-import {CROPS,ITEMS,TOOLS,validSave} from './simulation.js?v=0.32';
-import {ANIMALS} from './animal-care.js?v=0.32';
+import {migrateFarmLayout,validFarmLayout,validateFarmLayout} from './farm-customization.js?v=0.33';
+import {MAIN_FIELD,LEGACY_FIELD,MAIN_PLOT_COUNT,LEGACY_PLOT_COUNT,migrateCultivation} from './cultivation-layout.js?v=0.33';
+import {migrateFarmStumps,validFarmStumps} from './farm-stumps.js?v=0.33';
+import {CROPS,ITEMS,TOOLS,validSave} from './simulation.js?v=0.33';
+import {ANIMALS} from './animal-care.js?v=0.33';
 
 // Network data has its own schema. Visual release numbers never participate in
 // compatibility checks, and aliases/local settings never cross the wire.
-const SHARED=['version','farmName','day','season','year','minutes','weather','money','shipping','earned','lumber','seedChest','seedStorageVersion','homePlots','homesteads','animalCare','animalLocations','animalWander','herdRoutes','tractor','coopDriver','farmPets','nightVisits','eggCollections','gathered','farmStumps'];
+const SHARED=['version','farmName','day','season','year','minutes','weather','money','shipping','earned','lumber','seedChest','seedStorageVersion','homePlots','homesteads','animalCare','animalLocations','animalWander','herdRoutes','tractor','coopDriver','farmPets','nightVisits','eggCollections','gathered','farmStumps','farmLayout'];
 const CLOCK=new Set(['day','season','year','minutes','weather']);
 const PERSONAL=['inventory','held','bags','seed','tool','carryingHay','stamina','fatigue','water'];
 const BAD=new Set(['__proto__','prototype','constructor']);
@@ -35,7 +36,7 @@ function bounded(value){
 function counts(v){return object(v)&&Object.entries(v).every(([id,n])=>crop(id)&&integer(n,0,99999))}
 function plots(v,field=LEGACY_FIELD){return Array.isArray(v)&&v.length===field.cols*field.rows&&v.every((p,i)=>object(p)&&p.x===i%field.cols&&p.z===Math.floor(i/field.cols)&&typeof p.tilled==='boolean'&&typeof p.wet==='boolean'&&(p.crop===null||crop(p.crop))&&number(p.age,0,10000)&&[null,'weed','stone','branch'].includes(p.obstacle))}
 function validShared(v){
- if(!object(v)||!bounded(v)||Object.keys(v).some(k=>!SHARED.includes(k))||!validFarmStumps(v.farmStumps))return false;
+ if(!object(v)||!bounded(v)||Object.keys(v).some(k=>!SHARED.includes(k))||!validFarmStumps(v.farmStumps)||!validFarmLayout(v.farmLayout))return false;
  if(v.version!==2||typeof v.farmName!=='string'||!v.farmName.trim()||Array.from(v.farmName).length>24||/[<>\u0000-\u001f]/u.test(v.farmName))return false;
  if(!integer(v.day,1,30)||!integer(v.season,0,3)||!integer(v.year,1,999999)||!number(v.minutes,0,2000)||!['sun','rain'].includes(v.weather))return false;
  if(!['money','shipping','earned','lumber'].every(k=>number(v[k],0,1e12))||!counts(v.seedChest)||v.seedStorageVersion!==1||!plots(v.homePlots,MAIN_FIELD))return false;
@@ -56,9 +57,9 @@ function validShared(v){
  return validSave({...v,player:{x:0,z:0},plots:v.homePlots});
 }
 export function sharedSnapshot(state){
- migrateCultivation(state);
+ migrateCultivation(state);migrateFarmLayout(state);
  const h=state.homesteads||{},tractor=state.tractor||{};
- const value={version:2,farmName:state.profile?.farmName||'Fazenda Girassol',day:state.day,season:state.season,year:state.year,minutes:state.minutes,weather:state.weather,money:state.money,shipping:state.shipping||0,earned:state.earned||0,lumber:state.lumber||0,seedChest:state.seedChest||{},seedStorageVersion:1,homePlots:state.homePlots||state.plots,homesteads:{owned:h.owned||[],lots:h.lots||{}},animalCare:state.animalCare||{},animalLocations:state.animalLocations||Object.fromEntries(ANIMALS.map(a=>[a.id,'barn'])),animalWander:state.animalWander||{},herdRoutes:state.herdRoutes||{},tractor:{...tractor,trailer:tractor.trailer===true,cargo:tractor.cargo||null},coopDriver:state.coopDriver||null,farmPets:state.farmPets||{},nightVisits:state.nightVisits||{},eggCollections:state.eggCollections||{},gathered:state.gathered||{},farmStumps:migrateFarmStumps(state)};
+ const value={version:2,farmName:state.profile?.farmName||'Fazenda Girassol',day:state.day,season:state.season,year:state.year,minutes:state.minutes,weather:state.weather,money:state.money,shipping:state.shipping||0,earned:state.earned||0,lumber:state.lumber||0,seedChest:state.seedChest||{},seedStorageVersion:1,homePlots:state.homePlots||state.plots,homesteads:{owned:h.owned||[],lots:h.lots||{}},animalCare:state.animalCare||{},animalLocations:state.animalLocations||Object.fromEntries(ANIMALS.map(a=>[a.id,'barn'])),animalWander:state.animalWander||{},herdRoutes:state.herdRoutes||{},tractor:{...tractor,trailer:tractor.trailer===true,cargo:tractor.cargo||null},coopDriver:state.coopDriver||null,farmPets:state.farmPets||{},nightVisits:state.nightVisits||{},eggCollections:state.eggCollections||{},gathered:state.gathered||{},farmStumps:migrateFarmStumps(state),farmLayout:state.farmLayout};
  return clone(value);
 }
 export function applyShared(state,snapshot){
@@ -81,7 +82,7 @@ export function diffShared(before,after){
   if(top==='herdRoutes'&&path.length===2&&equal(routeIdentity(a),routeIdentity(b)))return;
   const plotArray=path.at(-1)==='homePlots'||path.at(-1)==='plots';
   if(plotArray&&Array.isArray(a)&&Array.isArray(b)&&a.length===b.length&&(a.length===MAIN_PLOT_COUNT||a.length===LEGACY_PLOT_COUNT)){for(let i=0;i<a.length;i++)if(!equal(a[i],b[i]))patches.push({path:[...path,i],before:{exists:true,value:clone(a[i])},after:{exists:true,value:clone(b[i])}});return}
-  if(object(a)&&object(b)&&!((top==='herdRoutes'||top==='farmStumps')&&path.length===2)){
+  if(object(a)&&object(b)&&top!=='farmLayout'&&!((top==='herdRoutes'||top==='farmStumps')&&path.length===2)){
    for(const key of new Set([...Object.keys(a),...Object.keys(b)])){
     if(BAD.has(key))continue;
     if(!own(a,key)||!own(b,key)){patches.push({path:[...path,key],before:entry(a,key),after:entry(b,key)});continue}
@@ -115,7 +116,7 @@ export function applyTransaction(state,transaction,expectedPersonal){
  const current=sharedSnapshot(state),candidate=clone(current),seen=new Set();
  for(const patch of transaction.patches){
   if(!object(patch)||!Array.isArray(patch.path)||patch.path.length<1||patch.path.length>9||patch.path.some(k=>typeof k!=='string'&&!Number.isInteger(k)||BAD.has(k)||typeof k==='number'&&(k<0||k>=MAIN_PLOT_COUNT)))return {ok:false,message:'Caminho de ação inválido.'};
-  const top=patch.path[0];if(top==='farmStumps'&&(patch.path.length!==2||typeof patch.path[1]!=='string'))return {ok:false,message:'Mova um toco inteiro de cada vez.'};if(!SHARED.includes(top)||CLOCK.has(top)||['version','seedStorageVersion','animalWander'].includes(top)||!validEntry(patch.before)||!validEntry(patch.after))return {ok:false,message:'Esta ação pertence ao dono da sala.'};
+  const top=patch.path[0];if(top==='farmLayout'&&patch.path.length!==1)return {ok:false,message:'Envie a organização completa da fazenda.'};if(top==='farmStumps'&&(patch.path.length!==2||typeof patch.path[1]!=='string'))return {ok:false,message:'Mova um toco inteiro de cada vez.'};if(!SHARED.includes(top)||CLOCK.has(top)||['version','seedStorageVersion','animalWander'].includes(top)||!validEntry(patch.before)||!validEntry(patch.after))return {ok:false,message:'Esta ação pertence ao dono da sala.'};
   const key=JSON.stringify(patch.path);if(seen.has(key))return {ok:false,message:'Ação repetida.'};seen.add(key);
   const actual=readPath(current,patch.path),target=readPath(candidate,patch.path);if(!actual||!target)return conflict;
   const found=entry(actual.parent,actual.key);
@@ -126,6 +127,7 @@ export function applyTransaction(state,transaction,expectedPersonal){
  // Ancestor/descendant patches are never emitted by diffShared and are rejected
  // rather than allowing a crafted packet to bypass a previous comparison.
  const paths=transaction.patches.map(p=>p.path);for(let i=0;i<paths.length;i++)for(let j=i+1;j<paths.length;j++){const a=paths[i],b=paths[j];if(a.length!==b.length&&a.slice(0,Math.min(a.length,b.length)).every((k,n)=>k===b[n]))return {ok:false,message:'Ação sobreposta inválida.'}}
+ if(transaction.patches.some(p=>p.path[0]==='farmLayout')){const placement=validateFarmLayout(candidate,candidate.farmLayout);if(!placement.ok)return {ok:false,message:placement.message}}
  if(!validShared(candidate))return {ok:false,message:'A alteração não forma uma fazenda válida.'};
  if(!applyShared(state,candidate))return {ok:false,message:'Não foi possível aplicar a alteração.'};
  return {ok:true,message:'Ação confirmada.',personal:clone(transaction.personal)};

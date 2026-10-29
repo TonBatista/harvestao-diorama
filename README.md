@@ -1,8 +1,18 @@
 # Harvestão — a vida no campo
 
-Versão 0.32.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.33.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.32)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.33)
+
+## Novidades da versão 0.33
+
+Saídas entre cenários nas bordas, com caminhos claros e placas discretas. As portas continuam ligadas aos seus prédios. Casa, celeiro e quarto de ferramentas começam junto à borda norte, deixando o centro livre para plantar.
+
+Menu → Organizar construções abre um mapa arrastável. Mova e gire a casa, celeiro, quarto de ferramentas, poço, caixa de entregas e conjunto de árvores com rede. Ajustes numéricos e rotação livre também estão disponíveis; Salvar aplica a mudança e Cancelar preserva a organização anterior. Portas, caminhos e rotas dos animais acompanham a posição. O editor protege plantações, árvores, acessos e outros objetos. No multiplayer, o dono organiza e todos veem a alteração.
+
+O quarto de ferramentas tem prateleiras para equipar/guardar ferramentas, acesso ao mesmo estoque de sementes da casa e freezer com duas bebidas por dia. A rede permite deitar e descansar: três pausas por dia, com recuperação de energia e avanço de 30 minutos. Árvores e rede formam um conjunto editável.
+
+Zoom distante até 8%, centralizando a fazenda para vê-la inteira, inclusive em tela estreita. Novas árvores na faixa de grama da borda. Construções são agrupadas por material e caminhos só se atualizam quando o layout muda. Progresso e culturas existentes são preservados. Para multiplayer, os dois jogadores devem abrir a versão 0.33.
 
 ## Novidades da versão 0.32
 

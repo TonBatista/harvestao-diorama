@@ -1,0 +1,24 @@
+import * as T from './three.module.js';
+import {cottage,artisanMaterial,treeCrown} from './art-direction.js?v=0.33';
+import {farmObject,farmFootprints,migrateFarmLayout} from './farm-customization.js?v=0.33';
+const g={box:new T.BoxGeometry(1,1,1),ball:new T.SphereGeometry(1,12,8),cyl:new T.CylinderGeometry(1,1,1,12)},mats=new Map();
+function mat(c,kind='wood'){const key=c+kind;if(!mats.has(key))mats.set(key,artisanMaterial(c,kind));return mats.get(key)}
+function part(p,geo,c,x,y,z,sx,sy,sz,kind){const o=new T.Mesh(geo,mat(c,kind));o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;p.add(o);return o}
+const box=(p,c,x,y,z,w,h,d,k)=>part(p,g.box,c,x,y,z,w,h,d,k),ball=(p,c,x,y,z,sx,sy,sz,k)=>part(p,g.ball,c,x,y,z,sx,sy,sz,k),cyl=(p,c,x,y,z,r,h,k)=>part(p,g.cyl,c,x,y,z,r,h,r,k);
+function beam(p,a,b,r,c='#b9a27a'){const start=new T.Vector3(...a),end=new T.Vector3(...b),delta=end.clone().sub(start),mid=start.add(end).multiplyScalar(.5),o=cyl(p,c,mid.x,mid.y,mid.z,r,delta.length());o.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize());return o}
+function hammock(){const p=new T.Group();for(const x of[-2.7,2.7]){cyl(p,'#9a8669',x,1.45,0,.20,2.9,'bark');for(let i=0;i<5;i++){const a=i*1.256;ball(p,'#988367',x+Math.sin(a)*.18,.08,Math.cos(a)*.18,.10,.08,.35,'bark').rotation.y=a}const crown=treeCrown(991+x*33);crown.position.set(x,3.65,0);crown.scale.setScalar(.82);p.add(crown);beam(p,[x,2,0],[x+Math.sign(x)*.52,2.75,.15],.085,'#968265');beam(p,[x,1.48,0],[Math.sign(x)*2.1,1.2,0],.024,'#ceb78b')}
+ const positions=[],uv=[],indices=[],segments=24;for(let i=0;i<=segments;i++){const x=-2.1+4.2*i/segments,curve=.66+.54*Math.pow(Math.abs(x)/2.1,2);for(const side of[-1,1]){positions.push(x,curve+.10,side*.48*(.7+.3*(1-Math.abs(x)/2.1)));uv.push(i/segments,(side+1)/2)}if(i<segments){const a=i*2;indices.push(a,a+2,a+1,a+1,a+2,a+3)}}
+ const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.Float32BufferAttribute(positions,3));geometry.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geometry.setIndex(indices);geometry.computeVertexNormals();const canvas=document.createElement('canvas');canvas.width=128;canvas.height=64;const ctx=canvas.getContext('2d');ctx.fillStyle='#d9c89a';ctx.fillRect(0,0,128,64);for(let i=0;i<8;i++){ctx.fillStyle=['#82987e','#b5939b','#dfcc9c'][i%3];ctx.fillRect(0,i*8,128,5)}for(let x=0;x<128;x+=3){ctx.fillStyle='#ffffff16';ctx.fillRect(x,0,1,64)}const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;const material=new T.MeshStandardMaterial({map:texture,roughness:1,side:T.DoubleSide});const cloth=new T.Mesh(geometry,material);cloth.castShadow=cloth.receiveShadow=true;p.add(cloth);for(const side of[-1,1])for(const dz of[-.38,0,.38])beam(p,[side*2.1,1.3,dz],[side*2.7,1.48,0],.014,'#cbb68b');ball(p,'#b8a2ae',-1.0,.90,0,.45,.09,.35,'plain');return p;
+}
+export function createFarmStructures(state,bake){
+ migrateFarmLayout(state);const root=new T.Group();root.name='farm-structures';const objects=new Map();
+ function add(id,build){const local=new T.Group();build(local);const art=bake(local);art.name=id+'-static';root.add(art);objects.set(id,art)}
+ add('house',p=>p.add(cottage(0,0,4.5,3.6,'#e1c79c','#a76b4e')));
+ add('barn',p=>p.add(cottage(0,0,3.8,3.2,'#b4966b','#617575')));
+ add('toolroom',p=>{p.add(cottage(0,0,3,2.9,'#d8bb83','#9a7848'));box(p,'#897b59',-1.18,.55,1.56,.25,1.1,.22);beam(p,[-1.2,.2,1.7],[-1.3,1.4,1.7],.027,'#b79769');box(p,'#768882',-1.3,1.4,1.7,.25,.18,.07,'plain');box(p,'#8c7958',1.25,.5,1.55,.46,1,.18);for(let i=0;i<3;i++)box(p,'#c4ab7a',1.25,.2+i*.28,1.68,.50,.06,.44)});
+ add('shipping',p=>{box(p,'#857456',0,.52,0,1.6,1.04,1.1);for(let j=0;j<4;j++){box(p,'#c0a679',0,.15+j*.24,.57,1.7,.21,.08);box(p,'#ae946b',.86,.15+j*.24,0,.08,.21,1.12)}box(p,'#c5b287',0,1.08,0,1.85,.14,1.28);box(p,'#483b26',0,1.16,0,1.3,.025,.7,'plain');box(p,'#edd29c',0,.63,.625,.8,.36,.025,'plain')});
+ add('well',p=>{for(let j=0;j<3;j++)for(let i=0;i<12;i++){const a=(i+(j%2)*.5)*Math.PI/6,b=box(p,['#a4a693','#b2af9b','#beb9a3'][i%3],Math.sin(a)*.72,.16+j*.24,Math.cos(a)*.72,.4,.22,.31,'stone');b.rotation.y=a}for(const x of[-.9,.9])box(p,'#755438',x,1.12,0,.13,2.24,.16);for(const side of[-1,1]){const roof=box(p,'#9d6747',side*.5,2.35,0,1.15,.12,1.7);roof.rotation.z=-side*.45}cyl(p,'#6baca5',0,.18,0,.61,.04,'plain')});
+ add('hammock',p=>p.add(hammock()));
+ function refresh(){for(const[id,art]of objects){const pose=farmObject(state,id);art.position.set(pose.x,0,pose.z);art.rotation.y=pose.angle;art.updateMatrixWorld(true)}return farmFootprints(state)}
+ refresh();return {root,objects,refresh};
+}

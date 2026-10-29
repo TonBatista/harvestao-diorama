@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {createFarmer} from './farmer-art.js?v=0.32';
-const areas=new Set(['farm','house','barn','village','market','mountain','beach','lake','homestead','chapel','library','clinic','inn','rosaHouse','fisherHouse','smithy','carpenter','mine','lighthouse','lighthouseUpper']);
+import {createFarmer} from './farmer-art.js?v=0.33';
+const areas=new Set(['farm','house','barn','village','market','mountain','beach','lake','homestead','chapel','library','clinic','inn','rosaHouse','fisherHouse','smithy','carpenter','mine','lighthouse','lighthouseUpper','toolroom']);
 export function validRemotePose(p){return !!p&&typeof p==='object'&&areas.has(p.region)&&['x','z','angle'].every(k=>Number.isFinite(p[k]))&&Math.abs(p.x)<200&&Math.abs(p.z)<200&&Math.abs(p.angle)<100&&(!p.lotId||['willow','sunrise','pine'].includes(p.lotId))}
 export function createRemoteFarmer(scene){
  let rig=null,target=null,lastProfile='',phase=0,blend=0,wasVisible=false;const displayed=new T.Vector3(),destination=new T.Vector3(),labelCanvas=document.createElement('canvas');labelCanvas.width=256;labelCanvas.height=64;const labelContext=labelCanvas.getContext('2d'),labelMap=new T.CanvasTexture(labelCanvas),labelMat=new T.SpriteMaterial({map:labelMap,depthTest:false,transparent:true,toneMapped:false}),label=new T.Sprite(labelMat);label.scale.set(1.8,.45,1);label.renderOrder=20;label.visible=false;scene.add(label);
