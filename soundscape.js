@@ -1,4 +1,4 @@
-import {SCORES,chooseScore} from './audio-score.js?v=0.30';
+import {SCORES,chooseScore} from './audio-score.js?v=0.31';
 const SETTINGS_KEY='harvestao-sound-v1';
 export function tractorEngineParameters({driving=false,speed=0,cutter=false,paused=false,hidden=false}={}){const pace=Math.min(1,Math.max(0,Number(speed)||0)/6.3),active=Boolean(driving&&!paused&&!hidden);return {gain:active?.14+pace*.075:0,frequency:35+pace*44,pulse:8+pace*8,cutoff:220+pace*370,cutterGain:active&&cutter?.045:0}}
 export function normalizeAudioSettings(value){const v=value&&typeof value==='object'&&!Array.isArray(value)?value:{};const volume=(key,fallback)=>Number.isFinite(v[key])?Math.max(0,Math.min(1,v[key])):fallback;return {master:volume('master',.70),music:volume('music',.55),ambience:volume('ambience',.65),muted:v.muted===true}}

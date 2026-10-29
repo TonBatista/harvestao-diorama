@@ -1,8 +1,16 @@
 # Harvestão — a vida no campo
 
-Versão 0.28.1. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.31.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.28.1)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.31)
+
+## Novidades da versão 0.31
+
+Capa fornecida pelo jogador, com arte inteira e menu após tocar ou apertar X. Multiplayer aparece apenas no item da lista e no menu de pausa. Removidos os avisos visuais de ação, as legendas sob X/Y e o botão flutuante dos cantos; os sons continuam disponíveis.
+
+A fazenda principal passou de 24 × 26 para 48 × 52, quatro vezes a área total. Canteiros, construções, itens e terrenos do lago continuam preservados. A área adicional é pasto livre. Animais atravessam os tocos baixos da borda e continuam respeitando paredes e plantações.
+
+Com mãos livres, aproxime-se de um toco e aperte X para pegar. X coloca em um espaço livre à frente; Y cancela. As 41 posições ficam salvas e são compartilhadas no multiplayer, com proteção contra movimentos simultâneos. Três malhas instanciadas mantêm o custo da cerca baixo. Os dois jogadores devem abrir o link da versão 0.31.
 
 ## Cuidar dos animais
 
@@ -37,7 +45,7 @@ O zoom fica discreto à esquerda: apenas + e − claros quando inativo. Toque ou
 
 Sirva esta pasta por HTTP. Exige WebGL e não precisa instalar dependências para jogar. `npm test` executa regras de cultivo, estações e cuidados; `npm run check` verifica sintaxe. Saves da versão 2 continuam compatíveis. Os interiores pausam o relógio. Esta é uma implementação própria dos sistemas de cuidado e mercado: rotinas sociais completas, festivais e mineração profunda ainda não estão implementados.
 
-Código editado em `outputs/harvestao-v025`. Three.js: licença MIT em `THREE-LICENSE.txt`.
+Código editado em `outputs/harvestao-v031`. Three.js: licença MIT em `THREE-LICENSE.txt`.
 ## Câmera, aves e encontros
 
 Equipe a câmera (ferramenta 8) e enquadre uma ave ou animal. A/Espaço ou o obturador fotografa. P ou o botão do caderno abre o registro: cada espécie recebe um check, uma miniatura real do jogo, data, local e contagem. Os registros acompanham o save e podem ser exportados no menu.

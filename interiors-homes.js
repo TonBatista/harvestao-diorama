@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.30';
+import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.31';
 
 // Small domestic objects reuse the room kit and are merged with its static art.
 function cup(k,p,x,y,z,color='#d9cfb3'){

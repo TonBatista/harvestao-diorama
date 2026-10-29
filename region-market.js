@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.30';
-import {CROPS,SEASONS} from './simulation.js?v=0.30';
+import {createKit} from './region-kit.js?v=0.31';
+import {CROPS,SEASONS} from './simulation.js?v=0.31';
 const C={oak:'#b18b5d',dark:'#75543c',trim:'#cbae7a',cream:'#e4d5b7',stone:'#b8af97',iron:'#687169'},seasonColors=['#91a876','#ceae68','#b7856b','#8b9eaf'];
 function group(p,x=0,y=0,z=0,angle=0){const g=new T.Group();g.position.set(x,y,z);g.rotation.y=angle;p.add(g);return g}
 function owned(m){m.userData.regionOwned=true;return m}

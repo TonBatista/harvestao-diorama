@@ -1,4 +1,4 @@
-import {colliderContains} from './scene-collisions.js?v=0.30';
+import {colliderContains} from './scene-collisions.js?v=0.31';
 export {colliderContains};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function hopCrossing(c,player,dx,dz){if(c.r){const xx=c.x-player.x,zz=c.z-player.z,along=xx*dx+zz*dz,cross=Math.abs(xx*dz-zz*dx),radius=c.r+.25;if(along<=0||cross>=radius)return null;const reach=Math.sqrt(radius*radius-cross*cross);return{near:along-reach,exit:along+reach}}if(!c.w||!c.d)return null;const a=c.angle||0,cs=Math.cos(a),sn=Math.sin(a),xx=player.x-c.x,zz=player.z-c.z,origin=[xx*cs-zz*sn,xx*sn+zz*cs],direction=[dx*cs-dz*sn,dx*sn+dz*cs],half=[c.w/2+.25,c.d/2+.25];let near=-Infinity,exit=Infinity;for(let i=0;i<2;i++){if(Math.abs(direction[i])<1e-8){if(Math.abs(origin[i])>=half[i])return null;continue}const t1=(-half[i]-origin[i])/direction[i],t2=(half[i]-origin[i])/direction[i];near=Math.max(near,Math.min(t1,t2));exit=Math.min(exit,Math.max(t1,t2));if(exit<near)return null}return exit>0?{near,exit}:null}

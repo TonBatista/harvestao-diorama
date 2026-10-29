@@ -1,8 +1,8 @@
-import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.30';
-import {mountMultiplayerMenu} from './multiplayer-menu.js?v=0.30';
-import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.30';
-import {FIELD,TILE} from './simulation.js?v=0.30';
-import {validRemotePose} from './remote-farmer.js?v=0.30';
+import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.31';
+import {mountMultiplayerMenu} from './multiplayer-menu.js?v=0.31';
+import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.31';
+import {FIELD,TILE} from './simulation.js?v=0.31';
+import {validRemotePose} from './remote-farmer.js?v=0.31';
 const copy=value=>JSON.parse(JSON.stringify(value)),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const dayKey=s=>[s.year,s.season,s.day].join(':');
 const vehicleKeys=['x','z','angle','area','lotId','trailerX','trailerZ','trailerAngle','trailerArea','trailerLot'];
@@ -89,7 +89,7 @@ export function mountCooperative({state,world,notify,writeLocal,refresh,beforeOp
  world.setVehiclePermission?.(()=>{if(connection.role==='guest'&&(!connection.ready||pending||closed))return false;if(connection.role==='solo')return true;if(state.coopDriver&&state.coopDriver!==connection.selfId)return false;mountPosition={...world.safePlayer};state.coopDriver=connection.selfId;return true});
  // Lock mutations while one transaction is awaiting its authoritative reply.
  // The room menu remains usable so a dropped network never traps the player.
- const guard=e=>{if(!blocked())return;const target=e.target instanceof Element?e.target:null;if(target?.closest('#startMenu,#menuButton,#multiplayerButton,#resume,#menu .close'))return;if(e.type==='keydown'&&['Escape','KeyY'].includes(e.code))return;e.preventDefault();e.stopImmediatePropagation()};
+ const guard=e=>{if(!blocked())return;const target=e.target instanceof Element?e.target:null;if(target?.closest('#titleScreen,#startMenu,#menuButton,#multiplayerButton,#resume,#menu .close'))return;if(e.type==='keydown'&&['Escape','KeyY'].includes(e.code))return;e.preventDefault();e.stopImmediatePropagation()};
  for(const event of ['click','pointerdown','keydown'])document.addEventListener(event,guard,true);
  function blocked(){return connection.role==='guest'&&(!connection.ready||!!pending||closed)}
  const invited=new URLSearchParams(location.search).get('sala');if(/^HV[A-F0-9]{6}$/i.test(invited||'')){const input=menu.element.querySelector('#mpRoomCode');input.value=invited.toUpperCase();statusText='Convite recebido. Clique em Entrar para visitar esta fazenda.'}

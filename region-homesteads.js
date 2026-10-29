@@ -1,8 +1,8 @@
-import {addInteriorEntrances} from './interior-catalog.js?v=0.30';
+import {addInteriorEntrances} from './interior-catalog.js?v=0.31';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.30';
-import {LOTS,BUILDINGS,DEBRIS,migrateHomesteads,lotState} from './homestead-rules.js?v=0.30';
-import {farmGround,farmMeadow,countryTrack,homesteadLandscape,lakeLotLandscape,lakeShorePlants} from './farm-landscape.js?v=0.30';
+import {createKit} from './region-kit.js?v=0.31';
+import {LOTS,BUILDINGS,DEBRIS,migrateHomesteads,lotState} from './homestead-rules.js?v=0.31';
+import {farmGround,farmMeadow,countryTrack,homesteadLandscape,lakeLotLandscape,lakeShorePlants} from './farm-landscape.js?v=0.31';
 const TAU=Math.PI*2;
 const owned=options=>{const m=new T.MeshStandardMaterial(options);m.userData.regionOwned=true;return m};
 function fence(k,x,z,w,d){const cols=Math.ceil(w/2),rows=Math.ceil(d/2),stepX=w/cols,stepZ=d/rows;for(let i=0;i<=cols;i++){const xx=x-w/2+i*stepX;for(const side of[-1,1]){if(side===1&&Math.abs(xx-x)<2)continue;const zz=z+side*d/2;k.cyl(k.fixed,'#9c8561',xx,.47,zz,.065,.94,'wood');k.roundSolid(xx,zz,.075);if(i&&!(side===1&&Math.abs(xx-x)<3)){k.box(k.fixed,'#b8a27b',xx-stepX/2,.58,zz,stepX,.085,.07,'wood');k.solid(xx-stepX/2,zz,stepX,.09)}}}for(let i=0;i<=rows;i++){const zz=z-d/2+i*stepZ;for(const side of[-1,1]){const xx=x+side*w/2;k.cyl(k.fixed,'#9c8561',xx,.47,zz,.065,.94,'wood');k.roundSolid(xx,zz,.075);if(i){k.box(k.fixed,'#b8a27b',xx,.58,zz-stepZ/2,.07,.085,stepZ,'wood');k.solid(xx,zz-stepZ/2,.09,stepZ)}}}}
