@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {part,mergeParts} from './wildlife-art.js?v=0.31';
-import {findDogPath,dogSegmentClear} from './companion-dog.js?v=0.31';
+import {part,mergeParts} from './wildlife-art.js?v=0.32';
+import {findDogPath,dogSegmentClear} from './companion-dog.js?v=0.32';
 const TAU=Math.PI*2,wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 const finite=p=>Number.isFinite(p?.x)&&Number.isFinite(p?.z);
 const random=n=>{const x=Math.sin(n*127.1+72.73)*43758.5453;return x-Math.floor(x)};

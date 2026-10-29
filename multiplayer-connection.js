@@ -1,7 +1,7 @@
 // Connection protocol is independent from cosmetic/game build numbers.
 // Only a validated hello -> welcome -> ready exchange opens the data channel.
-export const PROTOCOL='harvestao-world-2';
-export const BUILD='0.31.0';
+export const PROTOCOL='harvestao-world-3';
+export const BUILD='0.32.0';
 const PEER_URL='https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js';
 const ROOM=/^HV[A-F0-9]{6}$/;
 const ID=/^[a-zA-Z0-9_-]{8,80}$/;
@@ -121,11 +121,11 @@ export function createMultiplayerConnection({onStatus=()=>{},onRole=()=>{},onHel
   room=code;startedAt=lastSeen=Date.now();retryCount=0;handshakeActive=0;setRole(isHost?'host':'guest');status(isHost?'Abrindo sua sala…':'Procurando a sala…','opening');
   const result=new Promise(resolve=>{pendingResolve=resolve});
   try{
-   const p=new PeerConstructor(isHost?'harvestao-world2-'+room:undefined,{debug:0});peer=p;
+   const p=new PeerConstructor(isHost?'harvestao-world3-'+room:undefined,{debug:0});peer=p;
    p.on('open',()=>{
     if(peer!==p||epoch!==myEpoch)return;retryCount=0;startedAt=Date.now();
     if(isHost){status('Sala '+room+' aberta · envie o código ao amigo','waiting');settle(room)}
-    else if(!channel){try{bind(p.connect('harvestao-world2-'+room,{reliable:true,serialization:'json',metadata:{protocol:PROTOCOL}}),false,myEpoch)}catch{closeChannel('Não foi possível procurar esta sala.')}}
+    else if(!channel){try{bind(p.connect('harvestao-world3-'+room,{reliable:true,serialization:'json',metadata:{protocol:PROTOCOL}}),false,myEpoch)}catch{closeChannel('Não foi possível procurar esta sala.')}}
    });
    p.on('connection',c=>{if(isHost&&peer===p&&epoch===myEpoch)bind(c,true,myEpoch);else refuse(c,'Este aparelho não está recebendo visitantes.','not-host')});
    p.on('error',error=>{

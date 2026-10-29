@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.31';
+import {createKit} from './region-kit.js?v=0.32';
 export const C={oak:'#b0946c',dark:'#695642',trim:'#cfb58a',cream:'#e1d6bd',stone:'#aaa997',iron:'#626e69',sage:'#8e9c7e',rose:'#b89d9f'};
 export function group(parent,x=0,y=0,z=0,angle=0){const g=new T.Group();g.position.set(x,y,z);g.rotation.y=angle;parent.add(g);return g}
 function windowFrame(k,x,z,w=1.65,h=1.4){const F=k.fixed;k.box(F,C.dark,x,1.88,z,w+.19,h+.18,.15,'wood');k.box(F,'#c0d6cf',x,1.88,z+.09,w,h,.035);for(const dx of[-w/2,0,w/2])k.box(F,C.trim,x+dx,1.88,z+.13,.065,h+.10,.075,'wood');for(const y of[1.88-h/2,1.88,1.88+h/2])k.box(F,C.trim,x,y,z+.13,w+.08,.055,.075,'wood');k.box(F,C.oak,x,1.88-h/2-.07,z+.17,w+.32,.10,.31,'wood');for(const s of[-1,1]){k.box(F,'#b3b49a',x+s*(w/2+.11),1.89,z+.19,.19,h+.12,.11,'fabric');k.box(F,C.trim,x+s*(w/2+.11),1.66,z+.25,.22,.07,.05,'fabric')}}

@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {FARM_STUMP_DEFAULTS,migrateFarmStumps} from './farm-stumps.js?v=0.31';
+import {FARM_STUMP_DEFAULTS,migrateFarmStumps} from './farm-stumps.js?v=0.32';
 const rand=n=>{const v=Math.sin(n*127.1+34.2)*43758.5453;return v-Math.floor(v)};
 /** Three shared instance draws keep a movable fence as inexpensive as scenery. */
 export function createFarmStumpArt(state,{barkMaterial,cutMaterial,rootMaterial}){

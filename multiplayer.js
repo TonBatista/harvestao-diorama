@@ -1,8 +1,9 @@
-import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.31';
-import {mountMultiplayerMenu} from './multiplayer-menu.js?v=0.31';
-import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.31';
-import {FIELD,TILE} from './simulation.js?v=0.31';
-import {validRemotePose} from './remote-farmer.js?v=0.31';
+import {fieldForProperty} from './cultivation-layout.js?v=0.32';
+import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.32';
+import {mountMultiplayerMenu} from './multiplayer-menu.js?v=0.32';
+import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.32';
+import {FIELD,TILE} from './simulation.js?v=0.32';
+import {validRemotePose} from './remote-farmer.js?v=0.32';
 const copy=value=>JSON.parse(JSON.stringify(value)),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const dayKey=s=>[s.year,s.season,s.day].join(':');
 const vehicleKeys=['x','z','angle','area','lotId','trailerX','trailerZ','trailerAngle','trailerArea','trailerLot'];
@@ -51,7 +52,7 @@ export function mountCooperative({state,world,notify,writeLocal,refresh,beforeOp
   const v=pose?.vehicle;if(state.coopDriver!==sender||!pose.driving||!v||typeof v!=='object')return;
   if(!['farm','homestead','lake','village','mountain','beach'].includes(v.area)||['x','z','angle','trailerX','trailerZ','trailerAngle'].some(k=>!Number.isFinite(v[k])||Math.abs(v[k])>100)||v.area==='homestead'&&!['willow','sunrise','pine'].includes(v.lotId)||v.trailerArea!==undefined&&!['farm','homestead','lake','village','mountain','beach'].includes(v.trailerArea)||v.trailerLot!=null&&!['willow','sunrise','pine'].includes(v.trailerLot))return;
   for(const k of vehicleKeys)if(Object.hasOwn(v,k))state.tractor[k]=v[k];
-  if(connection.role==='host'&&state.tractor.cutter){const plots=v.area==='farm'?state.homePlots:v.area==='homestead'?state.homesteads?.lots[v.lotId]?.plots:null;if(plots)for(const p of plots)if(p.obstacle==='weed'&&Math.hypot(FIELD.x+p.x*TILE-v.x,FIELD.z+p.z*TILE-v.z)<1.18)p.obstacle=null;world.rebuild()}
+  if(connection.role==='host'&&state.tractor.cutter){const plots=v.area==='farm'?state.homePlots:v.area==='homestead'?state.homesteads?.lots[v.lotId]?.plots:null,field=fieldForProperty(v.area==='farm'?'farm':'homestead:'+v.lotId);if(plots)for(const p of plots)if(p.obstacle==='weed'&&Math.hypot(field.x+p.x*TILE-v.x,field.z+p.z*TILE-v.z)<1.18)p.obstacle=null;world.rebuild()}
   world.refreshVehicle();
  }
  function receive(packet){

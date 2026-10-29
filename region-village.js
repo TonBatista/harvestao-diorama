@@ -1,7 +1,7 @@
-import {addInteriorEntrances} from './interior-catalog.js?v=0.31';
-import {addMapFauna} from './fauna-art.js?v=0.31';
+import {addInteriorEntrances} from './interior-catalog.js?v=0.32';
+import {addMapFauna} from './fauna-art.js?v=0.32';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.31';
+import {createKit} from './region-kit.js?v=0.32';
 export function buildVillage(){const k=createKit(),F=k.fixed,D=k.dynamic,C={cream:'#ddcfad',timber:'#927354',dark:'#574c40',stone:'#b5b3a0',paving:'#b8b9a5',grass:'#93a472',sage:'#7b9279',clay:'#bd8a66',rose:'#b59391',slate:'#738184',blue:'#93b0b7',gold:'#cdb878',leaf:'#789155'};
 k.floor(C.grass,34,30,0,0,-.035,'moss');k.path(0,0,4.1,30,C.paving);k.path(0,-6,34,3.25,C.paving);k.path(0,7,34,3.7,C.paving);k.path(0,1.8,34,3.5,C.paving);k.path(-15,-8.5,3.1,7,C.paving);k.path(-6.9,10.1,2.1,6.8,C.paving);k.path(-8,13,12,2.1,C.paving);k.path(8,13.6,12,2.1,C.paving);k.floor('#c6c1ac',11.5,9.8,0,1.7,.035,'stone');const kerb=(x,z,w,d)=>k.box(F,'#dad6c1',x,.10,z,w,.17,d,'stone');for(const x of [-2.15,2.15]){for(let z=-13.8;z<-8;z+=.68)kerb(x,z,.15,.61);for(let z=9.1;z<14.8;z+=.68)kerb(x,z,.15,.61)}for(const z of [5.05,8.95])for(let x=-16.5;x<16.6;x+=.7){if(Math.abs(x)<2.4)continue;kerb(x,z,.63,.16)}for(let row=0;row<14;row++)for(let col=0;col<16;col++){const x=-5.3+col*.70+(row%2)*.28,z=-2.65+row*.66;if(Math.hypot(x,z-1.7)<1.7)continue;k.box(F,col%3?'#c3c1ad':'#b9baa6',x,.061,z,.65,.035,.61,'stone')}for(let z=9.5;z<14.7;z+=.55)k.box(F,'#d4ceba',0,.065,z,.19,.018,.27,'stone');
 function porch(x,z,w,color,striped=false){const g=new T.Group();g.position.set(x,0,z);F.add(g);for(const dx of [-w/2+.12,w/2-.12]){k.box(g,C.timber,dx,1.05,.72,.12,2.1,.12,'wood');k.roundSolid(x+dx,z+.72,.085)}for(let i=0;i<10;i++){const strip=k.box(g,striped&&i%2?'#ddd4b9':color,-w/2+(i+.5)*w/10,2.11,.30,w/10+.018,.07,1.35,'fabric');strip.rotation.x=.12;k.ball(g,striped&&i%2?'#ddd4b9':color,-w/2+(i+.5)*w/10,1.98,.96,w/20,.105,.045,'fabric')}k.box(g,C.timber,0,2.08,1,w+.08,.10,.10,'wood');return g}
