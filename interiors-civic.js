@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.33';
+import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.34';
 
 const botanicals=['#80936c','#9ea57d','#bc9b8d','#d6c68d'];
 function info(k,x,z,name,text,radius=1.35){k.interact({x,z,label:name,type:'info',data:{name,text},radius})}

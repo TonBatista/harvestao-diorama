@@ -1,5 +1,5 @@
-import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.33';
-import {colliderContains} from './scene-collisions.js?v=0.33';
+import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.34';
+import {colliderContains} from './scene-collisions.js?v=0.34';
 export const FARM_OBJECTS=Object.freeze([
  {id:'house',name:'Casa principal',w:5,d:4.1,default:{x:-3,z:-21,angle:0}},
  {id:'barn',name:'Celeiro',w:4.3,d:3.7,default:{x:-13.5,z:-20.5,angle:0}},
@@ -20,7 +20,7 @@ export function farmPoint(s,id,dx=0,dz=0){const p=farmObject(s,id);if(!p)return 
 export function farmFootprints(s){const map=migrateFarmLayout(s);return FARM_OBJECTS.map(d=>({x:map[d.id].x,z:map[d.id].z,w:d.w,d:d.d,angle:map[d.id].angle,farmObject:d.id,kind:'farm-building'}))}
 export const FARM_GATES=Object.freeze({village:{x:24.9,z:-15},beach:{x:12,z:24.8},mountain:{x:-20.9,z:8}});
 export const FARM_EDGE_TREES=Object.freeze([...[-19,-15,-10,-5,1,7,13,19,24].map(x=>({x,z:-25.1})),...[-18,-11,-4,3,20,25].map(x=>({x,z:25.1})),...[-19,-12,-5,2,15,22].map(z=>({x:-21.1,z})),...[-23,-8,0,8,16,23].map(z=>({x:25.1,z}))]);
-const fixedPaths=[{x:3.5,z:-16,w:43,d:2},{x:24,z:-15.5,w:3.8,d:2},{x:18,z:4.4,w:2,d:40.8},{x:15,z:24.4,w:8,d:2},{x:-18,z:-4,w:2,d:24},{x:-19.5,z:8,w:5,d:2}];
+const fixedPaths=[{x:24.2,z:-15,w:4.8,d:4.5},{x:3.5,z:-16,w:43,d:2},{x:24,z:-15.5,w:3.8,d:2},{x:18,z:4.4,w:2,d:40.8},{x:15,z:24.4,w:8,d:2},{x:-18,z:-4,w:2,d:24},{x:-19.5,z:8,w:5,d:2}];
 const pathsCache=new WeakMap();
 const onRect=(p,x,z,margin=0)=>colliderContains(p,x,z,margin);
 function routeToLane(start,footprints){

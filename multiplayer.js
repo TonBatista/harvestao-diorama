@@ -1,9 +1,9 @@
-import {fieldForProperty} from './cultivation-layout.js?v=0.33';
-import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.33';
-import {mountMultiplayerMenu} from './multiplayer-menu.js?v=0.33';
-import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.33';
-import {FIELD,TILE} from './simulation.js?v=0.33';
-import {validRemotePose} from './remote-farmer.js?v=0.33';
+import {fieldForProperty} from './cultivation-layout.js?v=0.34';
+import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.34';
+import {mountMultiplayerMenu} from './multiplayer-menu.js?v=0.34';
+import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.34';
+import {FIELD,TILE} from './simulation.js?v=0.34';
+import {validRemotePose} from './remote-farmer.js?v=0.34';
 const copy=value=>JSON.parse(JSON.stringify(value)),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const dayKey=s=>[s.year,s.season,s.day].join(':');
 const vehicleKeys=['x','z','angle','area','lotId','trailerX','trailerZ','trailerAngle','trailerArea','trailerLot'];

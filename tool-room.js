@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,shelf,rug,vase,lantern} from './rural-room.js?v=0.33';
+import {createInteriorRoom,group,C,table,shelf,rug,vase,lantern} from './rural-room.js?v=0.34';
 function hangingTool(k,parent,x,y,z,kind){
  const timber='#a88c61',metal='#7b8d83';
  if(kind==='water'){k.cyl(parent,'#879c91',x,y-.02,z,.15,.25);k.beam(parent,'#879c91',[x+.1,y,z],[x+.31,y+.12,z],.045);const handle=k.cyl(parent,metal,x,y+.15,z,.14,.025);handle.rotation.x=Math.PI/2;return;}

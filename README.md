@@ -1,8 +1,16 @@
 # Harvestão — a vida no campo
 
-Versão 0.33.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.34.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.33)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.34)
+
+## Correções e entrada rural — versão 0.34
+
+Corrige a matriz dos modelos agrupados para que todos os seis objetos editáveis apareçam na posição e rotação salvas, junto aos seus colisores, portas e caminhos. No multiplayer, as saídas também acompanham a construção quando o visitante já está dentro dela.
+
+A entrada para a vila ganhou pedras irregulares com grama nas juntas, flores, pilares e portão artesanal de madeira aberto. O centro fica livre para o trator; os sólidos da entrada permanecem ao reorganizar a fazenda. Não são necessários novos downloads de imagens: o piso é uma textura procedural compartilhada.
+
+Conferência pontual de 30 transformações dos seis modelos confirmou alinhamento com portas e colisores; corredor do portão livre para o trator. Progresso e organização salvos são preservados.
 
 ## Novidades da versão 0.33
 

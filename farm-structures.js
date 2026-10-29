@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {cottage,artisanMaterial,treeCrown} from './art-direction.js?v=0.33';
-import {farmObject,farmFootprints,migrateFarmLayout} from './farm-customization.js?v=0.33';
+import {cottage,artisanMaterial,treeCrown} from './art-direction.js?v=0.34';
+import {farmObject,farmFootprints,migrateFarmLayout} from './farm-customization.js?v=0.34';
 const g={box:new T.BoxGeometry(1,1,1),ball:new T.SphereGeometry(1,12,8),cyl:new T.CylinderGeometry(1,1,1,12)},mats=new Map();
 function mat(c,kind='wood'){const key=c+kind;if(!mats.has(key))mats.set(key,artisanMaterial(c,kind));return mats.get(key)}
 function part(p,geo,c,x,y,z,sx,sy,sz,kind){const o=new T.Mesh(geo,mat(c,kind));o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;p.add(o);return o}
@@ -19,6 +19,6 @@ export function createFarmStructures(state,bake){
  add('shipping',p=>{box(p,'#857456',0,.52,0,1.6,1.04,1.1);for(let j=0;j<4;j++){box(p,'#c0a679',0,.15+j*.24,.57,1.7,.21,.08);box(p,'#ae946b',.86,.15+j*.24,0,.08,.21,1.12)}box(p,'#c5b287',0,1.08,0,1.85,.14,1.28);box(p,'#483b26',0,1.16,0,1.3,.025,.7,'plain');box(p,'#edd29c',0,.63,.625,.8,.36,.025,'plain')});
  add('well',p=>{for(let j=0;j<3;j++)for(let i=0;i<12;i++){const a=(i+(j%2)*.5)*Math.PI/6,b=box(p,['#a4a693','#b2af9b','#beb9a3'][i%3],Math.sin(a)*.72,.16+j*.24,Math.cos(a)*.72,.4,.22,.31,'stone');b.rotation.y=a}for(const x of[-.9,.9])box(p,'#755438',x,1.12,0,.13,2.24,.16);for(const side of[-1,1]){const roof=box(p,'#9d6747',side*.5,2.35,0,1.15,.12,1.7);roof.rotation.z=-side*.45}cyl(p,'#6baca5',0,.18,0,.61,.04,'plain')});
  add('hammock',p=>p.add(hammock()));
- function refresh(){for(const[id,art]of objects){const pose=farmObject(state,id);art.position.set(pose.x,0,pose.z);art.rotation.y=pose.angle;art.updateMatrixWorld(true)}return farmFootprints(state)}
+ function refresh(){for(const[id,art]of objects){const pose=farmObject(state,id);art.position.set(pose.x,0,pose.z);art.rotation.y=pose.angle;art.updateMatrix();art.updateMatrixWorld(true)}return farmFootprints(state)}
  refresh();return {root,objects,refresh};
 }

@@ -1,6 +1,6 @@
-import {LOTS,BUILDINGS,migrateHomesteads,purchaseLot,selectLot,lotState,clearLotDebris,constructBuilding,buyLumber} from './homestead-rules.js?v=0.33';
-import {ANIMALS} from './animal-care.js?v=0.33';
-import {migrateTransport,transportRoster,loadAnimal,unloadAnimal,transportArea,herdStatus,ringHerd,indoorLocation} from './transport-rules.js?v=0.33';
+import {LOTS,BUILDINGS,migrateHomesteads,purchaseLot,selectLot,lotState,clearLotDebris,constructBuilding,buyLumber} from './homestead-rules.js?v=0.34';
+import {ANIMALS} from './animal-care.js?v=0.34';
+import {migrateTransport,transportRoster,loadAnimal,unloadAnimal,transportArea,herdStatus,ringHerd,indoorLocation} from './transport-rules.js?v=0.34';
 export function mountExpansionUI({state,world,notify,save,hud,beforeOpen,goArea,playBell=()=>{}}){
  const dialog=document.createElement('dialog');dialog.id='expansionDialog';dialog.innerHTML='<button class="close" aria-label="Fechar expansão">×</button><div class="dialog-eyebrow">NOVAS HISTÓRIAS NO VALE</div><h2 id="expansionTitle"></h2><div id="expansionBody"></div>';
  document.body.append(dialog);const title=dialog.querySelector('h2'),body=dialog.querySelector('#expansionBody');let mode='',lastSignature='';dialog.querySelector('.close').onclick=()=>dialog.close();

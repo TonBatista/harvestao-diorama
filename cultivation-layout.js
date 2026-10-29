@@ -1,5 +1,5 @@
-import {farmFootprints,farmPaths} from './farm-customization.js?v=0.33';
-import {colliderContains} from './scene-collisions.js?v=0.33';
+import {farmFootprints,farmPaths} from './farm-customization.js?v=0.34';
+import {colliderContains} from './scene-collisions.js?v=0.34';
 export const TILE=1.25;
 export const LEGACY_FIELD=Object.freeze({x:-6,z:-3,cols:12,rows:12});
 export const MAIN_FIELD=Object.freeze({x:-19.75,z:-23,cols:36,rows:38});

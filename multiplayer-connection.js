@@ -1,7 +1,7 @@
 // Connection protocol is independent from cosmetic/game build numbers.
 // Only a validated hello -> welcome -> ready exchange opens the data channel.
 export const PROTOCOL='harvestao-world-4';
-export const BUILD='0.33.0';
+export const BUILD='0.34.0';
 const PEER_URL='https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js';
 const ROOM=/^HV[A-F0-9]{6}$/;
 const ID=/^[a-zA-Z0-9_-]{8,80}$/;

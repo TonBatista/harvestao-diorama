@@ -1,4 +1,4 @@
-import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.33';
+import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.34';
 const defaults=[];
 for(let i=0;i<16;i++){defaults.push({id:'L-'+i,x:-7.8,z:-3+i});if(i<5||i>8)defaults.push({id:'R-'+i,x:9.6,z:-3+i})}
 for(let i=0;i<16;i++){const x=-7.6+i*1.1;if(x>-.8&&x<2.5)continue;defaults.push({id:'T-'+i,x:Math.round(x*1000)/1000,z:-4.55})}
