@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
 
-import {createInteriorKit,group,table} from './rural-room.js?v=0.34';
+import {createInteriorKit,group,table} from './rural-room.js?v=0.35';
 function barrel(k,x,z,scale=1){const g=group(k.fixed,x,0,z);k.cyl(g,'#a0835a',0,.45*scale,0,.34*scale,.88*scale,'wood');for(const y of[.12,.45,.77])k.cyl(g,'#6d756b',0,y*scale,0,.35*scale,.045*scale);k.cyl(g,'#c4a579',0,.90*scale,0,.31*scale,.04*scale,'wood');k.roundSolid(x,z,.35*scale,{height:.94*scale});return g}
 const TAU=Math.PI*2;
 function seaPanorama(state){

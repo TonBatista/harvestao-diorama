@@ -1,8 +1,16 @@
 # Harvestão — a vida no campo
 
-Versão 0.34.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.35.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.34)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.35)
+
+## Trator e portas — versão 0.35
+
+Nenhuma construção pode ser acessada enquanto o jogador dirige, incluindo o farol e as opções de viagem pelo mapa. Para entrar a pé, estacione o trator a mais de 3,2 m do portal; a carreta acoplada também precisa deixar a porta livre. Subir no trator próximo a um portal tem prioridade sobre entrar no prédio. Ao descer, o jogador é colocado fora das áreas de ativação.
+
+Na primeira abertura desta versão, o trator e a carreta são recuperados para um espaço livre da fazenda principal, com o motor de corte desligado. A organização da fazenda, os animais transportados e o progresso são preservados. A recuperação é salva e não volta a mudar o estacionamento nas próximas aberturas. O descanso automático por exaustão desmonta o jogador antes de levá-lo para casa.
+
+Nenhum teste foi executado nesta atualização, conforme solicitado.
 
 ## Correções e entrada rural — versão 0.34
 

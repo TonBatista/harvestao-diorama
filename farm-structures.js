@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {cottage,artisanMaterial,treeCrown} from './art-direction.js?v=0.34';
-import {farmObject,farmFootprints,migrateFarmLayout} from './farm-customization.js?v=0.34';
+import {cottage,artisanMaterial,treeCrown} from './art-direction.js?v=0.35';
+import {farmObject,farmFootprints,migrateFarmLayout} from './farm-customization.js?v=0.35';
 const g={box:new T.BoxGeometry(1,1,1),ball:new T.SphereGeometry(1,12,8),cyl:new T.CylinderGeometry(1,1,1,12)},mats=new Map();
 function mat(c,kind='wood'){const key=c+kind;if(!mats.has(key))mats.set(key,artisanMaterial(c,kind));return mats.get(key)}
 function part(p,geo,c,x,y,z,sx,sy,sz,kind){const o=new T.Mesh(geo,mat(c,kind));o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;p.add(o);return o}

@@ -1,8 +1,8 @@
-import {addInteriorEntrances} from './interior-catalog.js?v=0.34';
-import {addMapFauna} from './fauna-art.js?v=0.34';
+import {addInteriorEntrances} from './interior-catalog.js?v=0.35';
+import {addMapFauna} from './fauna-art.js?v=0.35';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.34';
-import {buildUrutau} from './wildlife-art.js?v=0.34';
+import {createKit} from './region-kit.js?v=0.35';
+import {buildUrutau} from './wildlife-art.js?v=0.35';
 const TAU=Math.PI*2;
 function ownedMaterial(options){const m=new T.MeshStandardMaterial(options);m.userData.regionOwned=true;return m}
 function rng(seed){return ()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}}

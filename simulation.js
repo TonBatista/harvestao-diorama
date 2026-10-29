@@ -1,5 +1,5 @@
-import {farmPoint,farmObject} from './farm-customization.js?v=0.34';
-import {MAIN_FIELD,LEGACY_FIELD,MAIN_PLOT_COUNT,LEGACY_PLOT_COUNT,fieldForState,migrateCultivation,canCultivate} from './cultivation-layout.js?v=0.34';
+import {farmPoint,farmObject} from './farm-customization.js?v=0.35';
+import {MAIN_FIELD,LEGACY_FIELD,MAIN_PLOT_COUNT,LEGACY_PLOT_COUNT,fieldForState,migrateCultivation,canCultivate} from './cultivation-layout.js?v=0.35';
 export const CROPS={
  turnip:{name:'Nabo',days:4,price:60,bag:120,season:0,regrow:0},
  potato:{name:'Batata',days:7,price:80,bag:150,season:0,regrow:0},
@@ -25,8 +25,8 @@ export const SEASONS=['Primavera','Verão','Outono','Inverno'];
 const isCrop=id=>typeof id==='string'&&Object.hasOwn(CROPS,id);
 export function cropsForSeason(season){return Object.entries(CROPS).filter(([,crop])=>crop.season===season)}
 export const TOOLS=['hand','hoe','water','seed','sickle','axe','hammer','camera'];
-export {TILE} from './cultivation-layout.js?v=0.34';
-import {TILE} from './cultivation-layout.js?v=0.34';
+export {TILE} from './cultivation-layout.js?v=0.35';
+import {TILE} from './cultivation-layout.js?v=0.35';
 export const FIELD=LEGACY_FIELD;
 export function freshState(demo=true){const plots=[];for(let z=0;z<FIELD.rows;z++)for(let x=0;x<FIELD.cols;x++){let p={x,z,tilled:false,wet:false,crop:null,age:0,obstacle:null};if(demo&&x<3&&z<3){p.tilled=true;p.crop='turnip';p.age=4}if(demo&&x>=4&&x<7&&z<3){p.tilled=true;p.crop='strawberry';p.age=8}if(demo&&x<3&&z>=4&&z<7){p.tilled=true;p.crop='potato';p.age=3}if(x>7||z>8){const r=(x*13+z*7)%9;p.obstacle=r<2?'weed':r===3?'stone':r===5?'branch':null}plots.push(p)}const state={version:2,day:1,season:0,year:1,minutes:360,money:300,stamina:100,fatigue:0,water:100,seed:'turnip',seedStorageVersion:1,seedChest:{turnip:2,potato:1,strawberry:1},bags:{},tool:'hand',player:{x:-.8,z:1.6,angle:Math.PI},held:null,inventory:[],shipping:0,earned:0,lumber:0,weather:'sun',plots,demo};migrateCultivation(state);return state;}
 export function tileAt(s,x,z){migrateCultivation(s);const f=fieldForState(s),ix=Math.round((x-f.x)/TILE),iz=Math.round((z-f.z)/TILE);if(ix<0||iz<0||ix>=f.cols||iz>=f.rows)return undefined;const p=s.plots[iz*f.cols+ix];return canCultivate(s,p)?p:undefined}

@@ -1,4 +1,4 @@
-import {farmPoint} from './farm-customization.js?v=0.34';
+import {farmPoint} from './farm-customization.js?v=0.35';
 const finite=(value,fallback)=>Number.isFinite(value)?value:fallback;
 const nearBox=(player,x,z,angle,w,d,reach)=>{const dx=player.x-x,dz=player.z-z,c=Math.cos(angle),s=Math.sin(angle),lx=dx*c-dz*s,lz=dx*s+dz*c,ax=Math.max(0,Math.abs(lx)-w/2),az=Math.max(0,Math.abs(lz)-d/2);return ax*ax+az*az<=reach*reach};
 /** Pure spatial access rules shared by the tractor button, barn sign and animal commands. */
