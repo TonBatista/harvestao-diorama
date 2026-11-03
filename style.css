@@ -53,3 +53,5 @@
 @media(max-width:600px){.field-utility-dock{left:12px;top:190px}.field-utility-dock .dog-whistle-button{width:38px;height:38px;min-width:38px;min-height:38px;padding:4px}}
 /* Clean play view: contextual wording stays available to assistive technology. */
 #toast,#context{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;padding:0!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important;pointer-events:none!important}#actionLabel,#interactLabel{display:none!important}
+
+.resident-portrait{width:130px;float:left;margin:0 20px 12px 0;border-radius:20px}#worldInfo{min-height:240px}#worldInfoText{line-height:1.65}

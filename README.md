@@ -1,8 +1,22 @@
 # Harvestão — a vida no campo
 
-Versão 0.35.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.36.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.35)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.36)
+
+## Caminhos, inverno e vida no vale — versão 0.36
+
+A entrada da fazenda mantém o portão artesanal sobre terra normal, sem o piso de pedras.
+
+Portais entre exteriores dão acesso a trilhas percorríveis, com curvas, árvores e paisagem relacionada ao destino. Os cenários continuam carregados por trecho para preservar desempenho; o mapa continua disponível para viagem direta. Montanha e vila recebem relevo físico, e personagens, trator, cachorro e câmera acompanham a altura. A subida reduz suavemente a velocidade. Não há escalada livre de paredões nesta versão.
+
+No inverno, o ícone de boneco de neve ou Menu → Atividades e inverno permite preparar bolas. Caminhe para fazê-las crescer e pressione X para arremessar. Para montar um boneco na fazenda, leve cada bola ao mesmo lugar e escolha Montar: base de70cm, corpo de50cm e cabeça de32cm. O boneco permanece durante o inverno.
+
+O mercado vende guirlanda40G, enfeites60G e luzes80G. Na montanha, equipe o machado junto ao pinheiro de manejo da trilha para recolhê-lo. Em casa, monte a árvore pelo menu de atividades após comprar os enfeites. A guirlanda e as luzes decoram a parede. O guarda-roupa dentro da casa oferece roupa de trabalho, casacos de inverno e roupa de praia; o casaco também está na personalização.
+
+Joana, Rosa, Clara, Miguel, Bento, Lia e Tomé têm retratos originais nas conversas. A agenda marca brincadeiras de inverno nos dias5 e15 e a noite de Natal no dia24. As atividades ficam acessíveis durante a estação, sem obrigar esperar um festival. Preparativos e decoração da propriedade são compartilhados; a organização fica a cargo do anfitrião.
+
+Referência visual consultada: [Coral Island, página oficial da Stairway Games](https://blog.stairwaygames.com/coral-island). Os modelos e retratos são próprios. Ambos os jogadores devem abrir a versão0.36.
 
 ## Trator e portas — versão 0.35
 

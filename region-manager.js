@@ -1,26 +1,27 @@
-import {migrateFarmLayout,farmPoint} from './farm-customization.js?v=0.35';
-import {buildToolRoom} from './tool-room.js?v=0.35';
-import {migrateCultivation} from './cultivation-layout.js?v=0.35';
-import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.35';
-import {colliderContains,compactSceneColliders} from './scene-collisions.js?v=0.35';
-import {buildLighthouseUpper} from './lighthouse-upper.js?v=0.35';
-import {INTERIOR_DESTINATIONS} from './interior-catalog.js?v=0.35';
-import {buildChapel,buildLibrary,buildClinic} from './interiors-civic.js?v=0.35';
-import {buildInn,buildRosaHouse,buildFisherHouse} from './interiors-homes.js?v=0.35';
-import {buildSmithy,buildCarpenter,buildMine,buildLighthouse} from './interiors-workshops.js?v=0.35';
-import {buildLake,buildHomestead} from './region-homesteads.js?v=0.35';
-import {migrateHomesteads,lotState} from './homestead-rules.js?v=0.35';
-import {addMapFauna} from './fauna-art.js?v=0.35';
-import {createKit} from './region-kit.js?v=0.35';
-import {buildHouse,buildBarn} from './region-interiors.js?v=0.35';
-import {buildVillage} from './region-village.js?v=0.35';
-import {buildMountain,buildBeach} from './region-nature.js?v=0.35';
-import {buildMarket} from './region-market.js?v=0.35';
+import {applyRelief,buildValleyTrail} from './valley-terrain.js?v=0.36';
+import {migrateFarmLayout,farmPoint} from './farm-customization.js?v=0.36';
+import {buildToolRoom} from './tool-room.js?v=0.36';
+import {migrateCultivation} from './cultivation-layout.js?v=0.36';
+import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.36';
+import {colliderContains,compactSceneColliders} from './scene-collisions.js?v=0.36';
+import {buildLighthouseUpper} from './lighthouse-upper.js?v=0.36';
+import {INTERIOR_DESTINATIONS} from './interior-catalog.js?v=0.36';
+import {buildChapel,buildLibrary,buildClinic} from './interiors-civic.js?v=0.36';
+import {buildInn,buildRosaHouse,buildFisherHouse} from './interiors-homes.js?v=0.36';
+import {buildSmithy,buildCarpenter,buildMine,buildLighthouse} from './interiors-workshops.js?v=0.36';
+import {buildLake,buildHomestead} from './region-homesteads.js?v=0.36';
+import {migrateHomesteads,lotState} from './homestead-rules.js?v=0.36';
+import {addMapFauna} from './fauna-art.js?v=0.36';
+import {createKit} from './region-kit.js?v=0.36';
+import {buildHouse,buildBarn} from './region-interiors.js?v=0.36';
+import {buildVillage} from './region-village.js?v=0.36';
+import {buildMountain,buildBeach} from './region-nature.js?v=0.36';
+import {buildMarket} from './region-market.js?v=0.36';
 export const DESTINATIONS=[{id:'farm',label:'Sua fazenda',description:'Cultivo amplo, construções e caminhos até as bordas',icon:'✿'},{id:'house',label:'Sua casa',description:'Cozinha, lareira, quarto e descanso',icon:'⌂'},{id:'barn',label:'Celeiro',description:'Vacas, ovelhas, galinhas e cuidados',icon:'♧'},{id:'toolroom',label:'Quarto de ferramentas',description:'Prateleiras, sementes e bebidas refrescantes',icon:'⚒'},{id:'village',label:'Vila Mineral',description:'Praça, lojas, igreja e moradores',icon:'♜'},{id:'market',label:'Mercado da Vila',description:'Prateleiras e sementes das quatro estações',icon:'♧'},{id:'mountain',label:'Montanha da Lua',description:'Bosque, riacho, mina e águas termais',icon:'▲'},{id:'beach',label:'Praia das Conchas',description:'Mar, píer, barco e pescador',icon:'≈'}];
 DESTINATIONS.push({id:'lake',label:'Lago dos Ipês',description:'Terrenos à venda e oficina do lenhador',icon:'≈'},{id:'homestead',label:'Sua fazenda do lago',description:'Limpar, plantar e construir do zero',icon:'⌂'});
 DESTINATIONS.push(...INTERIOR_DESTINATIONS);
-const builders={toolroom:buildToolRoom,lighthouseUpper:buildLighthouseUpper,chapel:buildChapel,library:buildLibrary,clinic:buildClinic,inn:buildInn,rosaHouse:buildRosaHouse,fisherHouse:buildFisherHouse,smithy:buildSmithy,carpenter:buildCarpenter,mine:buildMine,lighthouse:buildLighthouse,lake:buildLake,homestead:buildHomestead,market:buildMarket,house:buildHouse,barn:buildBarn,village:buildVillage,mountain:buildMountain,beach:buildBeach};
-const outdoorAreas=new Set(['farm','village','mountain','beach','lake','homestead']);
+const builders={valleyTrail:buildValleyTrail,toolroom:buildToolRoom,lighthouseUpper:buildLighthouseUpper,chapel:buildChapel,library:buildLibrary,clinic:buildClinic,inn:buildInn,rosaHouse:buildRosaHouse,fisherHouse:buildFisherHouse,smithy:buildSmithy,carpenter:buildCarpenter,mine:buildMine,lighthouse:buildLighthouse,lake:buildLake,homestead:buildHomestead,market:buildMarket,house:buildHouse,barn:buildBarn,village:buildVillage,mountain:buildMountain,beach:buildBeach};
+const outdoorAreas=new Set(['farm','village','mountain','beach','lake','homestead','valleyTrail']);
 export function isIndoorArea(id){return typeof id==='string'&&Object.hasOwn(builders,id)&&!outdoorAreas.has(id)}
 export function createRegionManager({scene,state,bake,farmRoot,farmColliders,onChange,onLeave,canTravel=()=>true}){
  migrateHomesteads(state);migrateCultivation(state);migrateFarmLayout(state);state.homePlots??=state.plots;if(state.region==='homestead'&&lotState(state))lotState(state).plots=state.plots;else state.homePlots=state.plots;
@@ -59,8 +60,8 @@ export function createRegionManager({scene,state,bake,farmRoot,farmColliders,onC
   const next=id==='farm'?farm:builders[id](state);
   if(next.indoors&&state.buildingReturn?.area==='homestead'){for(const p of next.portals)if(p.to==='farm'){p.to='homestead';p.spawn=[10,10];}}
   else if(['house','barn','toolroom'].includes(id)){const door=farmPoint(state,id,0,4.2);for(const p of next.portals)if(p.to==='farm')p.spawn=[door.x,door.z];}
-  if(id!=='farm'){const art=bake(next.fixed,8);art.name=id+'-static';next.root.remove(next.fixed);next.fixed.clear();next.root.add(art)}
-  const requested=spawn||(restore?[state.player.x,state.player.z]:id==='farm'&&state.farmReturn?[state.farmReturn.x,state.farmReturn.z]:null),position=safeSpawn(next,requested);
+  if(id==='house'){next.interactions.push({type:'wardrobe',x:-3.9,z:2.9,radius:1.4,label:'Abrir guarda-roupa'});next.colliders.push({x:-3.9,z:2.2,w:1.4,d:.72})}if(id==='market')next.interactions.push({type:'festiveShop',x:0,z:1.5,radius:1.8,label:'Enfeites de Natal'});if(id==='mountain')next.colliders.push({x:6,z:11,r:.3});if(id==='mountain')next.interactions.push({type:'christmasPine',x:6,z:11,radius:1.8,label:'Pinheiro para o Natal'});if(id!=='farm'){const art=bake(next.fixed,8);art.name=id+'-static';next.root.remove(next.fixed);next.fixed.clear();next.root.add(art)}
+  applyRelief(next);const requested=spawn||(restore?[state.player.x,state.player.z]:id==='farm'&&state.farmReturn?[state.farmReturn.x,state.farmReturn.z]:null),position=safeSpawn(next,requested);
   onLeave?.(active);if(active.id==='farm'&&id!=='farm'&&!restore)state.farmReturn={x:state.player.x,z:state.player.z,angle:state.player.angle};if(active.id!=='farm'){scene.remove(active.root);active.dispose()}farmRoot.visible=id==='farm';if(id!=='farm')scene.add(next.root);active=next;next.portalVisit=++portalVisit;state.region=id;state.player.x=position[0];state.player.z=position[1];if(!restore)state.player.angle=id==='farm'&&state.farmReturn&&Number.isFinite(state.farmReturn.angle)?state.farmReturn.angle:Math.PI/4;state.visited=Array.from(new Set([...(Array.isArray(state.visited)?state.visited.filter(x=>DESTINATIONS.some(d=>d.id===x)):[]),id]));onChange?.(next);return next;
  }
  function nearby(){let best=null,dist=Infinity;for(const p of [...active.portals,...active.interactions]){const d=Math.hypot(state.player.x-p.x,state.player.z-p.z);if(d<(p.radius??1.6)&&d<dist){best=p;dist=d}}return best}
