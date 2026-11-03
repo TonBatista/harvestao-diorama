@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {fieldForState,TILE} from './cultivation-layout.js?v=0.37';
-import {snowRecord} from './snow-rules.js?v=0.37';
+import {fieldForState,TILE} from './cultivation-layout.js?v=0.38';
+import {snowRecord} from './snow-rules.js?v=0.38';
 import {getSeasonLook, normalizeSeason} from './seasonal-palette.js';
 
 const SURFACES = new Set(['ground','grass','leaf','pine','path','soil','roof','stone','wood','sand','water','exclude']);

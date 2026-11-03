@@ -1,8 +1,8 @@
 # Harvestão — a vida no campo
 
-Versão 0.37.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.38.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.37)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.38)
 
 ## Caminhos, inverno e vida no vale — versão 0.36
 
@@ -170,3 +170,9 @@ Ajustadas cercas, móveis rodados, barris, pilhas, vasos, bases e veículos esta
 - Descanso com fade lento, breve melodia de piano, cão na poltrona e despertar com canto de galo sintetizado; galo dourado no quintal.
 
 Ações que mudam neve/boneco/decoração ficam com o anfitrião no multiplayer. A revisão desta rodada limitou-se à sintaxe, ligações entre módulos e abertura publicada; não foi executada bateria de testes. Os cantos e a melodia de descanso são sintetizados e respeitam as preferências de áudio.
+
+## Ajustes 0.38
+
+Enfeites de Natal saem do menu geral: clique no pinheiro do quintal para abrir suas opções. O pinheiro de manejo recolhido na montanha já é levado ao quintal. Retratos dos moradores aparecem grandes, acima e fora da caixa de diálogo (inclusive Tomé), adaptados a telas pequenas.
+
+Segurar X com a pá e caminhar faz a bola crescer. Soltar X deixa a bola crescida parada no chão; apenas a bola inicial, sem crescimento, desaparece. Bolas ficam salvas durante o inverno, inclusive entre visitas aos cenários. Com mãos livres, segure X perto de uma delas para retomar o crescimento. As bolas que atingem os tamanhos das três etapas formam a base, o corpo e a cabeça junto do boneco. O trator pode passar sobre o boneco e as bolas soltas para desfazê-los. As bolas não seguem o avatar depois de soltas.
