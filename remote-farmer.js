@@ -1,6 +1,6 @@
-import {terrainHeight} from './valley-terrain.js?v=0.36';
+import {terrainHeight} from './valley-terrain.js?v=0.37';
 import * as T from './three.module.js';
-import {createFarmer} from './farmer-art.js?v=0.36';
+import {createFarmer} from './farmer-art.js?v=0.37';
 const areas=new Set(['farm','house','barn','village','market','mountain','beach','lake','homestead','chapel','library','clinic','inn','rosaHouse','fisherHouse','smithy','carpenter','mine','lighthouse','lighthouseUpper','toolroom','valleyTrail']);
 export function validRemotePose(p){return !!p&&typeof p==='object'&&areas.has(p.region)&&['x','z','angle'].every(k=>Number.isFinite(p[k]))&&Math.abs(p.x)<200&&Math.abs(p.z)<200&&Math.abs(p.angle)<100&&(!p.lotId||['willow','sunrise','pine'].includes(p.lotId))}
 export function createRemoteFarmer(scene){

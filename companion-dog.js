@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {part,mergeParts} from './wildlife-art.js?v=0.36';
-import {migrateCompanion} from './profile-rules.js?v=0.36';
+import {part,mergeParts} from './wildlife-art.js?v=0.37';
+import {migrateCompanion} from './profile-rules.js?v=0.37';
 const TAU=Math.PI*2,wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 const finitePoint=p=>Number.isFinite(p?.x)&&Number.isFinite(p?.z);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -69,6 +69,13 @@ export function createCompanionDog(scene,state={}){
  }
  function loadedVehicleBlocked(x,z){if(lastBlocked(x,z))return true;const a=lastPlayer.angle||0,c=Math.cos(a),s=Math.sin(a),dx=x-lastPlayer.x,dz=z-lastPlayer.z,rx=root.position.x-lastPlayer.x,rz=root.position.z-lastPlayer.z;if(Math.abs(dx*c-dz*s)<.85&&Math.abs(dx*s+dz*c)<1.2&&!(Math.abs(rx*c-rz*s)<.85&&Math.abs(rx*s+rz*c)<1.2))return true;const cart=lastTrailer;if(!cart)return false;const ca=Number.isFinite(cart.angle)?cart.angle:a,cc=Math.cos(ca),ss=Math.sin(ca),cx=x-cart.x,cz=z-cart.z,px=root.position.x-cart.x,pz=root.position.z-cart.z;return Math.abs(cx*cc-cz*ss)<.92&&Math.abs(cx*ss+cz*cc)<1.03&&!(Math.abs(px*cc-pz*ss)<.92&&Math.abs(px*ss+pz*cc)<1.03)}
  function update(dt,{player=lastPlayer,area:nextArea=area,driving=false,blocked=lastBlocked,targets=[],indoors=false,bounds=lastBounds,trailer=null}={}){if(!finitePoint(player))return;lastPlayer=player;lastBlocked=typeof blocked==='function'?blocked:()=>false;lastDriving=!!driving;lastBounds=bounds;lastTrailer=trailer;appearance();if(nextArea!==area||!root.visible)travel({player,area:nextArea,blocked:lastBlocked});for(const target of targets)if(['snake','spider'].includes(target.speciesId)&&target.distance<3)defend(target);accumulator+=clamp(Number.isFinite(dt)?dt:0,0,.20);let frames=0;while(accumulator>=1/60&&frames++<12){const escort=driving&&lastTrailer?.attached&&!lastTrailer.empty,walk=escort?loadedVehicleBlocked:lastBlocked;step(1/60,player,walk,driving,indoors);accumulator-=1/60}}
+ let sleepPath=null,sleepStage='',chairTime=0;
+ function sleepPose(dt,stage){root.visible=true;heart.visible=false;mode='sleeping';if(sleepStage!==stage){sleepStage=stage;if(stage==='settle'){chairTime=0;sleepPath=findDogPath(root.position,{x:-3.8,z:2.05},lastBlocked)}if(stage==='wake')chairTime=0}
+ if(stage==='settle'&&sleepPath?.length){const p=sleepPath[0],dx=p.x-root.position.x,dz=p.z-root.position.z,d=Math.hypot(dx,dz),step=Math.min(d,dt*3.4);if(d>.01){root.position.x+=dx/d*step;root.position.z+=dz/d*step;root.rotation.y=Math.atan2(dx,dz)}phase+=step*11;legs.forEach((leg,i)=>leg.rotation.x=Math.sin(phase+i*Math.PI)*.4);if(d<.12)sleepPath.shift();return}
+ chairTime=Math.min(1,chairTime+dt*2);if(stage==='wake'){root.position.set(-3.8,.65*(1-chairTime),1.1+chairTime*1.1);avatar.rotation.z=(1-chairTime)*Math.PI/2;legs.forEach(l=>l.rotation.x=0);body.position.y=0;head.rotation.x=0;return}
+ root.position.lerp(new T.Vector3(-3.8,.69,1.1),1-Math.exp(-dt*5));root.rotation.y=Math.PI/2;avatar.rotation.z=Math.PI/2;body.position.y=-.05+Math.sin(performance.now()*.002)*.008;head.rotation.x=-.2;legs.forEach(l=>l.rotation.x=-.6);eyes.scale.y=.06;
+ }
+ function endSleep(){sleepPath=null;sleepStage='';avatar.rotation.z=0;body.position.y=0;head.rotation.x=0;eyes.scale.y=1;root.position.y=0;followUntil=time+7;mode='following'}
  function dispose(){scene.remove(root);root.traverse(o=>{if(o.geometry&&!o.geometry.userData.shared)o.geometry.dispose()});art.shadowMaterial.dispose();heartMat.dispose();root.clear();repelled.clear()}
- return{root,update,travel,defend,watchVisitor,repels,whistle,pet,get status(){return{area,x:root.position.x,z:root.position.z,angle,moving,guarding:!!guard,protectedId:guard?.id||null,barkSerial,name:state.companion.name,coat:state.companion.coat,mode}},dispose};
+ return{root,get elevation(){return mode==='riding'?.70*Math.sin(jump*Math.PI/2):0},sleepPose,endSleep,update,travel,defend,watchVisitor,repels,whistle,pet,get status(){return{area,x:root.position.x,z:root.position.z,angle,moving,guarding:!!guard,protectedId:guard?.id||null,barkSerial,name:state.companion.name,coat:state.companion.coat,mode}},dispose};
 }

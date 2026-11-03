@@ -1,13 +1,43 @@
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.36';
-import {cottage,artisanMaterial} from './art-direction.js?v=0.36';
+import {createKit} from './region-kit.js?v=0.37';
+import {artisanMaterial} from './art-direction.js?v=0.37';
 const smooth=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t)};
-export function terrainHeight(area,x,z){if(area==='mountain')return 4.4*smooth(-2,12,-z)+.22*Math.sin(x*.23)*smooth(0,7,-z);if(area==='village')return 1.35*smooth(2,11,-z);if(area==='valleyTrail')return 1.8*Math.sin(Math.PI*Math.max(0,Math.min(1,(z+28)/56)))**2;return 0}
-export function applyRelief(region){if(region.indoors||!['mountain','village','valleyTrail'].includes(region.id)||region.root.userData.reliefApplied)return;region.root.userData.reliefApplied=true;region.root.updateMatrixWorld(true);const v=new T.Vector3(),inverse=new T.Matrix4(),m=new T.Matrix4();region.root.traverse(o=>{if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,m);v.setFromMatrixPosition(m);v.applyMatrix4(o.matrixWorld);const h=terrainHeight(region.id,v.x,v.z);m.elements[13]+=h;o.setMatrixAt(i,m)}o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere();return}if(!o.isMesh||!o.geometry?.attributes.position)return;for(let p=o.parent;p;p=p.parent)if(p===region.dynamic)return;const old=o.geometry,g=old.clone(),p=g.attributes.position;inverse.copy(o.matrixWorld).invert();for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i).applyMatrix4(o.matrixWorld);v.y+=terrainHeight(region.id,v.x,v.z);v.applyMatrix4(inverse);p.setXYZ(i,v.x,v.y,v.z)}g.computeVertexNormals();g.computeBoundingSphere();o.geometry=g;if(!old.userData.shared)old.dispose()});
- const b=region.bounds,w=b[1]-b[0],d=b[3]-b[2],geo=new T.PlaneGeometry(w,d,64,64);geo.rotateX(-Math.PI/2);const p=geo.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i)+(b[0]+b[1])/2,z=p.getZ(i)+(b[2]+b[3])/2;p.setXYZ(i,x,terrainHeight(region.id,x,z)-.015,z)}geo.computeVertexNormals();const ground=new T.Mesh(geo,artisanMaterial('#9caa78','moss'));ground.receiveShadow=true;ground.name='raised-valley-ground';region.root.add(ground);const priorUpdate=region.update.bind(region),last=new WeakMap();region.update=(dt,time)=>{priorUpdate(dt,time);for(const o of region.dynamic?.children||[]){if(o.isInstancedMesh)continue;const old=last.get(o),y=old&&o.position.y===old.y?o.position.y-old.h:o.position.y,h=terrainHeight(region.id,o.position.x,o.position.z);o.position.y=y+h;last.set(o,{y:o.position.y,h})}};
+// All walkers and ground vertices sample this same continuous surface.
+export function terrainHeight(area,x,z){if(area==='mountain')return 3.5*smooth(-1,13,-z);if(area==='village')return .95*smooth(2,12,-z);if(area==='valleyTrail')return 1.15*Math.sin(Math.PI*Math.max(0,Math.min(1,(z+30)/60)))**2;return 0}
+export function applyRelief(region){
+ if(region.indoors||!['mountain','village','valleyTrail'].includes(region.id)||region.root.userData.reliefApplied)return;
+ region.root.userData.reliefApplied=true;region.root.updateMatrixWorld(true);
+ const bounds=new T.Box3(),pos=new T.Vector3(),matrix=new T.Matrix4();
+ // Work before batching: terrain is tessellated; furniture, houses and trees stay rigid.
+ for(const o of [...region.fixed.children]){
+  bounds.setFromObject(o);const w=bounds.max.x-bounds.min.x,d=bounds.max.z-bounds.min.z;
+  if(o.userData.reliefSurface){const g=o.geometry,a=g.attributes.position;for(let i=0;i<a.count;i++)a.setY(i,a.getY(i)+terrainHeight(region.id,a.getX(i),a.getZ(i)));g.computeVertexNormals();g.computeBoundingSphere()}else if(o.isMesh&&bounds.max.y<.13&&w>.5&&d>.5){
+   const inv=o.matrixWorld.clone().invert(),g=new T.PlaneGeometry(w,d,Math.max(1,Math.ceil(w*2)),Math.max(1,Math.ceil(d*2)));g.rotateX(-Math.PI/2);
+   const a=g.attributes.position,uv=g.attributes.uv,cx=(bounds.min.x+bounds.max.x)/2,cz=(bounds.min.z+bounds.max.z)/2,y=bounds.max.y;
+   for(let i=0;i<a.count;i++){const x=a.getX(i)+cx,z=a.getZ(i)+cz;pos.set(x,y+terrainHeight(region.id,x,z),z).applyMatrix4(inv);a.setXYZ(i,pos.x,pos.y,pos.z);uv.setXY(i,x/1.7,z/1.7)}
+   g.computeVertexNormals();g.computeBoundingSphere();if(!o.geometry.userData.shared)o.geometry.dispose();o.geometry=g;
+  }else{o.position.y+=terrainHeight(region.id,o.position.x,o.position.z);o.updateMatrix()}
+ }
+ for(const p of region.signs||[])if(p.sign)p.sign.y+=terrainHeight(region.id,p.sign.x,p.sign.z);
+ const last=new WeakMap();
+ for(const o of region.dynamic.children)if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,matrix);pos.setFromMatrixPosition(matrix);matrix.elements[13]+=terrainHeight(region.id,pos.x,pos.z);o.setMatrixAt(i,matrix)}o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere()}
+ const previous=region.update.bind(region);region.update=(dt,time)=>{for(const o of region.dynamic.children){const p=last.get(o);if(p&&o.position.y===p.y)o.position.y-=p.h}previous(dt,time);for(const o of region.dynamic.children){if(o.isInstancedMesh)continue;const h=terrainHeight(region.id,o.position.x,o.position.z);o.position.y+=h;last.set(o,{y:o.position.y,h})}};
 }
-export function buildValleyTrail(state){const route=state.valleyRoute||{from:'farm',to:'village',returnSpawn:[22.3,-15],spawn:[0,12.4]},k=createKit();k.floor('#9caa78',26,64,0,0,0,'moss');for(let i=0;i<28;i++){const z=-27+i*2,x=Math.sin(z*.085)*2;k.path(x,z,4.1,2.1,'#c6b28c');for(const side of[-1,1]){if(i%2===0)k.tree(side*(7+(i%3)*1.4),z,.8+(i%4)*.08);if(i%3===0)k.rock(side*4.7,z,.5)}}
- k.path(0,-28,4.8,5,'#c8b593');k.path(0,28,4.8,5,'#c8b593');k.sign(3.4,26,'Voltar');k.sign(-3.6,-25,route.label||'Próximo destino');k.portal({x:0,z:29,to:route.from,spawn:route.returnSpawn,label:'Voltar pela trilha',radius:1.6});k.portal({x:0,z:-29,to:route.to,spawn:route.spawn,label:route.label||'Continuar pelo vale',radius:1.6});
- if(route.to==='beach'||route.from==='beach'){k.floor('#83aaa4',8,64,10,0,-.08,'sand');for(let i=0;i<12;i++)k.rock(6.4,-27+i*5,.6)}else if(route.to==='mountain'||route.from==='mountain'){for(let i=0;i<12;i++)k.rock(-10,-26+i*4,1.3+(i%3)*.3)}else{k.fixed.add(cottage(-7,-23,3,2.6,'#d5bc92','#8d7a65'));k.fixed.add(cottage(7,-25,3.5,3,'#dbccb0','#8d987c'))}
- return k.finish({id:'valleyTrail',label:'Caminhos do vale',bounds:[-12,12,-31,31],spawn:[0,26],viewHeight:15,indoors:false});}
-export function routeForPortal(state,area,p){const outdoors=['farm','village','mountain','beach','lake','homestead'];if(!outdoors.includes(area)||!outdoors.includes(p.to))return null;return {from:area,to:p.to,spawn:p.spawn,returnSpawn:[state.player.x,state.player.z],label:p.label,lotId:p.data?.lotId};}
+const center=z=>3.6*Math.sin(z*Math.PI/28)*Math.sin(Math.PI*Math.max(0,Math.min(1,(z+30)/60)));
+export function buildValleyTrail(state){
+ const route=state.valleyRoute||{from:'farm',to:'village',returnSpawn:[22.3,-15],spawn:[0,12.4]},reverse=route.from>route.to,k=createKit();k.floor('#9eaf79',26,64,0,0,0,'moss');
+ const road=artisanMaterial('#bca47c','earth');road.userData.seasonSurface='path';
+ const verge=artisanMaterial('#9f9e6d','moss');verge.userData.seasonSurface='ground';
+ function ribbon(width,material,y){const p=[],uv=[],idx=[];for(let i=0;i<=120;i++){const z=-31+i*62/120,x=center(z);p.push(x-width/2,y,z,x+width/2,y,z);uv.push(0,i*.30,1.8,i*.30);if(i<120){const a=i*2;idx.push(a,a+2,a+1,a+1,a+2,a+3)}}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();const m=new T.Mesh(g,material);m.receiveShadow=true;m.userData.reliefSurface=true;k.fixed.add(m);return m}
+ ribbon(5.5,verge,.013);ribbon(4.0,road,.025);
+ for(let i=0;i<28;i++){const z=-26+i*1.95,x=center(z);for(const side of[-1,1]){const edge=x+side*(3.1+(i%3)*.25);k.plant(edge,z,.75+(i%3)*.1);if(i%2===0)k.tree(x+side*(7.3+(i%3)*.6),z,.8+(i%4)*.08);if(i%4===0)k.rock(x+side*5.2,z,.5);for(let j=0;j<2;j++){const xx=edge+side*.45+j*.19;k.ball(k.fixed,['#dfcc8a','#d4b0bd','#ede6cd'][i%3],xx,.20,z+j*.32,.065,.065,.065);k.cyl(k.fixed,'#7d925e',xx,.09,z+j*.32,.013,.18)}}}
+ // Wide unobstructed landings make both ends usable on foot and with a trailer.
+ k.sign(4.2,25,'Voltar');k.sign(-4.2,-25,route.label||'Próximo destino');
+ k.portal({x:0,z:reverse?-30.5:30.5,to:route.from,spawn:route.returnSpawn,label:'Voltar pela trilha',radius:2.6,autoRadius:2.5});
+ k.portal({x:0,z:reverse?30.5:-30.5,to:route.to,spawn:route.spawn,label:route.label||'Continuar pelo vale',radius:2.6,autoRadius:2.5});
+ if([route.from,route.to].includes('mountain'))for(let i=0;i<9;i++)k.rock(-10,-24+i*6,1.4+(i%3)*.25);
+ const r=k.finish({id:'valleyTrail',label:'Caminhos do vale',bounds:[-12,12,-32,32],spawn:[0,reverse?-24.5:24.5],viewHeight:15,indoors:false});
+ // Meadow exclusion follows the curved strip, instead of rectangular paving tiles.
+ r.dynamic.traverse(o=>{if(!o.isInstancedMesh)return;const m=new T.Matrix4(),v=new T.Vector3();for(let i=0;i<o.count;i++){o.getMatrixAt(i,m);v.setFromMatrixPosition(m);if(Math.abs(v.x-center(v.z))<2.3){m.scale(new T.Vector3(0,0,0));o.setMatrixAt(i,m)}}o.instanceMatrix.needsUpdate=true});return r;
+}
+export function routeForPortal(state,area,p){const outdoors=['farm','village','mountain','beach','lake','homestead'];if(!outdoors.includes(area)||!outdoors.includes(p.to))return null;return {from:area,to:p.to,entryZ:area>p.to?-24.5:24.5,spawn:p.spawn,returnSpawn:[state.player.x,state.player.z],label:p.label,lotId:p.data?.lotId}}

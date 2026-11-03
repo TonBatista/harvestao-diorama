@@ -1,8 +1,8 @@
 # Harvestão — a vida no campo
 
-Versão 0.36.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.37.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.36)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.37)
 
 ## Caminhos, inverno e vida no vale — versão 0.36
 
@@ -158,3 +158,15 @@ Somente conferência de sintaxe nesta rodada; não foi executada a bateria de te
 Colisões revisadas na fazenda, terrenos, vila, montanha, praia, lago, mercado e interiores. Tocos baixos da borda da plantação agora provocam um pulinho automático ao correr na direção deles com as mãos livres. O personagem sobe de verdade e só salta se houver caminho e chão livre para pousar. Trator, paredes, móveis e obstáculos de limpeza continuam sólidos.
 
 Ajustadas cercas, móveis rodados, barris, pilhas, vasos, bases e veículos estacionados. A água do lago e da praia bloqueia a passagem fora das pontes e do píer. O save utiliza uma posição segura no chão durante o salto. Veja a [revisão de colisões](COLISOES.md) para os achados e os limites da análise.
+## Atualização 0.37
+
+- Mochila em painéis de equipamento e itens, com miniaturas, paginação e seleção por teclado/toque. Preserva os 24 espaços e as sementes no baú.
+- Retratos ilustrados próprios para os onze moradores, em dois atlas compactos carregados nas conversas.
+- Guarda-roupa na parede abre a personalização completa; jaqueta com mangas e touca com protetores de orelha/pompom, cores editáveis.
+- Pá de neve nas ferramentas e no quarto de ferramentas. Segure X e caminhe para limpar neve e aumentar a bola; solte junto ao boneco para montar cada etapa quando atingir 70/50/32 cm. Um toque curto arremessa a bola menor. No dia seguinte a neve cobre novamente os canteiros. A roçadeira também remove a neve.
+- Árvore de Natal grande no quintal, dezesseis enfeites individuais, estrela final e luzes noturnas. Guirlandas/luzes nas fachadas ou no quintal. Compras no mercado e pinheiro de manejo na montanha.
+- Relevo aplicado antes do agrupamento das peças, com superfícies subdivididas e construções rígidas. Personagem e chão compartilham a altura.
+- Trilhas curvas de terra com vegetação/florzinhas e saídas largas que alcançam o limite do mapa. Direção física compartilhada entre viajantes vindos de lados opostos.
+- Descanso com fade lento, breve melodia de piano, cão na poltrona e despertar com canto de galo sintetizado; galo dourado no quintal.
+
+Ações que mudam neve/boneco/decoração ficam com o anfitrião no multiplayer. A revisão desta rodada limitou-se à sintaxe, ligações entre módulos e abertura publicada; não foi executada bateria de testes. Os cantos e a melodia de descanso são sintetizados e respeitam as preferências de áudio.

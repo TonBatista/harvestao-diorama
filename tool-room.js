@@ -1,10 +1,11 @@
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,shelf,rug,vase,lantern} from './rural-room.js?v=0.36';
+import {createInteriorRoom,group,C,table,shelf,rug,vase,lantern} from './rural-room.js?v=0.37';
 function hangingTool(k,parent,x,y,z,kind){
  const timber='#a88c61',metal='#7b8d83';
  if(kind==='water'){k.cyl(parent,'#879c91',x,y-.02,z,.15,.25);k.beam(parent,'#879c91',[x+.1,y,z],[x+.31,y+.12,z],.045);const handle=k.cyl(parent,metal,x,y+.15,z,.14,.025);handle.rotation.x=Math.PI/2;return;}
  k.beam(parent,timber,[x,y-.45,z],[x,y+.36,z],.027,'wood');
  if(kind==='hoe'){k.box(parent,metal,x+.10,y+.35,z,.37,.095,.15);k.box(parent,'#b9c5b4',x+.25,y+.29,z,.07,.19,.16);}
+ else if(kind==='snowShovel'){k.box(parent,'#a9bcbc',x,y-.45,z,.42,.33,.09);k.box(parent,'#d0d5c8',x,y-.59,z+.04,.45,.06,.11);k.box(parent,timber,x,y+.38,z,.18,.05,.06)}
  else if(kind==='axe'){k.box(parent,metal,x+.13,y+.24,z,.29,.29,.075);k.box(parent,'#bbc3b1',x+.28,y+.23,z,.05,.27,.08);}
  else if(kind==='sickle'){for(let i=0;i<7;i++){const a=-1.1+i*.33;k.ball(parent,metal,x+.12+Math.cos(a)*.17,y+.26+Math.sin(a)*.17,z,.055,.035,.027);}}
  else k.box(parent,metal,x,y+.29,z,.32,.17,.16);
@@ -15,7 +16,7 @@ function seedPackets(k,parent,x,y,z){
 export function buildToolRoom(){
  const k=createInteriorRoom({id:'toolroom',label:'Quarto de ferramentas',w:10,d:9,wall:'#d4c4a2',floor:'#b49970',wallKind:'wood',returnTo:'farm',returnSpawn:[6,-17],windows:true}),F=k.fixed;
  const seeds=shelf(k,-2.8,-3.85,2.85,'packets');for(let row=0;row<3;row++)seedPackets(k,seeds,0,.36+row*.63,.12);
- k.box(F,'#a38860',2.15,1.73,-4.22,3.6,1.68,.13,'wood');for(let i=0;i<5;i++){k.cyl(F,'#716d53',.85+i*.65,2.2,-4.09,.025,.13).rotation.x=Math.PI/2;hangingTool(k,F,.85+i*.65,1.70,-3.98,['hoe','axe','hammer','sickle','water'][i]);}
+ k.box(F,'#a38860',2.15,1.73,-4.22,3.6,1.68,.13,'wood');for(let i=0;i<6;i++){k.cyl(F,'#716d53',.65+i*.60,2.2,-4.09,.025,.13).rotation.x=Math.PI/2;hangingTool(k,F,.65+i*.60,1.70,-3.98,['hoe','axe','hammer','sickle','water','snowShovel'][i]);}
  const work=table(k,-3.78,-.25,1.52,2.55,.82);k.box(work,'#c9b084',0,.91,0,1.65,.08,2.64,'wood');k.box(work,'#b9c5af',0,.97,.35,.94,.035,.61,'fabric');k.beam(work,'#99794f',[-.35,1.01,-.75],[.35,1.01,-.20],.04,'wood');k.box(work,'#718376',-.35,1.01,-.75,.25,.13,.21);k.cyl(work,'#a78c60',.4,1.10,-.88,.12,.31,'wood');
  const boots=group(F,-3.6,0,2.1);for(const s of[-1,1]){k.cyl(boots,'#697b64',s*.21,.30,0,.14,.54);k.ball(boots,'#6f8066',s*.21,.09,.12,.16,.10,.25);k.cyl(boots,'#56664e',s*.21,.58,0,.145,.055);}k.solid(-3.6,2.1,.82,.65,{height:.65});
  const cold=group(F,3.65,0,-.45);k.box(cold,'#b1c2b5',0,.66,0,1.75,1.28,1.28);k.box(cold,'#d4d8c3',0,1.34,0,1.86,.14,1.38);k.box(cold,'#7c9385',0,1.42,.08,1.43,.025,1.0);k.box(cold,'#5f786d',0,1.46,.22,.55,.045,.075);k.box(cold,'#e4d5ab',0,.88,.65,.72,.21,.015);for(const xx of[-.66,.66])k.box(cold,'#73877b',xx,.09,0,.15,.17,1.15);k.solid(3.65,-.45,1.91,1.43,{height:1.48});

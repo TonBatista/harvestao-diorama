@@ -1,4 +1,6 @@
 import * as T from './three.module.js';
+import {fieldForState,TILE} from './cultivation-layout.js?v=0.37';
+import {snowRecord} from './snow-rules.js?v=0.37';
 import {getSeasonLook, normalizeSeason} from './seasonal-palette.js';
 
 const SURFACES = new Set(['ground','grass','leaf','pine','path','soil','roof','stone','wood','sand','water','exclude']);
@@ -74,6 +76,9 @@ varying vec3 vSeasonWorldNormal;
 varying vec3 vSeasonWorldPosition;
 uniform float seasonEnabled;
 uniform float seasonSnow;
+uniform sampler2D seasonClearMap;
+uniform vec4 seasonClearBounds;
+uniform float seasonClearEnabled;
 uniform float seasonFoliageMix;
 uniform float seasonVariation;
 uniform vec3 seasonTintA;
@@ -100,6 +105,8 @@ if ( seasonEnabled > .5 ) {
     float seasonUp = normalize( vSeasonWorldNormal ).y;
     float seasonCoverage = mix( seasonSnowBase, 1.0, smoothstep( seasonSnowThreshold.x, seasonSnowThreshold.y, seasonUp ) );
     seasonCoverage *= seasonSnow * seasonSnowStrength;
+    vec2 clearUV = (vSeasonWorldPosition.xz - seasonClearBounds.xy) / seasonClearBounds.zw;
+    if(seasonClearEnabled > .5 && vSeasonWorldPosition.y < .32 && all(greaterThanEqual(clearUV,vec2(0.))) && all(lessThanEqual(clearUV,vec2(1.)))) seasonCoverage *= 1.0-texture2D(seasonClearMap,clearUV).r;
     vec3 seasonSnowDetail = seasonSnowColor * ( .97 + seasonLuminance * .03 );
     diffuseColor.rgb = mix( diffuseColor.rgb, seasonSnowDetail, clamp( seasonCoverage, 0.0, 1.0 ) );
   }
@@ -117,6 +124,10 @@ function supported(material) {
 export function createSeasonalScenery({season = 0, indoors = false} = {}) {
   let currentSeason = normalizeSeason(season), inside = Boolean(indoors);
   const roots = new Map(), owners = new WeakMap();
+  let clearStamp='';const clearTexture=new T.DataTexture(new Uint8Array(4),1,1,T.RGBAFormat);clearTexture.needsUpdate=true;
+  const clearUniforms={seasonClearMap:{value:clearTexture},seasonClearBounds:{value:new T.Vector4(0,0,1,1)},seasonClearEnabled:{value:0}};
+  function updateSnowMask(state){const active=state.season===3&&['farm','homestead'].includes(state.region);clearUniforms.seasonClearEnabled.value=active?1:0;if(!active)return;const f=fieldForState(state),r=snowRecord(state),key=JSON.stringify([state.region,state.homesteads?.selected,r.day,r.tiles]);if(key===clearStamp)return;clearStamp=key;const data=new Uint8Array(f.cols*f.rows*4);for(const i of r.tiles)if(Number.isInteger(i)&&i>=0&&i<f.cols*f.rows){data[i*4]=255;data[i*4+3]=255}clearTexture.image={data,width:f.cols,height:f.rows};clearTexture.needsUpdate=true;clearUniforms.seasonClearBounds.value.set(f.x-TILE/2,f.z-TILE/2,f.cols*TILE,f.rows*TILE)}
+
 
   function updateMaterial(entry) {
     const look = getSeasonLook(currentSeason), {kind, uniforms} = entry;
@@ -146,11 +157,11 @@ export function createSeasonalScenery({season = 0, indoors = false} = {}) {
     material.onBeforeCompile = function(shader, renderer) {
       priorCompile?.call(this, shader, renderer);
       if (!shader.vertexShader.includes('#include <begin_vertex>') || !shader.fragmentShader.includes('#include <color_fragment>')) return;
-      Object.assign(shader.uniforms, uniforms);
+      Object.assign(shader.uniforms, uniforms,clearUniforms);
       shader.vertexShader = vertexDeclarations + shader.vertexShader.replace('#include <begin_vertex>', vertexSurface);
       shader.fragmentShader = fragmentDeclarations + shader.fragmentShader.replace('#include <color_fragment>', fragmentSurface);
     };
-    material.customProgramCacheKey = () => `${priorKey}|seasonal-scenery-v1`;
+    material.customProgramCacheKey = () => `${priorKey}|seasonal-scenery-v2`;
     material.userData.seasonalScenery = {kind};
     const entry = {source, material, kind, uniforms};
     updateMaterial(entry);
@@ -229,5 +240,5 @@ export function createSeasonalScenery({season = 0, indoors = false} = {}) {
   }
 
   function dispose() { for (const root of [...roots.keys()]) release(root); }
-  return {bind, setSeason, setIndoors, release, disposeRoot:release, dispose, inspect};
+  return {updateSnowMask,bind, setSeason, setIndoors, release, disposeRoot:release, dispose, inspect};
 }
