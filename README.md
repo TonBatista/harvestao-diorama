@@ -1,8 +1,8 @@
 # Harvestão — a vida no campo
 
-Versão 0.38.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.39.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.38)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.39)
 
 ## Caminhos, inverno e vida no vale — versão 0.36
 
@@ -176,3 +176,7 @@ Ações que mudam neve/boneco/decoração ficam com o anfitrião no multiplayer.
 Enfeites de Natal saem do menu geral: clique no pinheiro do quintal para abrir suas opções. O pinheiro de manejo recolhido na montanha já é levado ao quintal. Retratos dos moradores aparecem grandes, acima e fora da caixa de diálogo (inclusive Tomé), adaptados a telas pequenas.
 
 Segurar X com a pá e caminhar faz a bola crescer. Soltar X deixa a bola crescida parada no chão; apenas a bola inicial, sem crescimento, desaparece. Bolas ficam salvas durante o inverno, inclusive entre visitas aos cenários. Com mãos livres, segure X perto de uma delas para retomar o crescimento. As bolas que atingem os tamanhos das três etapas formam a base, o corpo e a cabeça junto do boneco. O trator pode passar sobre o boneco e as bolas soltas para desfazê-los. As bolas não seguem o avatar depois de soltas.
+
+## Ajustes 0.39
+
+Aproxime-se do pinheiro do quintal e aperte X para abrir as opções de Natal; funciona com ferramentas equipadas, sem depender do clique na árvore. Bolas soltas somem após 3 segundos reais, inclusive com o jogo pausado; as etapas já montadas do boneco permanecem. Um toque rápido em X com a pá arremessa a bola pequena, que desaparece após 2 segundos. Bolas da versão anterior recebem o novo prazo de 3 segundos ao carregar. O anfitrião controla a remoção dos objetos compartilhados no multiplayer.

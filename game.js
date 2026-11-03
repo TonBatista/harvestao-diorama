@@ -1,30 +1,30 @@
-import {mountSleepTransition} from './sleep-transition.js?v=0.38';
-import {mountValleyActivities,residentPortrait} from './valley-life.js?v=0.38';
-import {routeForPortal} from './valley-terrain.js?v=0.38';
-import {recoverTractorOnce} from './tractor-recovery.js?v=0.38';
-import {mountFarmEditor} from './farm-editor.js?v=0.38';
-import {migrateFarmLayout} from './farm-customization.js?v=0.38';
-import {createPortalTrigger} from './portal-trigger.js?v=0.38';
-import {migrateCultivation} from './cultivation-layout.js?v=0.38';
-import {mountTitleScreen} from './title-screen.js?v=0.38';
-import {mountCooperative} from './multiplayer.js?v=0.38';
-import {mountTelescopeView} from './telescope-view.js?v=0.38';
-import {mountFieldInventory} from './field-inventory-ui.js?v=0.38';
-import {migrateProfile} from './profile-rules.js?v=0.38';
-import {mountProfileMenu} from './profile-menu.js?v=0.38';
-import {mountHudCalendar} from './hud-calendar.js?v=0.38';
-import {mountExpansionUI} from './expansion-ui.js?v=0.38';
-import {migrateHomesteads,selectLot,lotState} from './homestead-rules.js?v=0.38';
-import {migrateTransport,advanceHerd,propertyKey} from './transport-rules.js?v=0.38';
-import {freshState,validSave,ITEMS,migrateSeedStorage,collectEgg,waterThree,CROPS,SEASONS,TOOLS,frontTile,useTool,pick,ship,sleep,buy,advanceTime,stash,retrieve,BAG_CAPACITY} from './simulation.js?v=0.38';
-import {ANIMALS,migrateAnimalCare,pickHay,returnHay,feedAnimal,petAnimal,animalStatus,advanceAnimalDay} from './animal-care.js?v=0.38';
-import {mountSoundscape} from './soundscape.js?v=0.38';
-import {mountFaunaEncounters} from './fauna-sounds.js?v=0.38';
-import {mountPhotographyUI} from './photo-ui.js?v=0.38';
-import {migrateBirding} from './birding.js?v=0.38';
-import {mountJoystick} from './controls.js?v=0.38';
-import {mountZoomControls} from './camera-controls.js?v=0.38';
-import {createWorld} from './world.js?v=0.38';
+import {mountSleepTransition} from './sleep-transition.js?v=0.39';
+import {mountValleyActivities,residentPortrait} from './valley-life.js?v=0.39';
+import {routeForPortal} from './valley-terrain.js?v=0.39';
+import {recoverTractorOnce} from './tractor-recovery.js?v=0.39';
+import {mountFarmEditor} from './farm-editor.js?v=0.39';
+import {migrateFarmLayout} from './farm-customization.js?v=0.39';
+import {createPortalTrigger} from './portal-trigger.js?v=0.39';
+import {migrateCultivation} from './cultivation-layout.js?v=0.39';
+import {mountTitleScreen} from './title-screen.js?v=0.39';
+import {mountCooperative} from './multiplayer.js?v=0.39';
+import {mountTelescopeView} from './telescope-view.js?v=0.39';
+import {mountFieldInventory} from './field-inventory-ui.js?v=0.39';
+import {migrateProfile} from './profile-rules.js?v=0.39';
+import {mountProfileMenu} from './profile-menu.js?v=0.39';
+import {mountHudCalendar} from './hud-calendar.js?v=0.39';
+import {mountExpansionUI} from './expansion-ui.js?v=0.39';
+import {migrateHomesteads,selectLot,lotState} from './homestead-rules.js?v=0.39';
+import {migrateTransport,advanceHerd,propertyKey} from './transport-rules.js?v=0.39';
+import {freshState,validSave,ITEMS,migrateSeedStorage,collectEgg,waterThree,CROPS,SEASONS,TOOLS,frontTile,useTool,pick,ship,sleep,buy,advanceTime,stash,retrieve,BAG_CAPACITY} from './simulation.js?v=0.39';
+import {ANIMALS,migrateAnimalCare,pickHay,returnHay,feedAnimal,petAnimal,animalStatus,advanceAnimalDay} from './animal-care.js?v=0.39';
+import {mountSoundscape} from './soundscape.js?v=0.39';
+import {mountFaunaEncounters} from './fauna-sounds.js?v=0.39';
+import {mountPhotographyUI} from './photo-ui.js?v=0.39';
+import {migrateBirding} from './birding.js?v=0.39';
+import {mountJoystick} from './controls.js?v=0.39';
+import {mountZoomControls} from './camera-controls.js?v=0.39';
+import {createWorld} from './world.js?v=0.39';
 const $=id=>document.getElementById(id),KEY='harvestao-v2';let state=freshState(),storageOK=true,hasProgress=false;
 try{const data=JSON.parse(localStorage.getItem(KEY));if(validSave(data)){state=data;hasProgress=true}}catch{}
 state.inventory??=[];migrateAnimalCare(state);migrateBirding(state);migrateHomesteads(state);migrateTransport(state);migrateProfile(state);migrateSeedStorage(state);migrateCultivation(state);migrateFarmLayout(state);
@@ -52,13 +52,13 @@ function distance(loc){return Math.hypot(state.player.x-loc.x,state.player.z-loc
 function near(){if(world.area!=='farm'&&world.area!=='homestead')return '';if(world.area==='homestead')return '';const l=world.locations;if(distance(l.house)<1.35)return 'house';if(distance(l.shipping)<1.4)return 'shipping';if(distance(l.well)<1.6)return 'well';return ''}
 function acceptDialog(){const dialog=[...document.querySelectorAll('dialog[open]')].at(-1);if(!dialog||dialog.id==='areaLoading')return;if(dialog.id==='bag'&&state.held){document.getElementById('bagStash').click();return}const focused=document.activeElement;if(dialog.contains(focused)&&focused.tagName==='BUTTON'&&!focused.disabled&&!focused.classList.contains('close')&&!focused.classList.contains('profile-close')){focused.click();return}const button=dialog.querySelector('button.primary:not([disabled]),button[type="submit"]:not([disabled])');button?.click()}
 function cancelDialog(){const dialog=[...document.querySelectorAll('dialog[open]')].at(-1);if(!dialog||dialog.id==='areaLoading'||dialog.id==='titleScreen')return;if(dialog.id==='startMenu'&&!cooperative?.menu.canClose)return;if(dialog.id==='profileMenu'&&dialog.querySelector('.profile-close')?.hidden)return;const button=dialog.querySelector('button[data-close],button.close,button.profile-close:not([hidden]),button.profile-cancel:not([hidden])');if(button)button.click();else dialog.close()}
-function use(){if(paused()){acceptDialog();return}if(world.busy)return;if(world.stumpSelection){result(world.placeStump());return}const point=world.nearby(),n=near();if(world.driving){result(world.vehicleAction());return}if(state.held){result(point?.type==='shipping'||n==='shipping'?ship(state):stash(state));return}if(state.carryingHay){if(point&&['feed','hayRack'].includes(point.type))explore(point);else notify('Leve o feno até um cocho ou devolva ao depósito.');return}if(state.tool==='camera'){photography.shoot();return}if(point&&(!['dogPet','farmPet'].includes(point.type)||state.tool==='hand')){explore(point);return}if(n==='shipping'){result(ship(state));return}if(n==='well'){state.water=100;world.act();notify('Regador reabastecido.');save();hud();return}if(world.area==='farm'||world.area==='homestead')result(useTool(state),state.tool);else notify('Aproxime-se de uma pessoa, porta ou objeto para usar X.')}
+function use(){if(paused()){acceptDialog();return}if(world.busy)return;if(world.stumpSelection){result(world.placeStump());return}const point=world.nearby(),n=near();if(point?.type==='christmasTree'&&!world.driving&&!state.held&&!state.carryingHay){explore(point);return}if(world.driving){result(world.vehicleAction());return}if(state.held){result(point?.type==='shipping'||n==='shipping'?ship(state):stash(state));return}if(state.carryingHay){if(point&&['feed','hayRack'].includes(point.type))explore(point);else notify('Leve o feno até um cocho ou devolva ao depósito.');return}if(state.tool==='camera'){photography.shoot();return}if(point&&(!['dogPet','farmPet'].includes(point.type)||state.tool==='hand')){explore(point);return}if(n==='shipping'){result(ship(state));return}if(n==='well'){state.water=100;world.act();notify('Regador reabastecido.');save();hud();return}if(world.area==='farm'||world.area==='homestead')result(useTool(state),state.tool);else notify('Aproxime-se de uma pessoa, porta ou objeto para usar X.')}
 function cancelOrRetrieve(){if(sleeping)return;if(paused()){cancelDialog();return}if(world.stumpSelection){const r=world.cancelStumpMove();notify(r?.message||'O toco ficou em seu lugar.');hud();return}if(world.driving){result(world.toggleTractor());return}if(state.held||state.carryingHay){world.stop();notify(state.held?'X guarda este item na mochila.':'Devolva o feno ao depósito para liberar as mãos.');return}if(!state.inventory?.length){notify('A mochila está vazia.');return}select('hand');result(retrieve(state,state.inventory.length-1))}
 let xHeld=false,xCharged=false,xHoldTimer=null,snowStarted=0,snowHeld=false;
-function canShovel(){return !paused()&&!world.driving&&!state.held&&!state.carryingHay&&state.tool==='snowShovel'&&state.season===3&&!world.region.indoors&&cooperative?.role!=='guest'}
+function canShovel(){return !paused()&&!world.driving&&!state.held&&!state.carryingHay&&state.tool==='snowShovel'&&world.nearby()?.type!=='christmasTree'&&state.season===3&&!world.region.indoors&&cooperative?.role!=='guest'}
 function canChargeWater(){const p=world.nearby();return !paused()&&!world.stumpSelection&&!world.busy&&!world.driving&&!state.held&&!state.carryingHay&&state.tool==='water'&&['farm','homestead'].includes(world.area)&&(!p||['dogPet','farmPet'].includes(p.type))&&near()!=='well'}
 function beginX(){if(sleeping||xHeld)return;xHeld=true;xCharged=false;if(canShovel()){snowStarted=performance.now();snowHeld=true;xCharged=true;world.activities.shovel(true);return}if(canChargeWater()){document.getElementById('action').classList.add('charging');xHoldTimer=setTimeout(()=>{if(xHeld&&canChargeWater()){xCharged=true;result(waterThree(state),'water')}},450)}else{xCharged=true;use()}}
-function endX(cancel=false){if(snowHeld){snowHeld=false;world.activities.shovel(false);{const r=world.activities.finishShovel();if(r.changed){save();hud()}else if(r.message)notify(r.message)}}clearTimeout(xHoldTimer);document.getElementById('action').classList.remove('charging');if(xHeld&&!xCharged&&!cancel&&canChargeWater())use();xHeld=false;xCharged=false}
+function endX(cancel=false){if(snowHeld){snowHeld=false;world.activities.shovel(false);{const r=world.activities.finishShovel(!cancel&&performance.now()-snowStarted<280);if(r.changed){save();hud()}else if(r.message)notify(r.message)}}clearTimeout(xHoldTimer);document.getElementById('action').classList.remove('charging');if(xHeld&&!xCharged&&!cancel&&canChargeWater())use();xHeld=false;xCharged=false}
 const resetJoy=mountJoystick($('joystick'),$('stick'),(x,y)=>joy={x,y});function open(id){resetJoy();keys.clear();world.stop();$(id).showModal()}
 const photography=mountPhotographyUI({state,world,notify,save,isPaused:paused,selectTool:select,beforeOpen:()=>{resetJoy();keys.clear();world.stop()}});const faunaEncounters=mountFaunaEncounters({state,world,notify,save,isPaused:paused,onDefense:()=>soundscape.bark()});const soundscape=mountSoundscape({state,world,isPaused:paused,save,notify,beforeOpen:()=>{resetJoy();keys.clear();world.stop()}});
 const expansion=mountExpansionUI({state,world,notify,save,hud,goArea,playBell:()=>soundscape.bell(),beforeOpen:()=>{resetJoy();keys.clear();world.stop()}});

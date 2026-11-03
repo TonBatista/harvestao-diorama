@@ -1,4 +1,4 @@
-import {fieldForState,canCultivate,TILE} from './cultivation-layout.js?v=0.38';
+import {fieldForState,canCultivate,TILE} from './cultivation-layout.js?v=0.39';
 export const snowDay=s=>[s.year,s.season,s.day].join(':');
 export function snowRecord(s){s.gathered??={};const id='snow-cleared:'+(s.region==='homestead'?s.homesteads?.selected||'lake':'farm');let r=s.gathered[id];if(!r||r.day!==snowDay(s)||!Array.isArray(r.tiles))r=s.gathered[id]={day:snowDay(s),tiles:[]};return r}
 export function snowCovered(s,p){return s.season===3&&p&&!snowRecord(s).tiles.includes(p.z*fieldForState(s).cols+p.x)}

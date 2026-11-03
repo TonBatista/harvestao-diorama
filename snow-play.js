@@ -1,6 +1,9 @@
 // Shared winter objects are saved with the farm, rather than attached to the avatar.
 export const snowArea=s=>s.region==='homestead'?'homestead:'+s.homesteads?.selected:s.region==='valleyTrail'?'valleyTrail:'+([s.valleyRoute?.from,s.valleyRoute?.to].sort().join(':')):s.region;
 export function parkedSnowballs(v,s){return (v.snowballs||[]).filter(b=>b.area===snowArea(s))}
-export function parkSnowball(v,s,radius,position){if(radius<=.185)return false;v.snowballs??=[];if(v.snowballs.length>=48)return false;v.snowSequence=(Number(v.snowSequence)||0)+1;v.snowballs.push({id:'snow-'+v.snowSequence,area:snowArea(s),x:position.x,z:position.z,radius:Math.round(radius*1000)/1000});return true}
+export function parkSnowball(v,s,radius,position){v.snowballs??=[];if(v.snowballs.length>=48)return false;v.snowSequence=(Number(v.snowSequence)||0)+1;v.snowballs.push({id:'snow-'+v.snowSequence,area:snowArea(s),x:position.x,z:position.z,radius:Math.round(radius*1000)/1000,expiresAt:Date.now()+3000});return true}
 export function tractorHitsSnow(x,z,angle,p,radius){const dx=p.x-x,dz=p.z-z,c=Math.cos(angle),n=Math.sin(angle),localX=dx*c-dz*n,localZ=dx*n+dz*c;return Math.hypot(Math.max(0,Math.abs(localX)-.70),Math.max(0,Math.abs(localZ)-1.05))<=radius}
 export function crushSnow(v,s,x,z,angle){if(s.season!==3)return false;let changed=false;if(s.region==='farm'&&v.snowman&&v.snowPosition&&tractorHitsSnow(x,z,angle,v.snowPosition,.7)){v.snowman=0;v.snowPosition=null;changed=true}const area=snowArea(s),before=v.snowballs?.length||0;v.snowballs=(v.snowballs||[]).filter(b=>b.area!==area||!tractorHitsSnow(x,z,angle,b,b.radius));return changed||before!==v.snowballs.length}
+
+// Parts already assembled into the snowman are stored separately and never expire here.
+export function expireSnowballs(v,now=Date.now()){let changed=false;const kept=[];for(const b of v.snowballs||[]){if(!Number.isFinite(b.expiresAt)){b.expiresAt=now+3000;changed=true}if(b.expiresAt>now)kept.push(b);else changed=true}if(changed)v.snowballs=kept;return changed}
