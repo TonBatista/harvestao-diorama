@@ -19,7 +19,7 @@ import {migrateHomesteads,selectLot,lotState} from './homestead-rules.js?v=0.40'
 import {migrateTransport,advanceHerd,propertyKey} from './transport-rules.js?v=0.40';
 import {freshState,validSave,ITEMS,migrateSeedStorage,collectEgg,waterThree,CROPS,SEASONS,TOOLS,frontTile,useTool,pick,ship,sleep,buy,advanceTime,stash,retrieve,BAG_CAPACITY} from './simulation.js?v=0.40';
 import {ANIMALS,migrateAnimalCare,pickHay,returnHay,feedAnimal,petAnimal,animalStatus,advanceAnimalDay} from './animal-care.js?v=0.40';
-import {mountSoundscape} from './soundscape.js?v=0.40';
+import {mountSoundscape} from './soundscape.js?v=0.40.1';
 import {mountFaunaEncounters} from './fauna-sounds.js?v=0.40';
 import {mountPhotographyUI} from './photo-ui.js?v=0.40';
 import {migrateBirding} from './birding.js?v=0.40';
@@ -127,7 +127,7 @@ function refreshCooperative({restore=false,full=false,rebuildArea=false}={}){
 cooperative=mountCooperative({state,world,notify,writeLocal,refresh:refreshCooperative,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop()},onProfile(){profileReturn='room';profileMenu.open(false)}});
 document.getElementById('profileMenu').addEventListener('close',()=>{const destination=profileReturn;profileReturn='';if(destination==='room')cooperative.open();else if(destination==='title')titleScreen.open()});
 cooperative.menu.element.addEventListener('close',()=>{const reason=cooperative.menu.element.dataset.closeReason;if(roomsFromTitle&&reason==='back'){roomsFromTitle=false;titleScreen.open()}else if(reason==='play')roomsFromTitle=false});
-titleScreen=mountTitleScreen({hasProgress,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop()},onPlay(){if(cooperative.blocked){roomsFromTitle=true;titleScreen.close();cooperative.open();return}titleScreen.close()},onNew(){if(cooperative.role!=='solo'){notify('Encerre a sala antes de iniciar outra fazenda.');return}newFromTitle=true;titleScreen.close();open('newDialog')},onProfile(){profileReturn='title';titleScreen.close();profileMenu.open(false)},onMultiplayer(){roomsFromTitle=true;titleScreen.close();cooperative.open()},onHelp(){helpFromTitle=true;titleScreen.close();open('welcome')}});
+titleScreen=mountTitleScreen({build:'0.40.1',hasProgress,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop()},onPlay(){if(cooperative.blocked){roomsFromTitle=true;titleScreen.close();cooperative.open();return}titleScreen.close()},onNew(){if(cooperative.role!=='solo'){notify('Encerre a sala antes de iniciar outra fazenda.');return}newFromTitle=true;titleScreen.close();open('newDialog')},onProfile(){profileReturn='title';titleScreen.close();profileMenu.open(false)},onMultiplayer(){roomsFromTitle=true;titleScreen.close();cooperative.open()},onHelp(){helpFromTitle=true;titleScreen.close();open('welcome')}});
 $('newDialog').addEventListener('close',()=>{if(newFromTitle){newFromTitle=false;titleScreen.open()}});
 $('welcome').addEventListener('close',()=>{if(helpFromTitle){helpFromTitle=false;titleScreen.open()}});
 const sleepTransition=mountSleepTransition({world,state,advance(){rest();clock=0},save,hud,audio:soundscape,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop();sleeping=true}});

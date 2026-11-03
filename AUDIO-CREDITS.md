@@ -11,3 +11,8 @@ A distribuição de espécies no mapa é uma adaptação do jogo. Cobra e aranha
 ## Galo da manhã — versão 0.40
 
 `rooster-v040.mp3`: áudio de galo fornecido pelo criador do projeto para uso no jogo. Copiado sem alteração do arquivo enviado. Substitui o canto sintetizado ao despertar; volume segue as preferências de som ambiente e volume geral.
+
+
+## Substituições de áudio — 0.40.1
+
+`rooster-v040-1.mp3` e `dog-whistle-v040-1.mp3`: novos arquivos de galo e assobio fornecidos pelo criador do projeto (`galo.mp3` e `AssobioVóCidinha.mp3`). Copiados integralmente, sem alterar o som. Substituem as gravações anteriores, mantendo os volumes e comportamentos existentes.
