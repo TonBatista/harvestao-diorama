@@ -1,4 +1,5 @@
-import {SPECIES,migrateBirding,recordSighting,listRecords,getBirdingProgress} from './birding.js?v=0.39';
+import {mountFarmJournal} from './farm-journal.js?v=0.40';
+import {SPECIES,migrateBirding,recordSighting,listRecords,getBirdingProgress} from './birding.js?v=0.40';
 
 const cameraIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h4l2-3h6l2 3h4v14H3z"/><circle cx="12" cy="13.5" r="4"/><path d="M17.5 10h1"/></svg>';
 const bookIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1zM12 5v15M6 8h3M6 11h3"/><path d="M15.3 10.1c1.7-1.2 3.3-.2 2.7 1.3-.4 1-1.5 1.8-2.7 2.2-1.1-.4-2-1.3-2.2-2.2"/></svg>';
@@ -40,6 +41,7 @@ export function mountPhotographyUI({state,world,notify=()=>{},save=()=>{},isPaus
  const footnote=element('small','footnote','As fotografias e descobertas ficam neste navegador e acompanham seu arquivo de progresso. Novas espécies poderão entrar neste caderno.');
  const equipButton=button('primary photo-equip-camera','Pegar a câmera e explorar →');
  album.append(closeButton,eyebrow,title,introduction,summary,progress,filterBar,tabs,detail,resultCount,list,pagination,equipButton,footnote);document.body.append(album);
+ const journal=mountFarmJournal({state,world,album,catalogElements:[introduction,summary,progress,filterBar,tabs,detail,resultCount,list,pagination,equipButton,footnote]});
  let selected=null,cooldown=0,busy=false,elapsed=.2,badgeElapsed=2,lastCaption='',lastTarget='',lastBadge='',filterKind='all',page=0,searchTimer=0,lastTool=null;
 
  function getCandidates(){const targets=world.photoTargets?.();return Array.isArray(targets)?targets.filter(subject=>subject&&subject.inFrame&&Number.isFinite(subject.distance)&&subject.distance<=10&&Number.isFinite(subject.screenX)&&Number.isFinite(subject.screenY)):[];}
@@ -91,7 +93,7 @@ export function mountPhotographyUI({state,world,notify=()=>{},save=()=>{},isPaus
   pagination.hidden=pages<=1;prev.disabled=page<=0;next.disabled=page>=pages-1;pageLabel.textContent=(page+1)+' / '+pages;
   refreshBadge();
  }
- function openAlbum(){if(isPaused())return;beforeOpen();world.stop?.();renderAlbum();album.showModal();}
+ function openAlbum(){if(isPaused())return;beforeOpen();world.stop?.();renderAlbum();journal.open();album.showModal();}
  function close(){if(album.open)album.close();}
  async function shoot(){
   if(state.tool!=='camera'||isPaused()||busy||cooldown>0)return {changed:false};

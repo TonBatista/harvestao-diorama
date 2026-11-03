@@ -1,8 +1,8 @@
 # Harvestão — a vida no campo
 
-Versão 0.39.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.40.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.39)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.40)
 
 ## Caminhos, inverno e vida no vale — versão 0.36
 
@@ -180,3 +180,10 @@ Segurar X com a pá e caminhar faz a bola crescer. Soltar X deixa a bola crescid
 ## Ajustes 0.39
 
 Aproxime-se do pinheiro do quintal e aperte X para abrir as opções de Natal; funciona com ferramentas equipadas, sem depender do clique na árvore. Bolas soltas somem após 3 segundos reais, inclusive com o jogo pausado; as etapas já montadas do boneco permanecem. Um toque rápido em X com a pá arremessa a bola pequena, que desaparece após 2 segundos. Bolas da versão anterior recebem o novo prazo de 3 segundos ao carregar. O anfitrião controla a remoção dos objetos compartilhados no multiplayer.
+
+## Ajustes 0.40
+
+- Bolas maiores soltas duram cinco segundos; partes montadas do boneco continuam preservadas e bolas pequenas arremessadas continuam durando dois segundos.
+- Barra de ferramentas com arraste horizontal por toque ou mouse; o gesto não equipa a ferramenta por acidente. Seleção por teclado revela a ferramenta, inclusive a pá de neve. A barra também responde à roda do mouse.
+- Canto da manhã reproduz `rooster-v040.mp3`, o áudio do galo fornecido pelo criador, respeitando volume, silêncio e aba oculta.
+- Caderno com placa de madeira e papel envelhecido, inspirado na referência enviada. Resumo com energia, dinheiro, ganhos, entregas pendentes, madeira, sementes, água, plantios e coleção. Página Animais e pets mostra nome, localização, alimentação diária, carinho e felicidade reais do rebanho; pets têm seu estado/afeto disponível. Fotografias preserva catálogo, busca, filtros e registros. Setas e abas trocam as páginas. Sem porcentagens fictícias: o percentual do cabeçalho corresponde às espécies fotografadas.

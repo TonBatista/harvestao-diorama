@@ -1,30 +1,31 @@
-import {mountSleepTransition} from './sleep-transition.js?v=0.39';
-import {mountValleyActivities,residentPortrait} from './valley-life.js?v=0.39';
-import {routeForPortal} from './valley-terrain.js?v=0.39';
-import {recoverTractorOnce} from './tractor-recovery.js?v=0.39';
-import {mountFarmEditor} from './farm-editor.js?v=0.39';
-import {migrateFarmLayout} from './farm-customization.js?v=0.39';
-import {createPortalTrigger} from './portal-trigger.js?v=0.39';
-import {migrateCultivation} from './cultivation-layout.js?v=0.39';
-import {mountTitleScreen} from './title-screen.js?v=0.39';
-import {mountCooperative} from './multiplayer.js?v=0.39';
-import {mountTelescopeView} from './telescope-view.js?v=0.39';
-import {mountFieldInventory} from './field-inventory-ui.js?v=0.39';
-import {migrateProfile} from './profile-rules.js?v=0.39';
-import {mountProfileMenu} from './profile-menu.js?v=0.39';
-import {mountHudCalendar} from './hud-calendar.js?v=0.39';
-import {mountExpansionUI} from './expansion-ui.js?v=0.39';
-import {migrateHomesteads,selectLot,lotState} from './homestead-rules.js?v=0.39';
-import {migrateTransport,advanceHerd,propertyKey} from './transport-rules.js?v=0.39';
-import {freshState,validSave,ITEMS,migrateSeedStorage,collectEgg,waterThree,CROPS,SEASONS,TOOLS,frontTile,useTool,pick,ship,sleep,buy,advanceTime,stash,retrieve,BAG_CAPACITY} from './simulation.js?v=0.39';
-import {ANIMALS,migrateAnimalCare,pickHay,returnHay,feedAnimal,petAnimal,animalStatus,advanceAnimalDay} from './animal-care.js?v=0.39';
-import {mountSoundscape} from './soundscape.js?v=0.39';
-import {mountFaunaEncounters} from './fauna-sounds.js?v=0.39';
-import {mountPhotographyUI} from './photo-ui.js?v=0.39';
-import {migrateBirding} from './birding.js?v=0.39';
-import {mountJoystick} from './controls.js?v=0.39';
-import {mountZoomControls} from './camera-controls.js?v=0.39';
-import {createWorld} from './world.js?v=0.39';
+import {mountToolScroller} from './tool-scroller.js?v=0.40';
+import {mountSleepTransition} from './sleep-transition.js?v=0.40';
+import {mountValleyActivities,residentPortrait} from './valley-life.js?v=0.40';
+import {routeForPortal} from './valley-terrain.js?v=0.40';
+import {recoverTractorOnce} from './tractor-recovery.js?v=0.40';
+import {mountFarmEditor} from './farm-editor.js?v=0.40';
+import {migrateFarmLayout} from './farm-customization.js?v=0.40';
+import {createPortalTrigger} from './portal-trigger.js?v=0.40';
+import {migrateCultivation} from './cultivation-layout.js?v=0.40';
+import {mountTitleScreen} from './title-screen.js?v=0.40';
+import {mountCooperative} from './multiplayer.js?v=0.40';
+import {mountTelescopeView} from './telescope-view.js?v=0.40';
+import {mountFieldInventory} from './field-inventory-ui.js?v=0.40';
+import {migrateProfile} from './profile-rules.js?v=0.40';
+import {mountProfileMenu} from './profile-menu.js?v=0.40';
+import {mountHudCalendar} from './hud-calendar.js?v=0.40';
+import {mountExpansionUI} from './expansion-ui.js?v=0.40';
+import {migrateHomesteads,selectLot,lotState} from './homestead-rules.js?v=0.40';
+import {migrateTransport,advanceHerd,propertyKey} from './transport-rules.js?v=0.40';
+import {freshState,validSave,ITEMS,migrateSeedStorage,collectEgg,waterThree,CROPS,SEASONS,TOOLS,frontTile,useTool,pick,ship,sleep,buy,advanceTime,stash,retrieve,BAG_CAPACITY} from './simulation.js?v=0.40';
+import {ANIMALS,migrateAnimalCare,pickHay,returnHay,feedAnimal,petAnimal,animalStatus,advanceAnimalDay} from './animal-care.js?v=0.40';
+import {mountSoundscape} from './soundscape.js?v=0.40';
+import {mountFaunaEncounters} from './fauna-sounds.js?v=0.40';
+import {mountPhotographyUI} from './photo-ui.js?v=0.40';
+import {migrateBirding} from './birding.js?v=0.40';
+import {mountJoystick} from './controls.js?v=0.40';
+import {mountZoomControls} from './camera-controls.js?v=0.40';
+import {createWorld} from './world.js?v=0.40';
 const $=id=>document.getElementById(id),KEY='harvestao-v2';let state=freshState(),storageOK=true,hasProgress=false;
 try{const data=JSON.parse(localStorage.getItem(KEY));if(validSave(data)){state=data;hasProgress=true}}catch{}
 state.inventory??=[];migrateAnimalCare(state);migrateBirding(state);migrateHomesteads(state);migrateTransport(state);migrateProfile(state);migrateSeedStorage(state);migrateCultivation(state);migrateFarmLayout(state);
@@ -32,6 +33,7 @@ const recoveredTractor=recoverTractorOnce(state);
 const names={hand:'Mãos livres',hoe:'Enxada',water:'Regador',seed:'Sementes',sickle:'Foice',axe:'Machado',hammer:'Martelo',camera:'Câmera fotográfica',snowShovel:'Pá de neve'};
 const icons={snowShovel:'M9 3h12v5H9zM15 8v12M7 18h16v5q-8 9-16 0z',hand:'M8 12V6a2 2 0 014 0v6m0-5a2 2 0 014 0v6m0-3a2 2 0 014 0v6c0 5-3 7-7 7-4 0-5-3-7-6l-2-3c-1-2 1-3 2-2l2 2V9',hoe:'M7 23L20 3M16 5l8 3-2 5-8-3',water:'M8 11h11v12H8zM10 11V6c0-4 8-4 8 0v5M19 17l5-7 3 2-6 8M5 14H2v6h6',seed:'M5 8h18l-1 17H6zM5 4h18v4H5zM14 21v-8m0 4c-5 0-6-4-6-4 5-1 6 4 6 4zm0-2c0-5 5-5 5-5 0 4-5 5-5 5',sickle:'M6 25l9-12M13 4c7-5 15 6 6 12l-5-3c6-3 4-8-1-9',axe:'M7 25L20 3M17 6l9 4-5 8-8-5',hammer:'M13 24V11M5 4h18v9H5z',camera:'M4 9h6l2-4h7l2 4h5v16H4zM21 17a6 6 0 11-12 0 6 6 0 0112 0'};
 $('tools').innerHTML=TOOLS.map((id,i)=>`<button data-tool="${id}" title="${names[id]}" aria-label="${names[id]}" aria-pressed="false"><svg viewBox="0 0 30 30"><path d="${icons[id]}"/></svg><b>${i+1}</b></button>`).join('');
+const toolScroller=mountToolScroller($('tools'));
 let bagSeason=state.season,shopSeason=state.season;
 function rest(){advanceAnimalDay(state);return sleep(state)}
 let world;try{world=await createWorld($('farm'),state);window.farmReady=true;if(new URLSearchParams(location.search).has("debug"))window.farmDebug={world,state};$('loading').remove()}catch(e){document.querySelector('#loading strong').textContent='Não foi possível carregar as artes da fazenda';document.querySelector('#loading span').textContent='Verifique sua conexão e recarregue a página.';console.error(e);throw e}
@@ -46,7 +48,7 @@ function writeLocal(){try{localStorage.setItem(KEY,JSON.stringify(savedState()))
 function farmLabel(){return state.profile?.farmName||'Sua fazenda'}
 function htmlText(v){return String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;')}
 function hud(){document.querySelector('.place').textContent=world.area==='farm'?farmLabel():world.region.label;document.querySelector('#menu h2').textContent=farmLabel();document.getElementById('playerGreeting').textContent='Vida no campo de '+state.profile.playerName;const weekday=['SEG','TER','QUA','QUI','SEX','SÁB','DOM'][(state.day-1)%7];$('date').textContent=`${state.day} ${weekday}`;$('time').textContent=String(Math.floor(state.minutes/60)%24).padStart(2,'0')+':'+String(Math.floor(state.minutes%60/10)*10).padStart(2,'0');$('season').textContent=`${SEASONS[state.season]} · Ano ${state.year}`;$('weather').textContent=state.season===3?'❄':state.weather==='rain'?'☁':'☀';$('money').textContent=state.money.toLocaleString('pt-BR');$('energy').textContent=state.stamina;$('energyFill').style.width=state.stamina+'%';$('water').textContent=state.water;$('held').hidden=!state.held&&!state.carryingHay&&!world.stumpSelection;if(world.stumpSelection)$('held').textContent='Carregando um toco · X colocar · Y cancelar';else if(state.carryingHay)$('held').textContent='Carregando: fardo de feno · leve ao cocho';else if(state.held)$('held').textContent='Carregando: '+ITEMS[state.held].name;document.querySelectorAll('[data-tool]').forEach(b=>{b.classList.toggle('selected',b.dataset.tool===state.tool);b.setAttribute('aria-pressed',b.dataset.tool===state.tool?'true':'false')});$('toolName').textContent=state.tool==='seed'?`${CROPS[state.seed].name} · ${state.bags[state.seed]||0} sacos`:names[state.tool];$('actionLabel').textContent=world.driving?'Roçadeira':state.tool==='camera'?'Fotografar':(world.area!=='farm'&&world.area!=='homestead')?'Interagir':state.tool==='hand'?'Pegar':'Usar';$('herdButton').hidden=world.area!=='barn';if(world.area==='barn'){$('herdSummary').textContent=ANIMALS.filter(a=>animalStatus(state,a.id).fed).length+'/'+ANIMALS.length+' alimentados · Ver cuidados'}}
-function select(id){if(world.stumpSelection&&id!=='hand')world.cancelStumpMove();state.tool=id;world.toolModel(id);hud();save()}
+function select(id){if(world.stumpSelection&&id!=='hand')world.cancelStumpMove();state.tool=id;world.toolModel(id);toolScroller.reveal(id);hud();save()}
 function result(r,action){notify(r.message);if(r.changed){if(world.area==='farm'||world.area==='homestead')world.rebuild();if(action)world.act(action);if(r.effect)world.effect(r.effect);save();hud()}}
 function distance(loc){return Math.hypot(state.player.x-loc.x,state.player.z-loc.z)}
 function near(){if(world.area!=='farm'&&world.area!=='homestead')return '';if(world.area==='homestead')return '';const l=world.locations;if(distance(l.house)<1.35)return 'house';if(distance(l.shipping)<1.4)return 'shipping';if(distance(l.well)<1.6)return 'well';return ''}

@@ -8,3 +8,6 @@ Gravações originais reproduzidas por streaming da Wikimedia Commons. O jogo to
 - **Gaivota-prateada — Larus argentatus:** Sonothèque ADVL, [XC707075](https://commons.wikimedia.org/wiki/File:XC707075_-_European_Herring_Gull_-_Larus_argentatus.mp3). [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). Arquivo original sem edição; reprodução parcial no jogo.
 
 A distribuição de espécies no mapa é uma adaptação do jogo. Cobra e aranha são identificações gerais de encontros, sem uma espécie científica atribuída.
+## Galo da manhã — versão 0.40
+
+`rooster-v040.mp3`: áudio de galo fornecido pelo criador do projeto para uso no jogo. Copiado sem alteração do arquivo enviado. Substitui o canto sintetizado ao despertar; volume segue as preferências de som ambiente e volume geral.

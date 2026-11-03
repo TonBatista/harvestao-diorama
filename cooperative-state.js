@@ -1,8 +1,8 @@
-import {migrateFarmLayout,validFarmLayout,validateFarmLayout} from './farm-customization.js?v=0.39';
-import {MAIN_FIELD,LEGACY_FIELD,MAIN_PLOT_COUNT,LEGACY_PLOT_COUNT,migrateCultivation} from './cultivation-layout.js?v=0.39';
-import {migrateFarmStumps,validFarmStumps} from './farm-stumps.js?v=0.39';
-import {CROPS,ITEMS,TOOLS,validSave} from './simulation.js?v=0.39';
-import {ANIMALS} from './animal-care.js?v=0.39';
+import {migrateFarmLayout,validFarmLayout,validateFarmLayout} from './farm-customization.js?v=0.40';
+import {MAIN_FIELD,LEGACY_FIELD,MAIN_PLOT_COUNT,LEGACY_PLOT_COUNT,migrateCultivation} from './cultivation-layout.js?v=0.40';
+import {migrateFarmStumps,validFarmStumps} from './farm-stumps.js?v=0.40';
+import {CROPS,ITEMS,TOOLS,validSave} from './simulation.js?v=0.40';
+import {ANIMALS} from './animal-care.js?v=0.40';
 
 // Network data has its own schema. Visual release numbers never participate in
 // compatibility checks, and aliases/local settings never cross the wire.
