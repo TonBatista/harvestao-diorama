@@ -1,3 +1,4 @@
+import {mergeParts} from './wildlife-art.js?v=0.43';
 import * as T from './three.module.js';
 import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.43';
 import {addResident,NEW_RESIDENTS} from './new-residents.js?v=0.43';
@@ -29,7 +30,7 @@ function laika(k,x,z){
  for(const side of[-1,1]){k.ball(g,'#c5a47c',side*.20,.65,.36,.09,.17,.11);k.ball(g,'#3b3933',side*.092,.76,.557,.027,.036,.017)}
  const legs=[];for(const sx of[-.17,.17])for(const zz of[-.27,.25]){const l=group(g,sx,.31,zz);k.cyl(l,'#e8e2d3',0,-.12,0,.068,.25);k.ball(l,'#eee6d7',0,-.245,.045,.09,.065,.13);legs.push(l)}
  const tail=group(g,0,.53,-.39);const t=k.ball(tail,'#c3a47b',0,.09,-.11,.065,.11,.17);t.rotation.x=.5;k.cyl(g,'#a092b4',0,.48,.26,.245,.07,'fabric').rotation.x=Math.PI/2;
- k.interact({x,z:z+.7,type:'talk',label:'Fazer carinho na Laika',data:{name:'Laika',text:'Au! Laika abana o rabinho e recebe você na casa da Vó Cidinha e do Vô Batista.'},radius:1.25});g.traverse(o=>o.userData.seasonalExclude=true);k.animate((dt,time)=>{tail.rotation.y=Math.sin(time*7)*.43;g.rotation.y=.3+Math.sin(time*.45)*.12;g.position.y=Math.sin(time*2)*.007;legs.forEach((l,i)=>l.rotation.x=Math.sin(time*1.5+i)*.025)});
+ k.interact({x,z:z+.7,type:'talk',label:'Fazer carinho na Laika',data:{name:'Laika',text:'Au! Laika abana o rabinho e recebe você na casa da Vó Cidinha e do Vô Batista.'},radius:1.25});const body=group(g);for(const o of [...g.children])if(o.isMesh)body.add(o);for(const part of[body,...legs,tail]){part.traverse(o=>{if(o.isMesh)o.userData.featherColor='#'+o.material.color.getHexString()});mergeParts(part)}g.traverse(o=>o.userData.seasonalExclude=true);k.animate((dt,time)=>{tail.rotation.y=Math.sin(time*7)*.43;g.rotation.y=.3+Math.sin(time*.45)*.12;g.position.y=Math.sin(time*2)*.007;legs.forEach((l,i)=>l.rotation.x=Math.sin(time*1.5+i)*.025)});
 }
 export function buildLaneHomes(k,state,route){
  const list=groups[[route.from,route.to].sort().join(':')]||[],lots=[];
