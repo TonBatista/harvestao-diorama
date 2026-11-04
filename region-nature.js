@@ -1,4 +1,4 @@
-import {buildAcademyExterior} from './alforria-academy.js?v=0.43';
+import {buildAcademyExterior} from './alforria-academy.js?v=0.44';
 import {BEACH_BOUNDS} from './coastal-layout.js?v=0.43';
 import {addNewResidents} from './new-residents.js?v=0.43';
 import {addInteriorEntrances} from './interior-catalog.js?v=0.43';

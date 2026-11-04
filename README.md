@@ -1,8 +1,19 @@
 # Harvestão — a vida no campo
 
-Versão 0.43.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.44.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
 [Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.43)
+
+## Vila Santa Cruz e Praça São Benedito — 0.44
+
+São Bento Grande, gravação fornecida pelo criador, acompanha a roda na praia por proximidade e o salão do Grupo Alforria. O volume respeita música, silêncio, pausa e aba oculta. O emblema externo agora é circular, menor e fica ao lado da porta. O mapa aceita rolagem por toque sobre todos os seus elementos.
+
+A Praça São Benedito substitui a fonte por um coreto de madeira e recebe quatro grandes árvores floridas nos canteiros centrais. Cerejeiras distribuídas pelos exteriores florescem no inverno; pétalas usam um conjunto fixo de instâncias, com menor quantidade em telas de toque. Troncos, copas e Laika são agrupados para reduzir desenhos.
+
+Os caminhos de ligação abrigam 21 residências de moradores, com portas, interiores, móveis e conversas. Na ligação entre o lago e a montanha fica a casa verde da Vó Cidinha e do Vô Batista, cercada de plantas e flores, com parabólica grande no telhado e a cachorrinha Laika, branca com manchas castanho-claras.
+
+Bancos da capela voltados para o altar e cadeiras da Rosa para suas mesas. O cachorro companheiro só entra na casa principal; nos outros interiores aguarda no exterior e reaparece no local de espera ao retornar. A identificação da residência também diferencia visitantes no multiplayer. Progresso existente preservado.
+
 
 ## Grupo Alforria, família e rebanho livre — 0.43
 
