@@ -1,3 +1,4 @@
+import {buildLaneHomes} from './rural-village.js?v=0.44';
 import {coastalGroundHeight} from './coastal-layout.js?v=0.43';
 import * as T from './three.module.js';
 import {createKit} from './region-kit.js?v=0.43';
@@ -37,6 +38,7 @@ export function buildValleyTrail(state){
  k.portal({x:0,z:reverse?-30.5:30.5,to:route.from,spawn:route.returnSpawn,label:'Voltar pela trilha',radius:2.6,autoRadius:2.5});
  k.portal({x:0,z:reverse?30.5:-30.5,to:route.to,spawn:route.spawn,label:route.label||'Continuar pelo vale',radius:2.6,autoRadius:2.5});
  if([route.from,route.to].includes('mountain'))for(let i=0;i<9;i++)k.rock(-10,-24+i*6,1.4+(i%3)*.25);
+ buildLaneHomes(k,state,route);
  const r=k.finish({id:'valleyTrail',label:'Caminhos do vale',bounds:[-12,12,-32,32],spawn:[0,reverse?-24.5:24.5],viewHeight:15,indoors:false});
  // Meadow exclusion follows the curved strip, instead of rectangular paving tiles.
  r.dynamic.traverse(o=>{if(!o.isInstancedMesh)return;const m=new T.Matrix4(),v=new T.Vector3();for(let i=0;i<o.count;i++){o.getMatrixAt(i,m);v.setFromMatrixPosition(m);if(Math.abs(v.x-center(v.z))<2.3){m.scale(new T.Vector3(0,0,0));o.setMatrixAt(i,m)}}o.instanceMatrix.needsUpdate=true});return r;
