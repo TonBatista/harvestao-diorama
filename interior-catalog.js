@@ -1,6 +1,7 @@
 export const INTERIOR_DESTINATIONS=[
+ {id:'capoeiraHall',label:'Grupo Alforria · salão de treino',description:'Varanda elevada, roda no piso de madeira, berimbaus e atabaque',icon:'◎',exterior:'beach',entry:[-31,-3.28],returnSpawn:[-31,-2.35],replaces:[]},
  {id:'lighthouseUpper',label:'Galeria do Farol',description:'Lanterna central, janelas para o mar e luneta da ilha',icon:'☼',exterior:'lighthouse',entry:[-2.7,.45],returnSpawn:[-2.7,.7],replaces:[]},
- {id:'chapel',label:'Capela das Estações',description:'Vitral, flores e memórias da comunidade',icon:'✧',exterior:'village',entry:[-9.5,-7.5],returnSpawn:[-9.5,-6.5],replaces:['Capela da vila']},
+ {id:'chapel',label:'Capela Sta Julieta',description:'Vó Cidinha, flores e acolhimento da comunidade',icon:'✧',exterior:'village',entry:[-9.5,-7.5],returnSpawn:[-9.5,-6.5],replaces:['Capela da vila']},
  {id:'library',label:'Biblioteca do Vale',description:'Livros, herbário e cadernos de aves',icon:'▤',exterior:'village',entry:[2.3,-8],returnSpawn:[2.3,-7.3],replaces:['Ler na biblioteca']},
  {id:'clinic',label:'Clínica da Clara',description:'Botica, ervas e cuidados do campo',icon:'✚',exterior:'village',entry:[-10.7,12.5],returnSpawn:[-10.7,12.5],replaces:['Clínica da Clara']},
  {id:'inn',label:'Pousada Girassol',description:'Café, tortas, recepção e quarto de hóspedes',icon:'☕',exterior:'village',entry:[9.5,2.1],returnSpawn:[9.5,2.1],replaces:['Pousada Girassol']},

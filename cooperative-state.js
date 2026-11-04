@@ -1,8 +1,8 @@
-import {migrateFarmLayout,validFarmLayout,validateFarmLayout} from './farm-customization.js?v=0.42';
-import {MAIN_FIELD,LEGACY_FIELD,MAIN_PLOT_COUNT,LEGACY_PLOT_COUNT,migrateCultivation} from './cultivation-layout.js?v=0.42';
-import {migrateFarmStumps,validFarmStumps} from './farm-stumps.js?v=0.42';
-import {CROPS,ITEMS,TOOLS,validSave} from './simulation.js?v=0.42';
-import {ANIMALS} from './animal-care.js?v=0.42';
+import {migrateFarmLayout,validFarmLayout,validateFarmLayout} from './farm-customization.js?v=0.43';
+import {MAIN_FIELD,LEGACY_FIELD,MAIN_PLOT_COUNT,LEGACY_PLOT_COUNT,migrateCultivation} from './cultivation-layout.js?v=0.43';
+import {migrateFarmStumps,validFarmStumps} from './farm-stumps.js?v=0.43';
+import {CROPS,ITEMS,TOOLS,validSave} from './simulation.js?v=0.43';
+import {ANIMALS} from './animal-care.js?v=0.43';
 
 // Network data has its own schema. Visual release numbers never participate in
 // compatibility checks, and aliases/local settings never cross the wire.
@@ -46,7 +46,7 @@ function validShared(v){
  const care=v.animalCare;if(!object(care)||care.schema!==1||!object(care.animals)||ANIMALS.some(a=>{const p=care.animals[a.id];return !object(p)||!number(p.happiness,0,100)||[p.fedDay,p.petDay].some(d=>d!==null&&(typeof d!=='string'||!/^\d+-[0-3]-\d{1,2}$/.test(d)))}))return false;
  if(!object(v.animalLocations)||Object.entries(v.animalLocations).some(([id,l])=>!ANIMAL_IDS.has(id)||!location(l)))return false;
  if(!object(v.herdRoutes)||Object.entries(v.herdRoutes).some(([id,r])=>!ANIMAL_IDS.has(id)||!object(r)||typeof r.property!=='string'||!location(r.property)||!location(r.from)||!location(r.to)||!number(r.duration,0.001,120)||!number(r.elapsed,0,1e8)))return false;
- for(const r of Object.values(v.herdRoutes)){if(r.version===2&&(!Array.isArray(r.sections)||r.sections.length<1||r.sections.length>3||!integer(r.section,0,r.sections.length-1)||!number(r.distance,0,1e8)||r.sections.some(section=>!object(section)||!Array.isArray(section.points)||section.points.length<1||section.points.length>1702||section.points.some(p=>!Array.isArray(p)||p.length!==2||!p.every(n=>number(n,-100,100))))))return false}
+ for(const r of Object.values(v.herdRoutes)){if([2,3,4].includes(r.version)&&(!Array.isArray(r.sections)||r.sections.length<1||r.sections.length>3||!integer(r.section,0,r.sections.length-1)||!number(r.distance,0,1e8)||r.sections.some(section=>!object(section)||!Array.isArray(section.points)||section.points.length<1||section.points.length>1702||section.points.some(p=>!Array.isArray(p)||p.length!==2||!p.every(n=>number(n,-100,100))))))return false}
  if(!object(v.animalWander)||Object.entries(v.animalWander).some(([id,p])=>!ANIMAL_IDS.has(id)||!object(p)||!number(p.x,-100,100)||!number(p.z,-100,100)))return false;
  if(!object(v.tractor)||(v.tractor.cargo!==null&&!ANIMAL_IDS.has(v.tractor.cargo))||typeof v.tractor.trailer!=='boolean')return false;
  if(['x','z','trailerX','trailerZ'].some(k=>own(v.tractor,k)&&!number(v.tractor[k],-100,100)))return false;

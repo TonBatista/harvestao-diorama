@@ -1,37 +1,37 @@
-import {clearSnow} from './snow-rules.js?v=0.42';
-import {terrainHeight} from './valley-terrain.js?v=0.42';
-import {createActivityArt} from './valley-life.js?v=0.42';
-import {createFarmEntrance} from './farm-entrance.js?v=0.42';
-import {createFarmStructures} from './farm-structures.js?v=0.42';
-import {migrateFarmLayout,farmObject,farmPoint,farmPaths} from './farm-customization.js?v=0.42';
-import {MAIN_FIELD,LEGACY_FIELD,fieldForState,fieldForProperty,migrateCultivation,isPlantablePlot} from './cultivation-layout.js?v=0.42';
-import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.42';
-import {migrateFarmStumps,findFarmStump,moveFarmStump} from './farm-stumps.js?v=0.42';
-import {createFarmStumpArt} from './farm-stumps-art.js?v=0.42';
-import {createRemoteFarmer,validRemotePose} from './remote-farmer.js?v=0.42';
-import {vehicleAccess} from './vehicle-access.js?v=0.42';
-import {buildHomestead} from './region-homesteads.js?v=0.42';
-import {colliderContains,planAutoHop,hopPosition} from './collision-rules.js?v=0.42';
-import {createFarmPets} from './farm-pets.js?v=0.42';
-import {createNightVisitors} from './night-visitors.js?v=0.42';
-import {createCompanionDog} from './companion-dog.js?v=0.42';
-import {createWildlifeDefense} from './companion-threats.js?v=0.42';
-import {createTractorTracks} from './tractor-tracks.js?v=0.42';
-import {createSeasonalScenery} from './seasonal-scenery.js?v=0.42';
-import {createSeasonalParticles} from './seasonal-particles.js?v=0.42';
-import {propertyKey} from './transport-rules.js?v=0.42';
-import {solveTrailer} from './trailer-physics.js?v=0.42';
+import {clearSnow} from './snow-rules.js?v=0.43';
+import {terrainHeight} from './valley-terrain.js?v=0.43';
+import {createActivityArt} from './valley-life.js?v=0.43';
+import {createFarmEntrance} from './farm-entrance.js?v=0.43';
+import {createFarmStructures} from './farm-structures.js?v=0.43';
+import {migrateFarmLayout,farmObject,farmPoint,farmPaths} from './farm-customization.js?v=0.43';
+import {MAIN_FIELD,LEGACY_FIELD,fieldForState,fieldForProperty,migrateCultivation,isPlantablePlot} from './cultivation-layout.js?v=0.43';
+import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.43';
+import {migrateFarmStumps,findFarmStump,moveFarmStump} from './farm-stumps.js?v=0.43';
+import {createFarmStumpArt} from './farm-stumps-art.js?v=0.43';
+import {createRemoteFarmer,validRemotePose} from './remote-farmer.js?v=0.43';
+import {vehicleAccess} from './vehicle-access.js?v=0.43';
+import {buildHomestead} from './region-homesteads.js?v=0.43';
+import {colliderContains,planAutoHop,hopPosition} from './collision-rules.js?v=0.43';
+import {createFarmPets} from './farm-pets.js?v=0.43';
+import {createNightVisitors} from './night-visitors.js?v=0.43';
+import {createCompanionDog} from './companion-dog.js?v=0.43';
+import {createWildlifeDefense} from './companion-threats.js?v=0.43';
+import {createTractorTracks} from './tractor-tracks.js?v=0.43';
+import {createSeasonalScenery} from './seasonal-scenery.js?v=0.43';
+import {createSeasonalParticles} from './seasonal-particles.js?v=0.43';
+import {propertyKey} from './transport-rules.js?v=0.43';
+import {solveTrailer} from './trailer-physics.js?v=0.43';
 import * as T from './three.module.js';
-import {createTractor} from './tractor-art.js?v=0.42';
-import {ANIMALS,animalStatus} from './animal-care.js?v=0.42';
-import {createTransportDisplay} from './transport-art.js?v=0.42';
-import {createRegionManager,isIndoorArea} from './region-manager.js?v=0.42';
-import {terrainTexture} from './terrain-materials.js?v=0.42';
-import {loadMiniatureMaterials,miniatureTexture,miniatureLens,contactTexture,soilEdgeTexture} from './miniature-materials.js?v=0.42';
-import {artisanMaterial,cottage,canopyGeometry,meadowGeometry,treeCrown} from './art-direction.js?v=0.42';
-import {TILE,CROPS,frontTile} from './simulation.js?v=0.42';
-import {createCropArt} from './crop-art.js?v=0.42';
-import {createFarmer} from './farmer-art.js?v=0.42';
+import {createTractor} from './tractor-art.js?v=0.43';
+import {ANIMALS,animalStatus} from './animal-care.js?v=0.43';
+import {createTransportDisplay} from './transport-art.js?v=0.43';
+import {createRegionManager,isIndoorArea} from './region-manager.js?v=0.43';
+import {terrainTexture} from './terrain-materials.js?v=0.43';
+import {loadMiniatureMaterials,miniatureTexture,miniatureLens,contactTexture,soilEdgeTexture} from './miniature-materials.js?v=0.43';
+import {artisanMaterial,cottage,canopyGeometry,meadowGeometry,treeCrown} from './art-direction.js?v=0.43';
+import {TILE,CROPS,frontTile} from './simulation.js?v=0.43';
+import {createCropArt} from './crop-art.js?v=0.43';
+import {createFarmer} from './farmer-art.js?v=0.43';
 const seedGeo=new T.SphereGeometry(1,5,3);
 const geo={box:new T.BoxGeometry(1,1,1),ball:new T.SphereGeometry(1,16,12),cylinder:new T.CylinderGeometry(1,1,1,12),cone:new T.ConeGeometry(1,1,12),leaf:new T.SphereGeometry(1,8,5)};
 const materials=new Map();function mat(c){if(!materials.has(c))materials.set(c,new T.MeshStandardMaterial({color:c,roughness:.9}));return materials.get(c)}
@@ -181,7 +181,7 @@ const pollenGeometry=new T.BufferGeometry(),pollenPosition=new Float32Array(120*
 const activityArt=createActivityArt(state,(x,z)=>!blocked(x,z),()=>networkRole!=='guest');scene.add(activityArt.root);
 const particles=[];function effect(type){pendingEffect={type,delay:.36}}
 function emitEffect(type){const field=fieldForState(state),p=frontTile(state);const x=p?field.x+p.x*TILE:state.player.x,z=p?field.z+p.z*TILE:state.player.z;for(let i=0;i<12;i++){const m=ball(scene,type==='water'?'#bbebed':type==='leaf'?'#94ac51':'#c4a36d',x,.5,z,.035);particles.push({m,v:new T.Vector3((rand(i+t)*2-1)*1.2,.6+rand(i+2)*1.3,(rand(i+3)*2-1)*1.2),life:.65})}}
-let hammockTime=0,hammockExit=null,layoutSignature=JSON.stringify(state.farmLayout);
+let plantingMask=null,plantingMaskSignature='',hammockTime=0,hammockExit=null,layoutSignature=JSON.stringify(state.farmLayout);
 let zoomValue=1,zoomTarget=1;const minimumZoom=.08,maximumZoom=3.4;
 function setZoom(value){if(!Number.isFinite(value))return zoomTarget;const next=T.MathUtils.clamp(value,minimumZoom,maximumZoom);if(next!==zoomTarget){zoomTarget=next;renderDirty=true}return zoomTarget}
 const herdGrounds=new Map([['farm',{bounds:[...MAIN_FARM_BOUNDS],colliders}]]);let hop=null,jumpHeight=0,hopCooldown=0,hopCount=0;let viewHeight=12,t=0,actionTime=0,actionTool=state.tool,pendingEffect=null,gait=0,isRunning=true,motion=0,travel=0,runBlend=0,speed=0;const velocity=new T.Vector3(),desired=new T.Vector3(),displacement=new T.Vector3(),deltaVelocity=new T.Vector3(),playerTarget=new T.Vector3(),look=new T.Vector3();const actionKeys=[[0,0],[.22,-2.4],[.38,-2.4],[.52,-.65],[.72,-.75],[1,0]];const follow=new T.Vector3(state.player.x,0,state.player.z),offset=new T.Vector3(9,13,9),right=new T.Vector3(.707,0,-.707),down=new T.Vector3(.707,0,.707);function resize(){renderDirty=true;const a=innerWidth/innerHeight;viewHeight=(regions?.active.viewHeight||12)*(a<.7?1.125:1);camera.left=-viewHeight*a/2;camera.right=viewHeight*a/2;camera.top=viewHeight/2;camera.bottom=-viewHeight/2;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}resize();addEventListener('resize',resize);
@@ -213,7 +213,7 @@ function toggleTrailer(){const d=tractorData();if(!driving&&!nearTractor()&&!tra
 function updateTractor(distance){const d=tractorData();if(driving){d.x=state.player.x;d.z=state.player.z;d.angle=state.player.angle;d.area=regions?.active.id||'farm';d.lotId=d.area==='homestead'?state.homesteads?.selected:null}tractor.root.visible=d.area===(regions?.active.id||'farm')&&(d.area!=='homestead'||d.lotId===state.homesteads?.selected);tractor.root.position.set(d.x,terrainHeight(d.area,d.x,d.z),d.z);tractor.root.rotation.y=d.angle;
  if(tractor.trailer.parent!==scene)scene.add(tractor.trailer);let trailerDistance=0;if(d.trailer){const reset=!lastTrailerAttached||d.trailerArea!==d.area||d.trailerLot!==d.lotId,p=solveTrailer(d,{x:d.trailerX,z:d.trailerZ,angle:d.trailerAngle},reset);d.trailerX=p.x;d.trailerZ=p.z;d.trailerAngle=p.angle;d.trailerArea=d.area;d.trailerLot=d.lotId;trailerDistance=p.wheelTravel;tractor.trailer.visible=tractor.root.visible}else{if(!Number.isFinite(d.trailerX))d.trailerX=11.6;if(!Number.isFinite(d.trailerZ))d.trailerZ=7.8;if(!Number.isFinite(d.trailerAngle))d.trailerAngle=Math.PI;tractor.trailer.visible=(d.trailerArea||'farm')===(regions?.active.id||'farm')&&(d.trailerArea!=='homestead'||d.trailerLot===state.homesteads?.selected)}tractor.trailer.position.set(d.trailerX,terrainHeight(d.area,d.trailerX,d.trailerZ),d.trailerZ);tractor.trailer.rotation.y=d.trailerAngle;lastTrailerAttached=d.trailer;tractor.animate(distance,d.cutter,trailerDistance);if(networkRole!=='guest'&&tractor.root.visible&&(driving||state.coopDriver))activityArt.controls.crush(d.x,d.z,d.angle);
  const animal=ANIMALS.find(a=>a.id===d.cargo);if(lastVehicleCargo!==d.cargo){tractor.setCargo(animal||(d.cargo?{species:'cow'}:null));lastVehicleCargo=d.cargo}if(driving&&d.cutter&&state.season===3)clearSnow(state,d.x,d.z,1.6);if(driving&&d.cutter&&(regions?.isFarm||regions?.active.id==='homestead')){let changed=false;const field=fieldForState(state);nearPlots(state.plots,field,d.x,d.z,1.18,(p,x,z)=>{if(p.obstacle==='weed'&&Math.hypot(x-d.x,z-d.z)<1.18){p.obstacle=null;changed=true}return false});if(changed)rebuild()}}
-function nearPlots(plots,field,x,z,reach,test){const minCol=Math.max(0,Math.ceil((x-reach-field.x)/TILE)),maxCol=Math.min(field.cols-1,Math.floor((x+reach-field.x)/TILE)),minRow=Math.max(0,Math.ceil((z-reach-field.z)/TILE)),maxRow=Math.min(field.rows-1,Math.floor((z+reach-field.z)/TILE));for(let row=minRow;row<=maxRow;row++)for(let col=minCol;col<=maxCol;col++){const p=plots[row*field.cols+col];if(p&&isPlantablePlot(p,field,state)&&test(p,field.x+col*TILE,field.z+row*TILE))return true}return false}
+function nearPlots(plots,field,x,z,reach,test){if(field===MAIN_FIELD&&(!plantingMask||plantingMaskSignature!==layoutSignature)){plantingMask=Array.from({length:MAIN_FIELD.cols*MAIN_FIELD.rows},(_,i)=>isPlantablePlot({x:i%MAIN_FIELD.cols,z:Math.floor(i/MAIN_FIELD.cols)},MAIN_FIELD,state));plantingMaskSignature=layoutSignature}const minCol=Math.max(0,Math.ceil((x-reach-field.x)/TILE)),maxCol=Math.min(field.cols-1,Math.floor((x+reach-field.x)/TILE)),minRow=Math.max(0,Math.ceil((z-reach-field.z)/TILE)),maxRow=Math.min(field.rows-1,Math.floor((z+reach-field.z)/TILE));for(let row=minRow;row<=maxRow;row++)for(let col=minCol;col<=maxCol;col++){const p=plots[row*field.cols+col];if(p&&(field===MAIN_FIELD?plantingMask[row*field.cols+col]:true)&&test(p,field.x+col*TILE,field.z+row*TILE))return true}return false}
 function blocked(x,z,ignoreJumpable=false,onFoot=false){for(const c of activityArt.colliders)if(!(driving&&!onFoot&&c.kind==='snow')&&colliderContains(c,x,z,driving&&!onFoot?.6:.23))return true;for(const c of transportedHerd.colliders||[])if(colliderContains(c,x,z,driving&&!onFoot?.6:.23))return true;if(regions){if(!regions.fits(regions.active,x,z,ignoreJumpable))return true;if(driving&&!onFoot){const b=regions.active.bounds;if(x<b[0]+.6||x>b[1]-.6||z<b[2]+.6||z>b[3]-.6)return true;for(const c of regions.active.colliders){if(ignoreJumpable&&c.jumpable===true)continue;if(colliderContains(c,x,z,.6))return true}}if(!regions.isFarm&&regions.active.id!=='homestead')return false}else{if(x<MAIN_FARM_BOUNDS[0]||x>MAIN_FARM_BOUNDS[1]||z<MAIN_FARM_BOUNDS[2]||z>MAIN_FARM_BOUNDS[3])return true;for(const c of colliders){if(ignoreJumpable&&c.jumpable===true)continue;if(colliderContains(c,x,z,driving&&!onFoot?.6:.23))return true}}const field=fieldForState(state);return nearPlots(state.plots,field,x,z,.44,(p,px,pz)=>{if((!p.obstacle||(driving&&!onFoot&&tractorData().cutter&&p.obstacle==='weed'))&&!(p.crop&&p.age>=CROPS[p.crop].days*.5))return false;return Math.abs(x-px)<.44&&Math.abs(z-pz)<.44})}
 // Vehicle footprints belong to the avatar; the dog keeps its own boarding route.
 function playerBlocked(x,z,ignoreJumpable=false,onFoot=false){if(blocked(x,z,ignoreJumpable,onFoot))return true;const d=tractorData(),area=regions?.active.id||'farm',lot=state.homesteads?.selected;if((!driving||onFoot)&&d.area===area&&(area!=='homestead'||d.lotId===lot)&&colliderContains({x:d.x,z:d.z,w:1.35,d:2.10,angle:d.angle},x,z))return true;const cartArea=d.trailer?d.area:d.trailerArea||'farm',cartLot=d.trailer?d.lotId:d.trailerLot;if((!driving||onFoot||!d.trailer)&&cartArea===area&&(area!=='homestead'||cartLot===lot)&&Number.isFinite(d.trailerX)&&Number.isFinite(d.trailerZ)&&colliderContains({x:d.trailerX,z:d.trailerZ,w:1.60,d:1.92,angle:d.trailerAngle},x,z,driving&&!onFoot?.6:.23))return true;return false}

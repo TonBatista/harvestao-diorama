@@ -1,5 +1,6 @@
+import {addNewResidents} from './new-residents.js?v=0.43';
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.42';
+import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.43';
 
 const botanicals=['#80936c','#9ea57d','#bc9b8d','#d6c68d'];
 function info(k,x,z,name,text,radius=1.35){k.interact({x,z,label:name,type:'info',data:{name,text},radius})}
@@ -13,8 +14,8 @@ function cupboard(k,x,z,w=2.4){const g=group(k.fixed,x,0,z);k.box(g,C.dark,0,1,-
 function bottle(k,p,x,y,z,color='#a0b7a5',r=.10){k.cyl(p,color,x,y+r*1.5,z,r,r*3);k.cyl(p,color,x,y+r*3.1,z,r*.40,r*.46);k.box(p,'#e5d5b5',x,y+r*1.6,z+r+.003,r*1.2,r*.8,.012);k.cyl(p,'#a38c62',x,y+r*3.4,z,r*.5,r*.25)}
 function leafPrint(k,x,z){const g=group(k.fixed,x,1.78,z);k.box(g,C.oak,0,0,0,1.22,1.46,.08,'wood');k.box(g,'#e2d5b6',0,0,.046,1.07,1.30,.018);for(let i=0;i<5;i++){const y=-.4+i*.19,s=i%2?-1:1;k.beam(g,'#85946a',[0,-.5,.061],[0,.48,.061],.012,'plain');const l=k.ball(g,'#8fa177',s*.14,y,.064,.21,.065,.019);l.rotation.z=s*.4}return g}
 
-export function buildChapel(){
- const k=createInteriorRoom({id:'chapel',label:'Capela das Estações',w:12,d:11,wall:'#ded6bd',returnTo:'village',returnSpawn:[-9.5,-6.5]}),F=k.fixed;
+export function buildChapel(state={}){
+ const k=createInteriorRoom({id:'chapel',label:'Capela Sta Julieta',w:12,d:11,wall:'#ded6bd',returnTo:'village',returnSpawn:[-9.5,-6.5]}),F=k.fixed;
  rug(k,0,.35,1.65,8.5,'#a69b82');for(const x of[-.72,.72])k.box(F,'#d5c398',x,.068,.35,.035,.01,8.2);
  for(const z of[-.75,1.35,3.45])for(const s of[-1,1])pew(k,s*3.15,z,3.25);
  // A timber-framed stained glass garden catches the warm afternoon light.
@@ -32,7 +33,7 @@ export function buildChapel(){
  info(k,0,-2.65,'Flores das estações','As famílias da vila trazem flores de seus quintais. Ramos secos e sementes guardam as lembranças do último outono.');
  info(k,-4.3,-2.8,'Caderno de gratidão','Entre as páginas estão receitas, agradecimentos pela chuva e desenhos das primeiras colheitas de cada família.');
  info(k,4.65,2.70,'Livro de lembranças','Cada viajante deixa uma lembrança do vale. Há uma pena de bem-te-vi, uma folha de ipê e um desenho da antiga ponte.');
- return k.finishRoom();
+ addNewResidents(k,'chapel',state);return k.finishRoom();
 }
 
 export function buildLibrary(){

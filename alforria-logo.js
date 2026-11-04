@@ -1,0 +1,4 @@
+import * as T from './three.module.js';
+let material;const geometries=new Map();
+export function alforriaLogoMaterial(){if(!material){let map=null;if(typeof Image!=='undefined'){map=new T.TextureLoader().load(new URL('./alforria-logo-v043.png',import.meta.url).href);map.colorSpace=T.SRGBColorSpace}material=new T.MeshBasicMaterial({map,color:map?'#ffffff':'#41689a',side:T.DoubleSide});material.userData.shared=true}return material}
+export function logoPanel(parent,x,y,z,w,h=w,rotation=0){const key=w+':'+h;let geometry=geometries.get(key);if(!geometry){geometry=new T.PlaneGeometry(w,h);geometry.userData.shared=true;geometries.set(key,geometry)}const panel=new T.Mesh(geometry,alforriaLogoMaterial());geometry.userData.shared=true;panel.position.set(x,y,z);panel.rotation.y=rotation;panel.userData.seasonalExclude=true;parent.add(panel);return panel}

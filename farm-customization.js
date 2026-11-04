@@ -1,5 +1,5 @@
-import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.42';
-import {colliderContains} from './scene-collisions.js?v=0.42';
+import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.43';
+import {colliderContains} from './scene-collisions.js?v=0.43';
 export const FARM_OBJECTS=Object.freeze([
  {id:'house',name:'Casa principal',w:5,d:4.1,default:{x:-3,z:-21,angle:0}},
  {id:'barn',name:'Celeiro',w:4.3,d:3.7,default:{x:-13.5,z:-20.5,angle:0}},
