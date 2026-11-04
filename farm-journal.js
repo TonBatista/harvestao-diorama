@@ -1,7 +1,7 @@
-import {ANIMALS,animalStatus} from './animal-care.js?v=0.41';
-import {getBirdingProgress} from './birding.js?v=0.41';
-import {DOG_COATS} from './profile-rules.js?v=0.41';
-import {LOTS} from './homestead-rules.js?v=0.41';
+import {ANIMALS,animalStatus} from './animal-care.js?v=0.42';
+import {getBirdingProgress} from './birding.js?v=0.42';
+import {DOG_COATS} from './profile-rules.js?v=0.42';
+import {LOTS} from './homestead-rules.js?v=0.42';
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n};
 const number=n=>Math.max(0,Math.round(Number(n)||0)).toLocaleString('pt-BR');
 const sum=o=>Object.values(o||{}).reduce((n,v)=>n+(Number.isFinite(v)?v:0),0);

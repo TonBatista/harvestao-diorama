@@ -1,8 +1,14 @@
 # Harvestão — a vida no campo
 
-Versão 0.41.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.42.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.41)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.42)
+
+## Moradores e roda de capoeira — 0.42
+
+O vale passa de 11 para 23 moradores únicos. Mestre Emerson, Bianca, Mônica, Nico, Dandara e Davi formam uma roda animada na Praia das Conchas, com berimbau, camiseta branca, calça azul e cordões individuais. Helena, Caio, Cecília, Ravi, Aurora e Seu Antônio se espalham pela vila, montanha, lago e praia; alguns também visitam os interiores. Todos têm nome, conversa própria e retrato ilustrado grande. Um atlas de 306 KB reúne os 12 retratos novos; os modelos usam partes agrupadas para reduzir chamadas de desenho.
+
+Esta rodada mantém a área atual da praia. A ampliação e o prédio elevado da academia ficam para a próxima etapa. Preserva a correção do celeiro e os sons publicados na 0.41.
 
 ## Caminhos, inverno e vida no vale — versão 0.36
 

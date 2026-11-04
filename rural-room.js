@@ -1,5 +1,6 @@
+import {addResident} from './new-residents.js?v=0.42';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.41';
+import {createKit} from './region-kit.js?v=0.42';
 export const C={oak:'#b0946c',dark:'#695642',trim:'#cfb58a',cream:'#e1d6bd',stone:'#aaa997',iron:'#626e69',sage:'#8e9c7e',rose:'#b89d9f'};
 export function group(parent,x=0,y=0,z=0,angle=0){const g=new T.Group();g.position.set(x,y,z);g.rotation.y=angle;parent.add(g);return g}
 function windowFrame(k,x,z,w=1.65,h=1.4){const F=k.fixed;k.box(F,C.dark,x,1.88,z,w+.19,h+.18,.15,'wood');k.box(F,'#c0d6cf',x,1.88,z+.09,w,h,.035);for(const dx of[-w/2,0,w/2])k.box(F,C.trim,x+dx,1.88,z+.13,.065,h+.10,.075,'wood');for(const y of[1.88-h/2,1.88,1.88+h/2])k.box(F,C.trim,x,y,z+.13,w+.08,.055,.075,'wood');k.box(F,C.oak,x,1.88-h/2-.07,z+.17,w+.32,.10,.31,'wood');for(const s of[-1,1]){k.box(F,'#b3b49a',x+s*(w/2+.11),1.89,z+.19,.19,h+.12,.11,'fabric');k.box(F,C.trim,x+s*(w/2+.11),1.66,z+.25,.22,.07,.05,'fabric')}}
@@ -14,7 +15,7 @@ export function createInteriorRoom({id,label,w=12,d=10,wall=C.cream,floor=C.oak,
  for(let i=0;i<Math.floor(w/.35);i++)k.box(F,i%3?C.oak:'#a58b65',-w/2+.21+i*.35,.57,-d/2+.14,.33,.74,.04,'wood');
  k.box(F,C.trim,w/2,.11,0,.12,.18,d,'wood');for(const x of[-(w+2.1)/4,(w+2.1)/4])k.box(F,C.trim,x,.11,d/2,(w-2.1)/2,.18,.12,'wood');k.box(F,C.trim,0,.035,d/2-.12,2.05,.055,.53,'wood');
  if(windows){windowFrame(k,-w*.27,-d/2+.14);windowFrame(k,w*.27,-d/2+.14)}
- lantern(k,-w/2+.39,2.28,-.8);k.portal({x:0,z:d/2-.33,to:returnTo,spawn:returnSpawn,label:'Sair de '+label,radius:.87});k.finishRoom=()=>k.finish({id,label,bounds:[-w/2,w/2,-d/2,d/2],spawn:[0,d/2-1.2],indoors:true,viewHeight:Math.max(10,w*.85),photoSubjects:[]});return k;
+ lantern(k,-w/2+.39,2.28,-.8);k.portal({x:0,z:d/2-.33,to:returnTo,spawn:returnSpawn,label:'Sair de '+label,radius:.87});let extraResidents=false;k.finishRoom=()=>{if(!extraResidents){extraResidents=true;const visits={chapel:['cecilia',-3.7,1.4],library:['ravi',-3.6,1.7],clinic:['helena',-3.4,1.5],carpenter:['caio',-1.4,2.2],fisherHouse:['antonio',-2.2,1.8]}[id];if(visits)addResident(k,visits[0],{},{x:visits[1],z:visits[2],indoors:true})}return k.finish({id,label,bounds:[-w/2,w/2,-d/2,d/2],spawn:[0,d/2-1.2],indoors:true,viewHeight:Math.max(10,w*.85),photoSubjects:[]})};return k;
 }
 export function table(k,x,z,w=1.8,d=1.2,height=.8){const g=group(k.fixed,x,0,z);k.box(g,C.oak,0,height,0,w,.13,d,'wood');k.box(g,C.trim,0,height+.078,0,w+.08,.035,d+.08,'wood');for(const sx of[-1,1])for(const sz of[-1,1])k.box(g,C.dark,sx*(w/2-.17),height/2,sz*(d/2-.16),.12,height,.12,'wood');k.solid(x,z,w+.08,d+.08,{height:height+.12});return g}
 export function chair(k,x,z,angle=0){const g=group(k.fixed,x,0,z,angle);k.box(g,C.oak,0,.48,0,.55,.10,.55,'wood');for(const sx of[-1,1])for(const sz of[-1,1])k.box(g,C.dark,sx*.21,.24,sz*.21,.07,.48,.07,'wood');for(const sx of[-1,1])k.box(g,C.dark,sx*.22,.84,-.23,.065,.73,.065,'wood');for(const y of[.76,1.03])k.box(g,C.oak,0,y,-.23,.48,.12,.06,'wood');k.solid(x,z,.58,.62,{angle,height:1.12});return g}

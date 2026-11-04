@@ -1,6 +1,7 @@
+import {addResident} from './new-residents.js?v=0.42';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.41';
-import {CROPS,SEASONS} from './simulation.js?v=0.41';
+import {createKit} from './region-kit.js?v=0.42';
+import {CROPS,SEASONS} from './simulation.js?v=0.42';
 const C={oak:'#b18b5d',dark:'#75543c',trim:'#cbae7a',cream:'#e4d5b7',stone:'#b8af97',iron:'#687169'},seasonColors=['#91a876','#ceae68','#b7856b','#8b9eaf'];
 function group(p,x=0,y=0,z=0,angle=0){const g=new T.Group();g.position.set(x,y,z);g.rotation.y=angle;p.add(g);return g}
 function owned(m){m.userData.regionOwned=true;return m}
@@ -18,4 +19,4 @@ const joana=group(F,-4.55,0,-.45,.15);k.ball(joana,'#9aa782',0,.63,0,.25,.35,.20
 // Produce crates and sacks share the existing kit geometry and are baked with the room.
 const display=group(F,4.6,0,.80);k.box(display,C.oak,0,.36,0,1.65,.72,2.6,'wood');k.box(display,C.trim,0,.77,0,1.77,.12,2.73,'wood');for(let i=0;i<3;i++)crate(k,display,0,.99,-.87+i*.86,C.oak,['#b7ae73','#b6816a','#a3b17e'][i]);k.solid(4.6,.8,1.85,2.8);for(let i=0;i<2;i++){const sack=group(F,3.65+i*1.02,0,3.28,.15-i*.3);k.ball(sack,i?'#acb48b':'#c4b38d',0,.37,0,.35,.43,.31,'fabric');k.cyl(sack,'#8c805c',0,.77,0,.22,.055,'fabric');k.cyl(sack,'#d6c58e',0,.79,0,.19,.015);for(let j=0;j<11;j++)k.ball(sack,'#cdb983',Math.sin(j*2.4)*.13,.81+(j%2)*.016,Math.cos(j*2.4)*.13,.034,.018,.028);k.roundSolid(3.65+i*1.02,3.28,.35)}for(let i=0;i<3;i++){k.box(F,C.oak,-5.12+(i%2)*.88,.30+Math.floor(i/2)*.60,3.23,.81,.58,.73,'wood');for(let j=0;j<4;j++)k.box(F,C.trim,-5.12+(i%2)*.88-.29+j*.19,.30+Math.floor(i/2)*.60,3.61,.13,.49,.035,'wood')}k.solid(-4.7,3.23,1.75,.8);pot(k,F,5.2,-1.46,.95);pot(k,F,-2.8,3.62,.8);
 const window=group(F,-5.82,1.83,-1.43,Math.PI/2);k.box(window,C.dark,0,0,0,1.55,1.28,.15,'wood');const glass=owned(new T.MeshStandardMaterial({color:'#c4d4b8',emissive:'#c4d4b8',emissiveIntensity:.18,roughness:.65}));k.box(window,glass,0,0,.09,1.32,1.03,.03);k.box(window,C.trim,0,0,.12,.055,1.07,.055,'wood');k.box(window,C.trim,0,0,.12,1.37,.055,.055,'wood');k.box(window,C.trim,0,-.68,.21,1.76,.12,.42,'wood');for(const dx of [-.78,.78])for(let i=0;i<3;i++)k.cyl(window,'#b6bf9c',dx+(dx<0?-1:1)*i*.055,.0,.14,.06,1.35,'fabric');for(const x of [-2.75,2.75]){const lamp=group(F,x,2.05,-4.17);k.box(lamp,C.dark,0,0,0,.30,.47,.23);const glass=owned(new T.MeshStandardMaterial({color:'#e2bf78',emissive:'#dab477',emissiveIntensity:.65,roughness:.8}));k.box(lamp,glass,0,0,.13,.21,.32,.035);k.box(lamp,C.dark,0,.29,.03,.40,.07,.37);k.beam(lamp,C.iron,[0,.35,-.08],[0,.48,-.08],.025,'plain')}
-k.sign(1.82,3.55,'SAÍDA ↓');k.portal({x:0,z:4.12,to:'village',spawn:[-11,.8],label:'Sair para a vila',radius:1.02});return k.finish({id:'market',label:'Mercado da Vila',bounds:[-5.8,5.8,-4.25,4.45],spawn:[0,3],viewHeight:11.5,indoors:true})}
+k.sign(1.82,3.55,'SAÍDA ↓');k.portal({x:0,z:4.12,to:'village',spawn:[-11,.8],label:'Sair para a vila',radius:1.02});addResident(k,'aurora',state,{x:3,z:2.4,indoors:true});return k.finish({id:'market',label:'Mercado da Vila',bounds:[-5.8,5.8,-4.25,4.45],spawn:[0,3],viewHeight:11.5,indoors:true})}
