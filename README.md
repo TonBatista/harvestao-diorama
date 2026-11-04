@@ -1,14 +1,22 @@
 # Harvestão — a vida no campo
 
-Versão 0.42.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.43.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.42)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.43)
+
+## Grupo Alforria, família e rebanho livre — 0.43
+
+Corrige o travamento provocado pelas buscas de caminho do rebanho: movimento local com limite de trabalho por quadro, saída sem fila e passeios independentes. Trajetos antigos presos são recuperados ao carregar, sem apagar o progresso, dinheiro, plantações, cuidados ou passageiro da carreta. A máscara dos canteiros junto às construções é calculada somente quando a organização muda.
+
+A Praia das Conchas passou de 34×30 para 68×30. A casa do Grupo Alforria fica elevada sobre pilares, com escada de seis degraus e varanda. O jogador sobe e entra no salão de madeira com roda desenhada no chão, berimbaus na parede e atabaque. O portão de volta à fazenda mudou para a borda oeste da praia.
+
+Uniformes e placas usam o logo fornecido do Grupo Alforria. Mestre Emerson tem novo retrato inspirado na referência. O menino chama-se Thomas. Vó Cidinha cuida da Capela Sta Julieta; seu marido, Vô Batista, pesca no lago. Ambos têm modelos, falas e retratos próprios. Só as ilustrações foram incluídas na publicação.
 
 ## Moradores e roda de capoeira — 0.42
 
 O vale passa de 11 para 23 moradores únicos. Mestre Emerson, Bianca, Mônica, Nico, Dandara e Davi formam uma roda animada na Praia das Conchas, com berimbau, camiseta branca, calça azul e cordões individuais. Helena, Caio, Cecília, Ravi, Aurora e Seu Antônio se espalham pela vila, montanha, lago e praia; alguns também visitam os interiores. Todos têm nome, conversa própria e retrato ilustrado grande. Um atlas de 306 KB reúne os 12 retratos novos; os modelos usam partes agrupadas para reduzir chamadas de desenho.
 
-Esta rodada mantém a área atual da praia. A ampliação e o prédio elevado da academia ficam para a próxima etapa. Preserva a correção do celeiro e os sons publicados na 0.41.
+A expansão da praia e a academia foram concluídas na versão 0.43. Preserva a correção do celeiro e os sons publicados na 0.41.
 
 ## Caminhos, inverno e vida no vale — versão 0.36
 

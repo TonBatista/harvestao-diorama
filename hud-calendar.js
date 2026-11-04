@@ -1,5 +1,5 @@
-import {SEASONS} from './simulation.js?v=0.42';
-import {SEASON_DAYS,calendarDate,shiftSeason,sameDate,dateLabel,migrateAgenda,eventsForDate,saveAppointment,deleteAppointment} from './calendar-rules.js?v=0.42';
+import {SEASONS} from './simulation.js?v=0.43';
+import {SEASON_DAYS,calendarDate,shiftSeason,sameDate,dateLabel,migrateAgenda,eventsForDate,saveAppointment,deleteAppointment} from './calendar-rules.js?v=0.43';
 const escape=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 export function mountHudCalendar({state,save=()=>{},beforeOpen=()=>{}}){
  migrateAgenda(state);
