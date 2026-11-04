@@ -1,11 +1,13 @@
-import {buildLaneHomes} from './rural-village.js?v=0.44';
+import {buildLaneHomes,gazeboFloorHeight} from './rural-village.js?v=0.45';
 import {coastalGroundHeight} from './coastal-layout.js?v=0.43';
 import * as T from './three.module.js';
 import {createKit} from './region-kit.js?v=0.43';
 import {artisanMaterial} from './art-direction.js?v=0.43';
 const smooth=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t)};
 // All walkers and ground vertices sample this same continuous surface.
-export function terrainHeight(area,x,z){if(area==='beach')return coastalGroundHeight(x,z);if(area==='mountain')return 3.5*smooth(-1,13,-z);if(area==='village')return .95*smooth(2,12,-z);if(area==='valleyTrail')return 1.15*Math.sin(Math.PI*Math.max(0,Math.min(1,(z+30)/60)))**2;return 0}
+function landHeight(area,x,z){if(area==='beach')return coastalGroundHeight(x,z);if(area==='mountain')return 3.5*smooth(-1,13,-z);if(area==='village')return .95*smooth(2,12,-z);if(area==='valleyTrail')return 1.15*Math.sin(Math.PI*Math.max(0,Math.min(1,(z+30)/60)))**2;return 0}
+// Structural ground stays below raised walkable platforms.
+export function terrainHeight(area,x,z){return landHeight(area,x,z)+(area==='village'?gazeboFloorHeight(x,z):0)}
 export function applyRelief(region){
  if(region.indoors||!['mountain','village','valleyTrail'].includes(region.id)||region.root.userData.reliefApplied)return;
  region.root.userData.reliefApplied=true;region.root.updateMatrixWorld(true);
@@ -13,17 +15,17 @@ export function applyRelief(region){
  // Work before batching: terrain is tessellated; furniture, houses and trees stay rigid.
  for(const o of [...region.fixed.children]){
   bounds.setFromObject(o);const w=bounds.max.x-bounds.min.x,d=bounds.max.z-bounds.min.z;
-  if(o.userData.reliefSurface){const g=o.geometry,a=g.attributes.position;for(let i=0;i<a.count;i++)a.setY(i,a.getY(i)+terrainHeight(region.id,a.getX(i),a.getZ(i)));g.computeVertexNormals();g.computeBoundingSphere()}else if(o.isMesh&&bounds.max.y<.13&&w>.5&&d>.5){
+  if(o.userData.reliefSurface){const g=o.geometry,a=g.attributes.position;for(let i=0;i<a.count;i++)a.setY(i,a.getY(i)+landHeight(region.id,a.getX(i),a.getZ(i)));g.computeVertexNormals();g.computeBoundingSphere()}else if(o.isMesh&&bounds.max.y<.13&&w>.5&&d>.5){
    const inv=o.matrixWorld.clone().invert(),g=new T.PlaneGeometry(w,d,Math.max(1,Math.ceil(w*2)),Math.max(1,Math.ceil(d*2)));g.rotateX(-Math.PI/2);
    const a=g.attributes.position,uv=g.attributes.uv,cx=(bounds.min.x+bounds.max.x)/2,cz=(bounds.min.z+bounds.max.z)/2,y=bounds.max.y;
-   for(let i=0;i<a.count;i++){const x=a.getX(i)+cx,z=a.getZ(i)+cz;pos.set(x,y+terrainHeight(region.id,x,z),z).applyMatrix4(inv);a.setXYZ(i,pos.x,pos.y,pos.z);uv.setXY(i,x/1.7,z/1.7)}
+   for(let i=0;i<a.count;i++){const x=a.getX(i)+cx,z=a.getZ(i)+cz;pos.set(x,y+landHeight(region.id,x,z),z).applyMatrix4(inv);a.setXYZ(i,pos.x,pos.y,pos.z);uv.setXY(i,x/1.7,z/1.7)}
    g.computeVertexNormals();g.computeBoundingSphere();if(!o.geometry.userData.shared)o.geometry.dispose();o.geometry=g;
-  }else{o.position.y+=terrainHeight(region.id,o.position.x,o.position.z);o.updateMatrix()}
+  }else{o.position.y+=landHeight(region.id,o.position.x,o.position.z);o.updateMatrix()}
  }
- for(const p of region.signs||[])if(p.sign)p.sign.y+=terrainHeight(region.id,p.sign.x,p.sign.z);
+ for(const p of region.signs||[])if(p.sign)p.sign.y+=landHeight(region.id,p.sign.x,p.sign.z);
  const last=new WeakMap();
- for(const o of region.dynamic.children)if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,matrix);pos.setFromMatrixPosition(matrix);matrix.elements[13]+=terrainHeight(region.id,pos.x,pos.z);o.setMatrixAt(i,matrix)}o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere()}
- const previous=region.update.bind(region);region.update=(dt,time)=>{for(const o of region.dynamic.children){const p=last.get(o);if(p&&o.position.y===p.y)o.position.y-=p.h}previous(dt,time);for(const o of region.dynamic.children){if(o.isInstancedMesh)continue;const h=terrainHeight(region.id,o.position.x,o.position.z);o.position.y+=h;last.set(o,{y:o.position.y,h})}};
+ for(const o of region.dynamic.children)if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,matrix);pos.setFromMatrixPosition(matrix);matrix.elements[13]+=landHeight(region.id,pos.x,pos.z);o.setMatrixAt(i,matrix)}o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere()}
+ const previous=region.update.bind(region);region.update=(dt,time)=>{for(const o of region.dynamic.children){const p=last.get(o);if(p&&o.position.y===p.y)o.position.y-=p.h}previous(dt,time);for(const o of region.dynamic.children){if(o.isInstancedMesh)continue;const h=landHeight(region.id,o.position.x,o.position.z);o.position.y+=h;last.set(o,{y:o.position.y,h})}};
 }
 const center=z=>3.6*Math.sin(z*Math.PI/28)*Math.sin(Math.PI*Math.max(0,Math.min(1,(z+30)/60)));
 export function buildValleyTrail(state){
