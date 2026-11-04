@@ -16,3 +16,11 @@ A distribuição de espécies no mapa é uma adaptação do jogo. Cobra e aranha
 ## Substituições de áudio — 0.40.1
 
 `rooster-v040-1.mp3` e `dog-whistle-v040-1.mp3`: novos arquivos de galo e assobio fornecidos pelo criador do projeto (`galo.mp3` e `AssobioVóCidinha.mp3`). Copiados integralmente, sem alterar o som. Substituem as gravações anteriores, mantendo os volumes e comportamentos existentes.
+
+
+## Animais da fazenda — 0.41
+
+- **Porquinho:** Secretlondon, [Mudchute pig 2.ogg](https://commons.wikimedia.org/wiki/File:Mudchute_pig_2.ogg), [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Gravação original sem edição, carregada sob demanda da Wikimedia Commons.
+- **Pato:** Jonathon Jongsma, [Anas platyrhynchos — Mallard — XC62258](https://commons.wikimedia.org/wiki/File:Anas_platyrhynchos_-_Mallard_-_XC62258.ogg), [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Gravação original sem edição; reprodução parcial sob demanda.
+- **Galo no quintal:** reutiliza o áudio fornecido pelo criador do projeto.
+- **Vacas, ovelhas e galinhas:** efeitos procedurais originais, sem gravações externas. Porco e pato têm efeitos procedurais de reserva quando a gravação não pode ser reproduzida. Todos respeitam distância, pausa, aba oculta e os controles de volume.

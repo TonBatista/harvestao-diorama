@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.40';
-import {artisanMaterial} from './art-direction.js?v=0.40';
+import {createKit} from './region-kit.js?v=0.41';
+import {artisanMaterial} from './art-direction.js?v=0.41';
 const smooth=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t)};
 // All walkers and ground vertices sample this same continuous surface.
 export function terrainHeight(area,x,z){if(area==='mountain')return 3.5*smooth(-1,13,-z);if(area==='village')return .95*smooth(2,12,-z);if(area==='valleyTrail')return 1.15*Math.sin(Math.PI*Math.max(0,Math.min(1,(z+30)/60)))**2;return 0}

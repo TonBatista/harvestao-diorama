@@ -1,8 +1,8 @@
 # Harvestão — a vida no campo
 
-Versão 0.40.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.41.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.40)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.41)
 
 ## Caminhos, inverno e vida no vale — versão 0.36
 
