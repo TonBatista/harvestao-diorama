@@ -1,8 +1,18 @@
 # Harvestão — a vida no campo
 
-Versão 0.45.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.46.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
-[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.43)
+[Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/)
+
+## Vila ampliada e cultivo visível — 0.46
+
+Vila Santa Cruz passa de 34×30 para 34×60, mantendo a praça e os edifícios originais. Uma escada de pedra com corrimãos leva aos jardins em canteiros triangulares arredondados e círculos floridos. O riacho desce pela margem da cidade, passa por uma ponte de pedra de 6,6 m com guarda-corpos de madeira e segue entre os bairros. Depois da ponte há quatro casas visitáveis e árvores frutíferas. A passagem superior para a montanha também cruza o riacho. Relevo, escadas e pontes compartilham as alturas usadas por jogador, cachorro, trator e visitantes.
+
+Copas da praça mais preenchidas, conservando o porte e a vista do coreto. Cartões de folhas com normal map procedural e vento, sem aumentar chamadas de desenho por folha. O telhado texturizado fica opaco ao chegar; só reduz a 50% quando o jogador alcança o centro e volta ao normal ao sair da plataforma.
+
+Sementes recém-plantadas são maiores e ficam acima do relevo do canteiro. É possível regar a neve sobre a área de cultivo: a máscara do mesmo quadrado fica visivelmente mais escura e volta ao normal no dia seguinte. A pá continua necessária para preparar a terra coberta.
+
+Link principal de publicação: https://tonbatista.github.io/harvestao-diorama/
 
 ## Praça e fachada — 0.45
 

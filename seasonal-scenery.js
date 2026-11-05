@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {fieldForState,TILE} from './cultivation-layout.js?v=0.43';
-import {snowRecord} from './snow-rules.js?v=0.43';
+import {fieldForState,TILE} from './cultivation-layout.js?v=0.46';
+import {snowRecord} from './snow-rules.js?v=0.46';
 import {getSeasonLook, normalizeSeason} from './seasonal-palette.js';
 
 const SURFACES = new Set(['ground','grass','leaf','pine','path','soil','roof','stone','wood','sand','water','exclude']);
@@ -107,7 +107,8 @@ if ( seasonEnabled > .5 ) {
     seasonCoverage *= seasonSnow * seasonSnowStrength;
     vec2 clearUV = (vSeasonWorldPosition.xz - seasonClearBounds.xy) / seasonClearBounds.zw;
     if(seasonClearEnabled > .5 && vSeasonWorldPosition.y < .32 && all(greaterThanEqual(clearUV,vec2(0.))) && all(lessThanEqual(clearUV,vec2(1.)))) seasonCoverage *= 1.0-texture2D(seasonClearMap,clearUV).r;
-    vec3 seasonSnowDetail = seasonSnowColor * ( .97 + seasonLuminance * .03 );
+    float wetSnow=0.;if(seasonClearEnabled>.5&&vSeasonWorldPosition.y<.32&&all(greaterThanEqual(clearUV,vec2(0.)))&&all(lessThanEqual(clearUV,vec2(1.))))wetSnow=texture2D(seasonClearMap,clearUV).g;
+    vec3 seasonSnowDetail = seasonSnowColor * ( .97 + seasonLuminance * .03 ) * mix(vec3(1.),vec3(.48,.58,.66),wetSnow);
     diffuseColor.rgb = mix( diffuseColor.rgb, seasonSnowDetail, clamp( seasonCoverage, 0.0, 1.0 ) );
   }
 }
@@ -126,7 +127,8 @@ export function createSeasonalScenery({season = 0, indoors = false} = {}) {
   const roots = new Map(), owners = new WeakMap();
   let clearStamp='';const clearTexture=new T.DataTexture(new Uint8Array(4),1,1,T.RGBAFormat);clearTexture.needsUpdate=true;
   const clearUniforms={seasonClearMap:{value:clearTexture},seasonClearBounds:{value:new T.Vector4(0,0,1,1)},seasonClearEnabled:{value:0}};
-  function updateSnowMask(state){const active=state.season===3&&['farm','homestead'].includes(state.region);clearUniforms.seasonClearEnabled.value=active?1:0;if(!active)return;const f=fieldForState(state),r=snowRecord(state),key=JSON.stringify([state.region,state.homesteads?.selected,r.day,r.tiles]);if(key===clearStamp)return;clearStamp=key;const data=new Uint8Array(f.cols*f.rows*4);for(const i of r.tiles)if(Number.isInteger(i)&&i>=0&&i<f.cols*f.rows){data[i*4]=255;data[i*4+3]=255}clearTexture.image={data,width:f.cols,height:f.rows};clearTexture.needsUpdate=true;clearUniforms.seasonClearBounds.value.set(f.x-TILE/2,f.z-TILE/2,f.cols*TILE,f.rows*TILE)}
+  function updateSnowMask(state){const active=state.season===3&&['farm','homestead'].includes(state.region);clearUniforms.seasonClearEnabled.value=active?1:0;if(!active)return;const f=fieldForState(state),r=snowRecord(state),wet=(state.plots||[]).filter(p=>p.wet).map(p=>p.z*f.cols+p.x),key=JSON.stringify([state.region,state.homesteads?.selected,r.day,r.tiles,wet]);if(key===clearStamp)return;clearStamp=key;const data=new Uint8Array(f.cols*f.rows*4);for(const i of r.tiles)if(Number.isInteger(i)&&i>=0&&i<f.cols*f.rows){data[i*4]=255;data[i*4+3]=255}for(const i of wet)if(i>=0&&i<f.cols*f.rows){data[i*4+1]=255;data[i*4+3]=255}clearTexture.image={data,width:f.cols,height:f.rows};clearTexture.needsUpdate=true;clearUniforms.seasonClearBounds.value.set(f.x-TILE/2,f.z-TILE/2,f.cols*TILE,f.rows*TILE)}
+
 
 
   function updateMaterial(entry) {
@@ -161,7 +163,7 @@ export function createSeasonalScenery({season = 0, indoors = false} = {}) {
       shader.vertexShader = vertexDeclarations + shader.vertexShader.replace('#include <begin_vertex>', vertexSurface);
       shader.fragmentShader = fragmentDeclarations + shader.fragmentShader.replace('#include <color_fragment>', fragmentSurface);
     };
-    material.customProgramCacheKey = () => `${priorKey}|seasonal-scenery-v2`;
+    material.customProgramCacheKey = () => `${priorKey}|seasonal-scenery-v3`;
     material.userData.seasonalScenery = {kind};
     const entry = {source, material, kind, uniforms};
     updateMaterial(entry);

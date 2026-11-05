@@ -1,13 +1,14 @@
-import {buildLaneHomes,gazeboFloorHeight} from './rural-village.js?v=0.45';
-import {coastalGroundHeight} from './coastal-layout.js?v=0.43';
+import {villageGroundHeight,villageWalkHeight} from './village-layout.js?v=0.46';
+import {buildLaneHomes,gazeboFloorHeight} from './rural-village.js?v=0.46';
+import {coastalGroundHeight} from './coastal-layout.js?v=0.46';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.43';
-import {artisanMaterial} from './art-direction.js?v=0.43';
+import {createKit} from './region-kit.js?v=0.46';
+import {artisanMaterial} from './art-direction.js?v=0.46';
 const smooth=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t)};
 // All walkers and ground vertices sample this same continuous surface.
-function landHeight(area,x,z){if(area==='beach')return coastalGroundHeight(x,z);if(area==='mountain')return 3.5*smooth(-1,13,-z);if(area==='village')return .95*smooth(2,12,-z);if(area==='valleyTrail')return 1.15*Math.sin(Math.PI*Math.max(0,Math.min(1,(z+30)/60)))**2;return 0}
+function landHeight(area,x,z){if(area==='beach')return coastalGroundHeight(x,z);if(area==='mountain')return 3.5*smooth(-1,13,-z);if(area==='village')return villageGroundHeight(x,z);if(area==='valleyTrail')return 1.15*Math.sin(Math.PI*Math.max(0,Math.min(1,(z+30)/60)))**2;return 0}
 // Structural ground stays below raised walkable platforms.
-export function terrainHeight(area,x,z){return landHeight(area,x,z)+(area==='village'?gazeboFloorHeight(x,z):0)}
+export function terrainHeight(area,x,z){return area==='village'?villageWalkHeight(x,z)+gazeboFloorHeight(x,z):landHeight(area,x,z)}
 export function applyRelief(region){
  if(region.indoors||!['mountain','village','valleyTrail'].includes(region.id)||region.root.userData.reliefApplied)return;
  region.root.userData.reliefApplied=true;region.root.updateMatrixWorld(true);

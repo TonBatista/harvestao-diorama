@@ -1,11 +1,11 @@
-import {buildAcademyExterior} from './alforria-academy.js?v=0.45';
-import {BEACH_BOUNDS} from './coastal-layout.js?v=0.43';
-import {addNewResidents} from './new-residents.js?v=0.43';
-import {addInteriorEntrances} from './interior-catalog.js?v=0.43';
-import {addMapFauna} from './fauna-art.js?v=0.43';
+import {buildAcademyExterior} from './alforria-academy.js?v=0.46';
+import {BEACH_BOUNDS} from './coastal-layout.js?v=0.46';
+import {addNewResidents} from './new-residents.js?v=0.46';
+import {addInteriorEntrances} from './interior-catalog.js?v=0.46';
+import {addMapFauna} from './fauna-art.js?v=0.46';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.43';
-import {buildUrutau} from './wildlife-art.js?v=0.43';
+import {createKit} from './region-kit.js?v=0.46';
+import {buildUrutau} from './wildlife-art.js?v=0.46';
 const TAU=Math.PI*2;
 function ownedMaterial(options){const m=new T.MeshStandardMaterial(options);m.userData.regionOwned=true;return m}
 function rng(seed){return ()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}}
