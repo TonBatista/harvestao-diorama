@@ -1,5 +1,5 @@
 import {clearSnow} from './snow-rules.js?v=0.43';
-import {terrainHeight} from './valley-terrain.js?v=0.43';
+import {terrainHeight} from './valley-terrain.js?v=0.45';
 import {createActivityArt} from './valley-life.js?v=0.43';
 import {createFarmEntrance} from './farm-entrance.js?v=0.43';
 import {createFarmStructures} from './farm-structures.js?v=0.43';
@@ -8,7 +8,7 @@ import {MAIN_FIELD,LEGACY_FIELD,fieldForState,fieldForProperty,migrateCultivatio
 import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.43';
 import {migrateFarmStumps,findFarmStump,moveFarmStump} from './farm-stumps.js?v=0.43';
 import {createFarmStumpArt} from './farm-stumps-art.js?v=0.43';
-import {createRemoteFarmer,validRemotePose} from './remote-farmer.js?v=0.44';
+import {createRemoteFarmer,validRemotePose} from './remote-farmer.js?v=0.45';
 import {vehicleAccess} from './vehicle-access.js?v=0.43';
 import {buildHomestead} from './region-homesteads.js?v=0.43';
 import {colliderContains,planAutoHop,hopPosition} from './collision-rules.js?v=0.43';
@@ -25,7 +25,7 @@ import * as T from './three.module.js';
 import {createTractor} from './tractor-art.js?v=0.43';
 import {ANIMALS,animalStatus} from './animal-care.js?v=0.43';
 import {createTransportDisplay} from './transport-art.js?v=0.43';
-import {createRegionManager,isIndoorArea} from './region-manager.js?v=0.44';
+import {createRegionManager,isIndoorArea} from './region-manager.js?v=0.45';
 import {terrainTexture} from './terrain-materials.js?v=0.43';
 import {loadMiniatureMaterials,miniatureTexture,miniatureLens,contactTexture,soilEdgeTexture} from './miniature-materials.js?v=0.43';
 import {artisanMaterial,cottage,canopyGeometry,meadowGeometry,treeCrown} from './art-direction.js?v=0.43';

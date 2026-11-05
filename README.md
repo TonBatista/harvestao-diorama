@@ -1,8 +1,16 @@
 # Harvestão — a vida no campo
 
-Versão 0.44.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.45.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
 [Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/?v=0.43)
+
+## Praça e fachada — 0.45
+
+A janela frontal da sede Alforria, com venezianas e jardineira, passou para o outro lado da porta; o emblema circular mantém sua posição. As quatro árvores centrais ficaram próximas da altura do coreto, com copas menores e mais abertas. Folhagem usa cartões com textura alpha, recortes de folhas e leve balanço ao vento; flores e pétalas continuam com quantidade limitada de instâncias.
+
+O coreto ganhou plataforma octogonal maior, entrada livre, dois degraus e piso de 45 cm. Colisões ficam nos postes e guarda-corpos. Personagem, companheiro, câmera e visitantes usam a mesma altura do piso; o terreno sob a estrutura continua no nível original. O telhado fica translúcido quando o jogador sobe, permitindo enxergar o avatar.
+
+Conferência focada de sintaxe, altura dos degraus, entrada livre e limite lateral do coreto concluída. Sem bateria ampla de testes.
 
 ## Vila Santa Cruz e Praça São Benedito — 0.44
 
