@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {CROPS} from './simulation.js?v=0.43';
-import {miniatureTexture} from './miniature-materials.js?v=0.43';
+import {CROPS} from './simulation.js?v=0.46';
+import {miniatureTexture} from './miniature-materials.js?v=0.46';
 
 // Every shape and material is shared: world.js can merge a whole field by material.
 const random=n=>{const v=Math.sin(n*127.1+34.2)*43758.5453;return v-Math.floor(v)};
@@ -96,7 +96,7 @@ export function createCropArt(){
  const pumpkinSkin=new T.MeshStandardMaterial({color:'#c57e38',roughness:.77});
  const eggplantSkin=new T.MeshStandardMaterial({color:'#65506e',roughness:.55});
  const leekWhite=new T.MeshStandardMaterial({color:'#e8e6c4',roughness:.88});
- const seedMaterial=new T.MeshStandardMaterial({color:'#b9925d',roughness:1});
+ const seedMaterial=new T.MeshStandardMaterial({color:'#e1bd7d',roughness:1});
  const shapes=Object.fromEntries(['turnip','strawberry','oval','lance','vine','corn','sepal'].map(kind=>[kind,leafGeometry(kind)]));
  const sphere=new T.SphereGeometry(1,12,8),smallSphere=new T.SphereGeometry(1,8,6),stemGeometry=new T.CylinderGeometry(.8,1,1,5,1),cone=new T.ConeGeometry(1,1,7);
  const strawberryGeometry=new T.SphereGeometry(1,16,10),sp=strawberryGeometry.attributes.position;
@@ -277,7 +277,7 @@ export function createCropArt(){
   const definition=CROPS[p.crop];if(!definition)return;
   if(held){heldCrop(parent,p.crop,x,z);return}
   const stage=clamp(p.age/definition.days),seed=x*11+z*31;
-  if(stage<.13){for(let i=0;i<3;i++)mesh(parent,smallSphere,seedMaterial,x+(i-1)*.09,.072,z+random(seed+i)*.025,.023,.014,.016);return}
+  if(stage<.13){for(let i=0;i<5;i++){const a=i*2.399+random(seed)*2,r=i===0?0:.23,xx=x+Math.sin(a)*r,zz=z+Math.cos(a)*r;const kernel=mesh(parent,smallSphere,seedMaterial,xx,.161,zz,.058,.027,.041);kernel.rotation.y=a;mesh(parent,smallSphere,seedMaterial,xx-.012,.183,zz+.008,.024,.007,.014)}return}
   if(p.crop==='turnip'){
    if(stage>.5)bulb(parent,x,.125,z,(stage-.3)/.7);
    turnipLeaves(parent,x,z,stage,seed,.12+stage*.14);

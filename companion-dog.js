@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {part,mergeParts} from './wildlife-art.js?v=0.43';
-import {migrateCompanion} from './profile-rules.js?v=0.43';
+import {part,mergeParts} from './wildlife-art.js?v=0.46';
+import {migrateCompanion} from './profile-rules.js?v=0.46';
 const DOG_OUTDOORS=new Set(['farm','village','mountain','beach','lake','homestead','valleyTrail']);
 const dogAllowed=area=>area==='house'||DOG_OUTDOORS.has(area);
 const TAU=Math.PI*2,wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));

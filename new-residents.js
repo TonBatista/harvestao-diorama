@@ -1,7 +1,7 @@
-import {logoPanel} from './alforria-logo.js?v=0.43';
+import {logoPanel} from './alforria-logo.js?v=0.46';
 import * as T from './three.module.js';
-import {part,mergeParts} from './wildlife-art.js?v=0.43';
-import {colliderContains} from './scene-collisions.js?v=0.43';
+import {part,mergeParts} from './wildlife-art.js?v=0.46';
+import {colliderContains} from './scene-collisions.js?v=0.46';
 export const NEW_RESIDENTS=Object.freeze([
  {id:'emerson',name:'Mestre Emerson',area:'beach',x:-31,z:5.7,skin:'#e9be9b',hair:'#463d37',beard:true,cord:['#eee9db'],master:true,text:'Eu sou o mestre Emerson. Aqui no Grupo Alforria a roda começa com respeito, escuta e amizade. O berimbau guia o nosso encontro, e todo mundo é bem-vindo!'},
  {id:'bianca',name:'Bianca',area:'beach',x:-28.66,z:6.65,skin:'#f0cdb4',hair:'#d6ac55',long:true,cord:['#589550','#d5b34b'],text:'Sou a Bianca! Meu cordão é verde e amarelo. Gosto de treinar na areia e ouvir o mar entre uma ginga e outra.'},
