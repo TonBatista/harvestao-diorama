@@ -1,8 +1,8 @@
 import * as T from './three.module.js';
-import {ALFORRIA} from './coastal-layout.js?v=0.46';
-import {logoPanel} from './alforria-logo.js?v=0.46';
-import {createInteriorRoom,group,C,lantern} from './rural-room.js?v=0.46';
-import {addResident} from './new-residents.js?v=0.46';
+import {ALFORRIA} from './coastal-layout.js?v=0.47';
+import {logoPanel} from './alforria-logo.js?v=0.47';
+import {createInteriorRoom,group,C,lantern} from './rural-room.js?v=0.47';
+import {addResident} from './new-residents.js?v=0.47';
 function ring(k,parent,x,y,z,r,color='#eee2bd',width=.045){const geometry=new T.RingGeometry(r-width,r+width,80),material=new T.MeshStandardMaterial({color,roughness:1,side:T.DoubleSide});material.userData.regionOwned=true;const m=new T.Mesh(geometry,material);m.rotation.x=-Math.PI/2;m.position.set(x,y,z);m.receiveShadow=true;parent.add(m);return m}
 function berimbau(k,parent,x,y,z,scale=1){const g=group(parent,x,y,z);g.scale.setScalar(scale);const curve=new T.QuadraticBezierCurve3(new T.Vector3(0,0,0),new T.Vector3(.22,.95,0),new T.Vector3(.01,1.85,0)),bow=new T.Mesh(new T.TubeGeometry(curve,20,.018,5,false),k.box(g,'#9b754d',0,0,0,.001,.001,.001,'wood').material);bow.castShadow=true;g.add(bow);k.beam(g,'#c8c1a2',[0,0,0],[.01,1.85,0],.004,'plain');k.ball(g,'#ac8350',.035,.47,.03,.17,.20,.17,'wood');k.ball(g,'#5e4934',.035,.47,.19,.10,.13,.018);k.beam(g,'#a18458',[-.16,.17,.06],[.16,.37,.06],.008,'wood');return g}
 export function buildAcademyExterior(k){const {x,z,height:h}=ALFORRIA,F=k.fixed;const house=k.house(x,z,9.6,6,'#bca076','#6b7d7c');house.position.y=h;

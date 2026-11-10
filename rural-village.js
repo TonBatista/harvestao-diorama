@@ -1,9 +1,9 @@
-import {artisanMaterial} from './art-direction.js?v=0.46';
-import {mergeParts} from './wildlife-art.js?v=0.46';
+import {artisanMaterial} from './art-direction.js?v=0.47';
+import {mergeParts} from './wildlife-art.js?v=0.47';
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.46';
-import {addResident,NEW_RESIDENTS} from './new-residents.js?v=0.46';
-import {colliderContains} from './scene-collisions.js?v=0.46';
+import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.47';
+import {addResident,NEW_RESIDENTS} from './new-residents.js?v=0.47';
+import {colliderContains} from './scene-collisions.js?v=0.47';
 
 export const GAZEBO=Object.freeze({x:0,z:1.7,radius:2.65,floor:.45,columnRadius:2.45,stairHalfWidth:.92,tread:.48});
 export function gazeboFloorHeight(x,z){

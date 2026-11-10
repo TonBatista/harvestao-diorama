@@ -1,4 +1,4 @@
-export const VILLAGE_BOUNDS=Object.freeze([-17,17,-15,45]);
+export const VILLAGE_BOUNDS=Object.freeze([-17,17,-15,68]);
 export const VILLAGE_STAIRS=Object.freeze({x:0,start:14.8,tread:.55,count:8,width:6.8,drop:1.2});
 export const VILLAGE_BRIDGE=Object.freeze({x:0,start:29.5,end:35.5,width:6.6,waterZ:32.5,waterWidth:2.6});
 const smooth=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t)};

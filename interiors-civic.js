@@ -1,6 +1,6 @@
-import {addNewResidents} from './new-residents.js?v=0.46';
+import {addNewResidents} from './new-residents.js?v=0.47';
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.46';
+import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.47';
 
 const botanicals=['#80936c','#9ea57d','#bc9b8d','#d6c68d'];
 function info(k,x,z,name,text,radius=1.35){k.interact({x,z,label:name,type:'info',data:{name,text},radius})}
@@ -48,7 +48,7 @@ export function buildLibrary(){
  const display=table(k,4.85,2.25,1.65,1.2,.79);book(k,display,-.32,.90,.08,'#829273',true);for(let i=0;i<3;i++){const a=.3+i*.6,l=k.ball(display,botanicals[i],-.40+Math.sin(a)*.10,.997,-.02+i*.10,.12,.009,.04);l.rotation.y=a}k.cyl(display,C.trim,.47,.92,-.17,.20,.06);k.ball(display,'#ae9b75',.47,1.09,-.17,.18,.14,.22);k.ball(display,'#b2a382',.47,1.25,-.01,.11,.12,.10);k.ball(display,'#424c3a',.42,1.27,.07,.017,.025,.013);k.beam(display,'#a68a62',[.47,1.20,.07],[.47,1.20,.22],.025,'plain');
  const clock=group(k.dynamic,-6.20,2.05,.1);k.box(clock,C.oak,0,0,0,.19,1.14,.61,'wood');const pendulum=k.ball(clock,'#b6a173',.13,-.23,.01,.05,.13,.15);k.animate((dt,time)=>{pendulum.rotation.x=Math.sin(time*2)*.18;pendulum.position.z=Math.sin(time*2)*.08});
  npc(k,{name:'Lia',text:'Separei um herbário e os cadernos das aves do vale. Quem observa a natureza com calma sempre encontra uma história para contar.',x:4.85,z:-2.35,shirt:'#819ba0',hair:'#7a624b',seed:4});
- info(k,-4.35,-.15,'Almanaque do campo','As margens guardam anotações dos agricultores: semear na estação certa, devolver folhas à terra e observar a chuva antes de regar.');
+ k.interact({type:'tutorialBooks',x:-4.35,z:-.15,label:'Manuais do jogo',data:{topic:'planting'}});info(k,-4.35,-.15,'Almanaque do campo','As margens guardam anotações dos agricultores: semear na estação certa, devolver folhas à terra e observar a chuva antes de regar.');
  info(k,1.65,2.25,'Mesa de leitura','Há um mapa desenhado à mão, histórias dos primeiros moradores e um caderno para registrar o canto dos pássaros ao amanhecer.');
  info(k,4.85,3.45,'Herbário e aves do vale','Folhas prensadas e desenhos ajudam a reconhecer espécies. O Urutau se confunde com os troncos; o bem-te-vi costuma anunciar a manhã.');
  info(k,-4.5,3.22,'Arquivo de sementes','Pequenos envelopes guardam sementes antigas trocadas entre famílias. Cada gaveta tem uma estação, um nome e uma lembrança.');
@@ -56,10 +56,10 @@ export function buildLibrary(){
 }
 
 export function buildClinic(){
- const k=createInteriorRoom({id:'clinic',label:'Clínica da Clara',w:12,d:10,wall:'#d8ddca',returnTo:'village',returnSpawn:[-10.7,12.5]}),F=k.fixed;
+ const k=createInteriorRoom({id:'clinic',label:'Clínica da Clara',w:12,d:10,wall:'#f1f2eb',wallKind:'plain',returnTo:'village',returnSpawn:[-10.7,12.5]}),F=k.fixed;
  rug(k,1.5,2.10,3.1,2.75,'#a0af9b');
- const bed=group(F,-3.72,0,-.65);for(const sx of[-.90,.90])for(const sz of[-1.36,1.36])k.cyl(bed,'#81948b',sx,.42,sz,.06,.80);k.box(bed,C.iron,0,.68,0,2.05,.12,3.08);k.box(bed,'#e3dfc7',0,.86,0,2.0,.28,3.0,'fabric');k.box(bed,'#b0bfa7',0,1.03,.42,2.04,.095,2.12,'fabric');k.box(bed,'#efe7cf',0,1.075,-1.04,1.61,.19,.65,'fabric');for(const sx of[-.92,.92])k.beam(bed,'#8b9c92',[sx,.65,-1.51],[sx,1.45,-1.51],.045,'plain');k.beam(bed,'#8b9c92',[-.92,1.43,-1.51],[.92,1.43,-1.51],.045,'plain');k.solid(-3.72,-.65,2.15,3.15);
- const screen=group(F,-2.15,0,-3.6);for(let col=0;col<3;col++){const x=-.63+col*.63,section=group(screen,x,0,(col%2)*.12);section.rotation.y=col%2?-.16:.16;for(const s of[-1,1])k.cyl(section,C.oak,s*.31,.90,0,.035,1.75);k.box(section,'#becab2',0,1.05,0,.56,1.18,.04,'fabric');for(const y of[.42,1.68])k.box(section,C.trim,0,y,0,.60,.055,.065,'wood');k.solid(-2.15+x,-3.6+(col%2)*.12,.69,.10,{angle:col%2?-.16:.16,height:1.78})}
+ const bed=group(F,-3.72,0,-.65);for(const sx of[-.90,.90])for(const sz of[-1.36,1.36])k.cyl(bed,'#81948b',sx,.42,sz,.06,.80);k.box(bed,C.iron,0,.68,0,2.05,.12,3.08);k.box(bed,'#e3dfc7',0,.86,0,2.0,.28,3.0,'fabric');k.box(bed,'#7ec2ca',0,1.03,.42,2.04,.095,2.12,'fabric');k.box(bed,'#efe7cf',0,1.075,-1.04,1.61,.19,.65,'fabric');for(const sx of[-.92,.92])k.beam(bed,'#8b9c92',[sx,.65,-1.51],[sx,1.45,-1.51],.045,'plain');k.beam(bed,'#8b9c92',[-.92,1.43,-1.51],[.92,1.43,-1.51],.045,'plain');k.solid(-3.72,-.65,2.15,3.15);
+ const screen=group(F,-2.15,0,-3.6);for(let col=0;col<3;col++){const x=-.63+col*.63,section=group(screen,x,0,(col%2)*.12);section.rotation.y=col%2?-.16:.16;for(const s of[-1,1])k.cyl(section,C.oak,s*.31,.90,0,.035,1.75);k.box(section,'#d9efed',0,1.05,0,.56,1.18,.04,'fabric');for(const y of[.42,1.68])k.box(section,C.trim,0,y,0,.60,.055,.065,'wood');k.solid(-2.15+x,-3.6+(col%2)*.12,.69,.10,{angle:col%2?-.16:.16,height:1.78})}
  const medicines=cupboard(k,3.85,-4.33,2.8);for(let row=0;row<3;row++)for(let col=0;col<6;col++){const x=-1.05+col*.42,y=.24+row*.60; bottle(k,medicines,x,y,.08,['#8fa99a','#c0b082','#a996aa','#9bb0ab'][(row+col)%4],.08+(col%2)*.012)}
  const basin=group(F,-.10,0,-4.25);k.box(basin,'#b2b99e',0,.50,0,1.85,1,.85,'wood');k.box(basin,'#dedbc6',0,1.05,0,1.98,.12,.97,'stone');k.ball(basin,'#dce2d6',-.27,1.13,0,.59,.10,.34);k.ball(basin,'#9fbdb6',-.27,1.16,0,.42,.018,.25);k.beam(basin,'#87968f',[.36,1.14,-.21],[.36,1.48,-.21],.035,'plain');k.beam(basin,'#87968f',[.36,1.48,-.21],[.09,1.48,-.21],.035,'plain');bottle(k,basin,.69,1.14,.13,'#bdc8a7',.075);k.solid(-.10,-4.25,1.98,1.03);
  const desk=table(k,2.68,-1.88,2.36,1.28,.80);chair(k,2.68,-2.96);book(k,desk,-.46,.92,.08,'#a1ab8b',true);k.box(desk,'#ece3cb',.48,.90,.17,.53,.035,.39);k.box(desk,'#9eaa9c',.48,.95,.17,.13,.017,.34);k.box(desk,'#9eaa9c',.48,.95,.17,.34,.017,.13);k.cyl(desk,'#aaa183',.83,.99,-.32,.10,.22);for(let i=0;i<3;i++)k.beam(desk,['#918475','#839a8f','#b2997f'][i],[.77+i*.05,1.05,-.32],[.79+i*.05,1.29,-.32],.012,'plain');
@@ -67,8 +67,8 @@ export function buildClinic(){
  const care=table(k,-3.73,2.18,1.72,.88,.70);for(let j=0;j<3;j++)k.box(care,'#ece2cb',-.45+j*.42,.83,.10,.30,.12,.43,'fabric');k.box(care,'#a0ad9c',.10,.85,-.23,.62,.18,.28);k.box(care,'#dedcc1',.10,.952,-.23,.14,.018,.21);k.box(care,'#dedcc1',.10,.952,-.23,.33,.018,.08);leafPrint(k,-5.85,1.55);lantern(k,-5.85,2.25,-2.3);
  // A tiny kettle breathes above a shelf of mountain herbs; just two cheap meshes move.
  const tea=table(k,-4.48,-4.25,1.72,.82,.74);k.cyl(tea,'#9f967f',0,.93,0,.19,.28);k.cyl(tea,'#b5a78b',0,1.10,0,.20,.06);k.ball(tea,'#8d846d',0,1.15,0,.045,.045,.045);const steam=[];for(let i=0;i<2;i++){const puff=k.ball(k.dynamic,'#dce0d0',-4.48+i*.08,1.32+i*.18,-4.25,.05,.12,.05);puff.castShadow=false;steam.push(puff)}k.animate((dt,time)=>steam.forEach((p,i)=>{p.position.y=1.30+((time*.13+i*.22)%.65);p.position.x=-4.48+Math.sin(time*.8+i)*.055;p.scale.set(.04,.10,.04)}));
- npc(k,{name:'Clara',text:'Aqui até o chá tem gosto de montanha. Cuide do corpo como cuida da terra: água, alimento e descanso fazem parte de uma boa colheita.',x:.86,z:-1.90,shirt:'#d7ddcd',hair:'#8a735b',seed:1});
- info(k,-3.73,3.24,'Cuidados da fazenda','Panos limpos, ataduras e uma caixinha de primeiros socorros ficam prontos para os pequenos arranhões da rotina no campo.');
+ const clara=npc(k,{name:'Clara',text:'Aqui até o chá tem gosto de montanha. Cuide do corpo como cuida da terra: água, alimento e descanso fazem parte de uma boa colheita.',x:.86,z:-1.90,shirt:'#f8f8ef',hair:'#8a735b',seed:1});
+ k.box(clara,'#f6f6ee',0,.60,.13,.45,.59,.15);for(const side of[-1,1]){k.box(clara,'#d6e6df',side*.13,.49,.22,.12,.11,.02);const collar=k.box(clara,'#fffef5',side*.07,.86,.20,.10,.23,.025);collar.rotation.z=side*.35} info(k,-3.73,3.24,'Cuidados da fazenda','Panos limpos, ataduras e uma caixinha de primeiros socorros ficam prontos para os pequenos arranhões da rotina no campo.');
  info(k,3.85,-3.18,'Botica da Clara','Potes de camomila, erva-cidreira e folhas secas da montanha. Cada etiqueta traz a data da coleta e o nome de quem trouxe as ervas.');
  info(k,-.10,-3.08,'Lavar as mãos','A bacia de cerâmica recebe água fresca do poço. Um sabonete de lavanda perfuma a sala de atendimento.');
  info(k,3.70,3.05,'Sala de espera','Um banco de madeira, uma manta e histórias da vila tornam a espera mais acolhedora. Pela janela entram os sons da praça.');

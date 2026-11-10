@@ -1,5 +1,5 @@
-import {farmFootprints,farmPaths} from './farm-customization.js?v=0.46';
-import {colliderContains} from './scene-collisions.js?v=0.46';
+import {farmFootprints,farmPaths} from './farm-customization.js?v=0.47';
+import {colliderContains} from './scene-collisions.js?v=0.47';
 export const TILE=1.25;
 export const LEGACY_FIELD=Object.freeze({x:-6,z:-3,cols:12,rows:12});
 export const MAIN_FIELD=Object.freeze({x:-19.75,z:-23,cols:36,rows:38});
@@ -34,7 +34,7 @@ export function isPlantablePlot(plot,field=MAIN_FIELD,state=defaultFarm){
 export function canCultivate(state,plot){
  const life=state.gathered?.['valley-life'];if(life?.snowballs?.some(b=>b.area===(state.region==='homestead'?'homestead:'+state.homesteads?.selected:'farm')&&Math.hypot(b.x-(fieldForState(state).x+plot.x*TILE),b.z-(fieldForState(state).z+plot.z*TILE))<b.radius+.25))return false;if(state.region!=='homestead'&&life){const x=MAIN_FIELD.x+plot.x*TILE,z=MAIN_FIELD.z+plot.z*TILE;if(life.treePlaced&&life.treePosition&&Math.hypot(life.treePosition.x-x,life.treePosition.z-z)<1.5)return false;if(state.season===3&&life.snowman&&life.snowPosition&&Math.hypot(life.snowPosition.x-x,life.snowPosition.z-z)<.85)return false}
 
- const field=fieldForState(state);if(!isPlantablePlot(plot,field,state))return false;
+ if(state.region!=='homestead'&&state.gathered?.['rural-economy']?.stable){const x=MAIN_FIELD.x+plot.x*TILE,z=MAIN_FIELD.z+plot.z*TILE;if(Math.abs(x-23.5)<2.05&&Math.abs(z-22.5)<2.05)return false}const field=fieldForState(state);if(!isPlantablePlot(plot,field,state))return false;
  if(field===MAIN_FIELD){const x=field.x+plot.x*TILE,z=field.z+plot.z*TILE;for(const p of Object.values(state.farmStumps||{}))if(Number.isFinite(p?.x)&&Number.isFinite(p?.z)&&Math.hypot(p.x-x,p.z-z)<.65)return false}
  return true;
 }

@@ -1,9 +1,9 @@
-import {villageGroundHeight,villageWalkHeight} from './village-layout.js?v=0.46';
-import {buildLaneHomes,gazeboFloorHeight} from './rural-village.js?v=0.46';
-import {coastalGroundHeight} from './coastal-layout.js?v=0.46';
+import {villageGroundHeight,villageWalkHeight} from './village-layout.js?v=0.47';
+import {buildLaneHomes,gazeboFloorHeight} from './rural-village.js?v=0.47';
+import {coastalGroundHeight} from './coastal-layout.js?v=0.47';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.46';
-import {artisanMaterial} from './art-direction.js?v=0.46';
+import {createKit} from './region-kit.js?v=0.47';
+import {artisanMaterial} from './art-direction.js?v=0.47';
 const smooth=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t)};
 // All walkers and ground vertices sample this same continuous surface.
 function landHeight(area,x,z){if(area==='beach')return coastalGroundHeight(x,z);if(area==='mountain')return 3.5*smooth(-1,13,-z);if(area==='village')return villageGroundHeight(x,z);if(area==='valleyTrail')return 1.15*Math.sin(Math.PI*Math.max(0,Math.min(1,(z+30)/60)))**2;return 0}
@@ -41,7 +41,7 @@ export function buildValleyTrail(state){
  k.portal({x:0,z:reverse?-30.5:30.5,to:route.from,spawn:route.returnSpawn,label:'Voltar pela trilha',radius:2.6,autoRadius:2.5});
  k.portal({x:0,z:reverse?30.5:-30.5,to:route.to,spawn:route.spawn,label:route.label||'Continuar pelo vale',radius:2.6,autoRadius:2.5});
  if([route.from,route.to].includes('mountain'))for(let i=0;i<9;i++)k.rock(-10,-24+i*6,1.4+(i%3)*.25);
- buildLaneHomes(k,state,route);
+ buildLaneHomes(k,state,route);k.path(7.5,18,10,2);k.sign(9.8,16.5,'Haras Boa Esperança');k.portal({x:10.7,z:18,to:'haras',spawn:[0,19],label:'Haras Boa Esperança',autoRadius:1.1});
  const r=k.finish({id:'valleyTrail',label:'Caminhos do vale',bounds:[-12,12,-32,32],spawn:[0,reverse?-24.5:24.5],viewHeight:15,indoors:false});
  // Meadow exclusion follows the curved strip, instead of rectangular paving tiles.
  r.dynamic.traverse(o=>{if(!o.isInstancedMesh)return;const m=new T.Matrix4(),v=new T.Vector3();for(let i=0;i<o.count;i++){o.getMatrixAt(i,m);v.setFromMatrixPosition(m);if(Math.abs(v.x-center(v.z))<2.3){m.scale(new T.Vector3(0,0,0));o.setMatrixAt(i,m)}}o.instanceMatrix.needsUpdate=true});return r;

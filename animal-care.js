@@ -16,7 +16,7 @@ const validDay=x=>typeof x==='string'&&/^\d+-[0-3]-\d{1,2}$/.test(x)?x:null;
 const clamp=x=>Math.max(0,Math.min(100,Math.round(x)));
 export function migrateAnimalCare(s){
  const old=record(s.animalCare)?s.animalCare:{},prior=record(old.animals)?old.animals:{},animals={};
- for(const a of ANIMALS){const p=record(prior[a.id])?prior[a.id]:{};animals[a.id]={happiness:Number.isFinite(p.happiness)?clamp(p.happiness):50,fedDay:validDay(p.fedDay)||validDay(old.feedDay),petDay:validDay(p.petDay)}}
+ for(const a of ANIMALS){const p=record(prior[a.id])?prior[a.id]:{};animals[a.id]={happiness:Number.isFinite(p.happiness)?clamp(p.happiness):50,fedDay:validDay(p.fedDay)||validDay(old.feedDay),petDay:validDay(p.petDay),unfedDays:Math.max(0,Math.min(100,Number(p.unfedDays)||0)),sickDays:Math.max(0,Math.min(6,Number(p.sickDays)||0)),sick:p.sick===true,alive:p.alive!==false,productDay:validDay(p.productDay),shearedAt:Number.isFinite(p.shearedAt)?p.shearedAt:-100}} 
  s.animalCare={schema:1,animals,settledDay:validDay(old.settledDay)};
  // A harvest and a hay portion cannot occupy the same hands in an imported save.
  s.carryingHay=s.carryingHay===true&&!s.held;
@@ -25,7 +25,7 @@ export function migrateAnimalCare(s){
 function care(s){return s.animalCare?.schema===1&&record(s.animalCare.animals)?s.animalCare:migrateAnimalCare(s)}
 export function animalStatus(s,id){
  const a=byId.get(id);if(!a)return null;const p=care(s).animals[id],fed=p.fedDay===dayKey(s);
- return {...a,hungry:!fed,fed,happiness:p.happiness,hearts:Math.round(p.happiness/20),petted:p.petDay===dayKey(s),fedDay:p.fedDay,petDay:p.petDay};
+ return {...a,alive:p.alive!==false,sick:p.sick===true,sickDays:p.sickDays||0,unfedDays:p.unfedDays||0,productDay:p.productDay,shearedAt:p.shearedAt,hungry:!fed,fed,happiness:p.happiness,hearts:Math.round(p.happiness/20),petted:p.petDay===dayKey(s),fedDay:p.fedDay,petDay:p.petDay};
 }
 export function pickHay(s){
  care(s);if(s.held)return {changed:false,message:'Guarde a colheita na mochila para pegar o feno.'};
@@ -38,14 +38,14 @@ export function returnHay(s){
 }
 export function feedAnimal(s,id){
  const a=byId.get(id);if(!a)return {changed:false,message:'Este cocho não pertence a um animal.'};
- const p=care(s).animals[id];if(p.fedDay===dayKey(s))return {changed:false,message:`${a.name} já comeu hoje. Guarde esta porção para outro animal.`};
+ const p=care(s).animals[id];if(!p.alive)return {changed:false,message:a.name+' não está mais no rebanho.'};if(p.fedDay===dayKey(s))return {changed:false,message:`${a.name} já comeu hoje. Guarde esta porção para outro animal.`};
  if(!s.carryingHay)return {changed:false,message:'Pegue uma porção de feno no depósito antes de encher este cocho.'};
  s.carryingHay=false;p.fedDay=dayKey(s);p.happiness=clamp(p.happiness+8);
  return {changed:true,message:`Você encheu o cocho de ${a.name}. Bem alimentado por hoje! ♥`};
 }
 export function petAnimal(s,id){
  const a=byId.get(id);if(!a)return {changed:false,message:'Este animal não está por perto.'};
- const p=care(s).animals[id];if(s.carryingHay)return {changed:false,message:'Coloque primeiro o feno em um cocho para fazer carinho.'};
+ const p=care(s).animals[id];if(!p.alive)return {changed:false,message:a.name+' não está mais no rebanho.'};if(s.carryingHay)return {changed:false,message:'Coloque primeiro o feno em um cocho para fazer carinho.'};
  if(s.held)return {changed:false,message:'Guarde a colheita para fazer carinho com as mãos livres.'};
  if(p.petDay===dayKey(s))return {changed:false,message:`${a.name} já recebeu seu carinho hoje. ♥`};
  p.petDay=dayKey(s);p.happiness=clamp(p.happiness+3);return {changed:true,message:`${a.name} gostou do seu carinho! ♥`};
@@ -53,7 +53,10 @@ export function petAnimal(s,id){
 // Call once BEFORE simulation.sleep changes the calendar. Repeated calls are safe.
 export function advanceAnimalDay(s){
  const c=care(s),day=dayKey(s);if(c.settledDay===day)return {changed:false,message:''};
- let hungry=0;for(const a of ANIMALS){const p=c.animals[a.id];if(p.fedDay!==day){p.happiness=clamp(p.happiness-10);hungry++}}
+ let hungry=0;const notices=[];for(const a of ANIMALS){const p=c.animals[a.id];if(!p.alive)continue;if(p.fedDay!==day){p.happiness=clamp(p.happiness-10);p.unfedDays=(p.unfedDays||0)+1;hungry++}else p.unfedDays=0;if(p.sick){p.sickDays=(p.sickDays||0)+1}else if(p.unfedDays>=2){p.sick=true;p.sickDays=0;notices.push(a.name+' adoeceu. Procure a veterinária.')}if(p.sick&&p.sickDays>=6){p.alive=false;notices.push(a.name+' morreu após seis dias sem tratar a doença.');delete s.herdRoutes?.[a.id];delete s.animalWander?.[a.id];if(s.tractor?.cargo===a.id)s.tractor.cargo=null;if(s.animalLocations)s.animalLocations[a.id]='barn'}else if(p.sick)notices.push(a.name+': doente, '+(6-p.sickDays)+' dias para tratar.')}s.gathered??={};s.gathered['animal-health-notice']=notices.join(' ');
  c.settledDay=day;s.carryingHay=false;
  return {changed:true,message:hungry?`${hungry} ${hungry===1?'animal ficou':'animais ficaram'} sem comida e ${hungry===1?'perdeu':'perderam'} felicidade.`:'Todos os animais passaram o dia bem alimentados.'};
 }
+
+export function treatAnimal(s,id){const a=byId.get(id),p=care(s).animals[id];if(!a||!p?.alive||!p.sick)return {changed:false,message:'Escolha um animal vivo e doente.'};p.sick=false;p.sickDays=0;return {changed:true,message:a.name+' foi tratado. Continue alimentando todos os dias.'}}
+export function animalAlive(s,id){return care(s).animals[id]?.alive!==false}

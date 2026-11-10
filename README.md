@@ -1,8 +1,20 @@
 # Harvestão — a vida no campo
 
-Versão 0.46.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.47.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
 [Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/)
+
+## Serviços, cavalos e produção — 0.47
+
+- Bairro de serviços ao sul da vila: Agro Santa Cruz, Veterinária do Vale, Ateliê da Rosa, Escola de Artes, Clube de Observadores de Aves e Oficina Mecânica, todos com interiores e interações. Equipamentos de ordenha/tosquia, remédios, queijeira e máquina de maionese têm compras e uso reais. Roupas do ateliê são combinações dos modelos e cores existentes.
+- Haras Boa Esperança acessível pelo caminho do vale ou mapa, com pista, cavalos em treino, sede, compra/venda e acessórios. Cavalo com carroça fornecido à fazenda nesta entrega; direcional conduz, Y desmonta. Não entra montado nos interiores. Tomé oferece abrigo e carroça; abrigo exige limpar o canto sudeste. Nesta versão, o dono da sala conduz o cavalo compartilhado.
+- Cada galinha saudável presente no celeiro disponibiliza um ovo por manhã. Vacas alimentadas e saudáveis dão leite uma vez por dia; ovelhas podem ser tosquiadas a cada sete dias, mediante compra das ferramentas. O produto vai às mãos/mochila e pode ser vendido ou processado no quarto de ferramentas.
+- Sementes são pacotes individuais na mochila. Mercado entrega à mochila; baús permitem retirar vários sacos/espécies sem devolver os anteriores. Selecione o pacote na mochila para plantar. Estoques antigos são preservados; excesso que não cabe fica no baú.
+- Saúde: dois dias consecutivos sem alimentar causam doença; seis dias seguintes sem tratamento levam à morte. Remédio ou consulta veterinária cura a doença. Caderno, marcadores e aviso ao despertar mostram a situação. A regra é uma adaptação com prazo explícito, inspirada no ciclo fome/doença/remédio do Harvest Moon clássico; não se apresenta como prazo universal de todas as versões. Fonte de referência: https://harvestmoon.fandom.com/wiki/Cows_(HM).
+- Biblioteca oferece seis manuais de jogo nos livros. Clínica da Clara com paredes claras, cama azul piscina e jaleco. Descanso com pose de sentar/deitar, cobertor por cima e cachorro melhor acomodado na poltrona.
+- Corrige a face invertida do piso da ponte e aumenta a presença das flores dos jardins. Sem novos downloads de imagens ou áudio e sem pós-processamento adicional.
+
+Validação curta de inventário, ovos, produção, remédio, morte após doença, seis portas/serviços, acesso da rua e construção dos cenários passou. Sintaxe e importações conferidas; sem bateria ampla, teste multiplayer entre dois aparelhos ou aferição de FPS nesta rodada.
 
 ## Vila ampliada e cultivo visível — 0.46
 

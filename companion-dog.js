@@ -1,7 +1,7 @@
 import * as T from './three.module.js';
-import {part,mergeParts} from './wildlife-art.js?v=0.46';
-import {migrateCompanion} from './profile-rules.js?v=0.46';
-const DOG_OUTDOORS=new Set(['farm','village','mountain','beach','lake','homestead','valleyTrail']);
+import {part,mergeParts} from './wildlife-art.js?v=0.47';
+import {migrateCompanion} from './profile-rules.js?v=0.47';
+const DOG_OUTDOORS=new Set(['haras','farm','village','mountain','beach','lake','homestead','valleyTrail']);
 const dogAllowed=area=>area==='house'||DOG_OUTDOORS.has(area);
 const TAU=Math.PI*2,wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 const finitePoint=p=>Number.isFinite(p?.x)&&Number.isFinite(p?.z);
@@ -75,9 +75,9 @@ export function createCompanionDog(scene,state={}){
  function sleepPose(dt,stage){root.visible=true;heart.visible=false;mode='sleeping';if(sleepStage!==stage){sleepStage=stage;if(stage==='settle'){chairTime=0;sleepPath=findDogPath(root.position,{x:-3.8,z:2.05},lastBlocked)}if(stage==='wake')chairTime=0}
  if(stage==='settle'&&sleepPath?.length){const p=sleepPath[0],dx=p.x-root.position.x,dz=p.z-root.position.z,d=Math.hypot(dx,dz),step=Math.min(d,dt*3.4);if(d>.01){root.position.x+=dx/d*step;root.position.z+=dz/d*step;root.rotation.y=Math.atan2(dx,dz)}phase+=step*11;legs.forEach((leg,i)=>leg.rotation.x=Math.sin(phase+i*Math.PI)*.4);if(d<.12)sleepPath.shift();return}
  chairTime=Math.min(1,chairTime+dt*2);if(stage==='wake'){root.position.set(-3.8,.65*(1-chairTime),1.1+chairTime*1.1);avatar.rotation.z=(1-chairTime)*Math.PI/2;legs.forEach(l=>l.rotation.x=0);body.position.y=0;head.rotation.x=0;return}
- root.position.lerp(new T.Vector3(-3.8,.69,1.1),1-Math.exp(-dt*5));root.rotation.y=Math.PI/2;avatar.rotation.z=Math.PI/2;body.position.y=-.05+Math.sin(performance.now()*.002)*.008;head.rotation.x=-.2;legs.forEach(l=>l.rotation.x=-.6);eyes.scale.y=.06;
+ root.position.lerp(new T.Vector3(-3.77,.83,1.20),1-Math.exp(-dt*5));root.rotation.y=.10;avatar.rotation.z=Math.PI/2;avatar.scale.setScalar(.78);body.position.y=-.05+Math.sin(performance.now()*.002)*.008;head.rotation.x=-.2;legs.forEach(l=>l.rotation.x=-.6);eyes.scale.y=.06;
  }
- function endSleep(){sleepPath=null;sleepStage='';avatar.rotation.z=0;body.position.y=0;head.rotation.x=0;eyes.scale.y=1;root.position.y=0;followUntil=time+7;mode='following'}
+ function endSleep(){avatar.scale.setScalar(1);sleepPath=null;sleepStage='';avatar.rotation.z=0;body.position.y=0;head.rotation.x=0;eyes.scale.y=1;root.position.y=0;followUntil=time+7;mode='following'}
  function dispose(){scene.remove(root);root.traverse(o=>{if(o.geometry&&!o.geometry.userData.shared)o.geometry.dispose()});art.shadowMaterial.dispose();heartMat.dispose();root.clear();repelled.clear()}
  return{root,get elevation(){return mode==='riding'?.70*Math.sin(jump*Math.PI/2):0},sleepPose,endSleep,update,travel,defend,watchVisitor,repels,whistle,pet,get status(){return{present:root.visible,area,x:root.position.x,z:root.position.z,angle,moving,guarding:!!guard,protectedId:guard?.id||null,barkSerial,name:state.companion.name,coat:state.companion.coat,mode}},dispose};
 }
