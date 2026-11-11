@@ -1,8 +1,14 @@
 # Harvestão — a vida no campo
 
-Versão 0.48.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.49.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
 [Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/)
+
+## Cerca de tocos alinhada — 0.49
+
+Na primeira abertura desta versão, os 41 tocos da cerca voltam às posições originais. O reset usa uma marca persistente e não se repete ao dormir, viajar ou recarregar; as novas mudanças continuam salvas. Plantações, construções e demais itens são preservados.
+
+A recolocação encaixa nas fileiras próximas, mantendo a mesma linha horizontal/vertical e os passos originais (1 m na vertical, 1,1 m na horizontal). Em lugar isolado, usa a grade retangular original. Não permite colocar outro toco a menos de 1 m. Um círculo verde/vermelho no chão mostra a posição exata e se ela está livre antes de confirmar com X. Y devolve ao ponto anterior. A direção de soltura segue os quatro eixos, evitando deslocamentos diagonais irregulares. O multiplayer mantém a verificação de alteração concorrente e usa protocolo atualizado para a migração da cerca.
 
 ## Carroça e bairro de serviços — 0.48
 

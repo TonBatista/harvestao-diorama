@@ -1,7 +1,7 @@
 import {fieldForProperty} from './cultivation-layout.js?v=0.47';
-import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.47';
+import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.49';
 import {mountMultiplayerMenu} from './multiplayer-menu.js?v=0.47';
-import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.47';
+import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.49';
 import {FIELD,TILE} from './simulation.js?v=0.47';
 import {validRemotePose} from './remote-farmer.js?v=0.47';
 const copy=value=>JSON.parse(JSON.stringify(value)),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);

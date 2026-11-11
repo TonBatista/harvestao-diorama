@@ -10,7 +10,7 @@ import {migrateFarmLayout} from './farm-customization.js?v=0.47';
 import {createPortalTrigger} from './portal-trigger.js?v=0.47';
 import {migrateCultivation} from './cultivation-layout.js?v=0.47';
 import {mountTitleScreen} from './title-screen.js?v=0.47';
-import {mountCooperative} from './multiplayer.js?v=0.47';
+import {mountCooperative} from './multiplayer.js?v=0.49';
 import {mountTelescopeView} from './telescope-view.js?v=0.47';
 import {mountFieldInventory} from './field-inventory-ui.js?v=0.47';
 import {migrateProfile} from './profile-rules.js?v=0.47';
@@ -27,7 +27,7 @@ import {mountPhotographyUI} from './photo-ui.js?v=0.47';
 import {migrateBirding} from './birding.js?v=0.47';
 import {mountJoystick} from './controls.js?v=0.47';
 import {mountZoomControls} from './camera-controls.js?v=0.47';
-import {createWorld} from './world.js?v=0.48';
+import {createWorld} from './world.js?v=0.49';
 const $=id=>document.getElementById(id),KEY='harvestao-v2';let state=freshState(),storageOK=true,hasProgress=false;
 try{const data=JSON.parse(localStorage.getItem(KEY));if(validSave(data)){state=data;hasProgress=true}}catch{}
 state.inventory??=[];migrateAnimalCare(state);migrateBirding(state);migrateHomesteads(state);migrateTransport(state);migrateProfile(state);migrateSeedStorage(state);migrateCultivation(state);migrateFarmLayout(state);
@@ -132,7 +132,7 @@ function refreshCooperative({restore=false,full=false,rebuildArea=false}={}){
 cooperative=mountCooperative({state,world,notify,writeLocal,refresh:refreshCooperative,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop()},onProfile(){profileReturn='room';profileMenu.open(false)}});
 document.getElementById('profileMenu').addEventListener('close',()=>{const destination=profileReturn;profileReturn='';if(destination==='room')cooperative.open();else if(destination==='title')titleScreen.open()});
 cooperative.menu.element.addEventListener('close',()=>{const reason=cooperative.menu.element.dataset.closeReason;if(roomsFromTitle&&reason==='back'){roomsFromTitle=false;titleScreen.open()}else if(reason==='play')roomsFromTitle=false});
-titleScreen=mountTitleScreen({build:'0.48.0',hasProgress,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop()},onPlay(){if(cooperative.blocked){roomsFromTitle=true;titleScreen.close();cooperative.open();return}titleScreen.close()},onNew(){if(cooperative.role!=='solo'){notify('Encerre a sala antes de iniciar outra fazenda.');return}newFromTitle=true;titleScreen.close();open('newDialog')},onProfile(){profileReturn='title';titleScreen.close();profileMenu.open(false)},onMultiplayer(){roomsFromTitle=true;titleScreen.close();cooperative.open()},onHelp(){helpFromTitle=true;titleScreen.close();open('welcome')}});
+titleScreen=mountTitleScreen({build:'0.49.0',hasProgress,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop()},onPlay(){if(cooperative.blocked){roomsFromTitle=true;titleScreen.close();cooperative.open();return}titleScreen.close()},onNew(){if(cooperative.role!=='solo'){notify('Encerre a sala antes de iniciar outra fazenda.');return}newFromTitle=true;titleScreen.close();open('newDialog')},onProfile(){profileReturn='title';titleScreen.close();profileMenu.open(false)},onMultiplayer(){roomsFromTitle=true;titleScreen.close();cooperative.open()},onHelp(){helpFromTitle=true;titleScreen.close();open('welcome')}});
 $('newDialog').addEventListener('close',()=>{if(newFromTitle){newFromTitle=false;titleScreen.open()}});
 $('welcome').addEventListener('close',()=>{if(helpFromTitle){helpFromTitle=false;titleScreen.open()}});
 const sleepTransition=mountSleepTransition({world,state,advance(){rest();clock=0},save,hud,audio:soundscape,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop();sleeping=true}});

@@ -9,8 +9,8 @@ import {createFarmStructures} from './farm-structures.js?v=0.47';
 import {migrateFarmLayout,farmObject,farmPoint,farmPaths} from './farm-customization.js?v=0.47';
 import {MAIN_FIELD,LEGACY_FIELD,fieldForState,fieldForProperty,migrateCultivation,isPlantablePlot} from './cultivation-layout.js?v=0.47';
 import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.47';
-import {migrateFarmStumps,findFarmStump,moveFarmStump} from './farm-stumps.js?v=0.47';
-import {createFarmStumpArt} from './farm-stumps-art.js?v=0.47';
+import {migrateFarmStumps,findFarmStump,moveFarmStump,snapFarmStump} from './farm-stumps.js?v=0.49';
+import {createFarmStumpArt} from './farm-stumps-art.js?v=0.49';
 import {createRemoteFarmer,validRemotePose} from './remote-farmer.js?v=0.47';
 import {vehicleAccess} from './vehicle-access.js?v=0.47';
 import {buildHomestead} from './region-homesteads.js?v=0.47';
@@ -96,7 +96,7 @@ for(let r=9;r<155;r+=6+rand(r)*4){cq.strokeStyle=r%2?'#82603d88':'#9b764b99';cq.
 for(let i=0;i<5;i++){const a=rand(i+882)*6.28;cq.strokeStyle='#65482b99';cq.lineWidth=.75;cq.beginPath();cq.moveTo(119+Math.cos(a)*(57+rand(i)*35),132+Math.sin(a)*(57+rand(i)*35));cq.lineTo(119+Math.cos(a)*155,132+Math.sin(a)*155);cq.stroke()}
 const cutTexture=new T.CanvasTexture(cutMap);cutTexture.colorSpace=T.SRGBColorSpace;
 const cutMaterial=new T.MeshStandardMaterial({map:cutTexture,bumpMap:cutTexture,bumpScale:.008,roughness:1});
-const stumpArt=createFarmStumpArt(state,{barkMaterial:artisanMaterial('#c7b89a','bark'),cutMaterial,rootMaterial:artisanMaterial('#bcaa8c','bark')});scene.add(stumpArt.root);colliders.push(...stumpArt.colliders);let stumpSelection=null,stumpGhost=null,expectedStumpPosition=null;
+const stumpArt=createFarmStumpArt(state,{barkMaterial:artisanMaterial('#c7b89a','bark'),cutMaterial,rootMaterial:artisanMaterial('#bcaa8c','bark')});scene.add(stumpArt.root);colliders.push(...stumpArt.colliders);let stumpSelection=null,stumpGhost=null,expectedStumpPosition=null;const stumpPreview=new T.Mesh(new T.RingGeometry(.30,.39,28),new T.MeshBasicMaterial({color:'#91b583',transparent:true,opacity:.85,side:T.DoubleSide,depthWrite:false}));stumpPreview.rotation.x=-Math.PI/2;stumpPreview.visible=false;scene.add(stumpPreview);
 function fence(x,z,rot=0){let g=new T.Group();g.position.set(x,0,z);g.rotation.y=rot;for(const dx of [-1,1]){box(g,'#a48048',dx,.48,0,.16,.96,.17);mesh(g,geo.cone,'#c3a16b',dx,1.01,0,.12,.16,.12)}for(const y of [.38,.76])box(g,'#bd9c63',0,y,0,2.1,.13,.11);fixed.add(g);colliders.push({x,z,w:2.1,d:.20,angle:rot,kind:'fence'})}
 for(let i=0;i<24;i++)fence(-21+i*2,26.2);for(let i=0;i<26;i++)fence(-22.2,-25+i*2,Math.PI/2);
 const farmStructures=createFarmStructures(state,bake);scene.add(farmStructures.root);colliders.push(...farmStructures.refresh());
@@ -293,17 +293,20 @@ function restInHammock(duration=6){if(!regions?.isFarm||driving||state.held||sta
 function rememberHerdGround(region){if(!['farm','homestead'].includes(region.id))return;const key=region.id==='farm'?'farm':'homestead:'+region.lotId;herdGrounds.set(key,{bounds:[...region.bounds],colliders:region.id==='farm'?region.colliders:region.colliders.map(c=>({...c,passages:c.passages?.map(p=>({...p}))}))})}
 function herdGround(property){if(herdGrounds.has(property))return herdGrounds.get(property);const id=property?.split(':')[1],h=state.homesteads;if(!id||!h?.owned?.includes(id)||!h.lots?.[id]?.barn)return null;const copy={...state,homesteads:{...h,selected:id,owned:[...h.owned],lots:Object.fromEntries(Object.entries(h.lots).map(([key,value])=>[key,{...value}]))}};const region=buildHomestead(copy);rememberHerdGround(region);region.dispose();return herdGrounds.get(property)}
 
+function stumpTarget(){const angle=Math.round(state.player.angle/(Math.PI/2))*Math.PI/2;return snapFarmStump(state,stumpSelection,state.player.x+Math.sin(angle)*1.35,state.player.z+Math.cos(angle)*1.35)}
 function syncStumps(){
  if(stumpSelection){const p=state.farmStumps?.[stumpSelection];if(regions?.active.id!=='farm'||state.tool!=='hand'||state.held||state.carryingHay||!p||p.x!==expectedStumpPosition?.x||p.z!==expectedStumpPosition?.z)cancelStumpMove();}
+ if(stumpSelection){const p=stumpTarget(),others=Object.entries(state.farmStumps).filter(([id])=>id!==stumpSelection),free=others.every(([,q])=>Math.hypot(p.x-q.x,p.z-q.z)>=1-1e-8)&&canPlaceStump(p.x,p.z,stumpSelection);stumpPreview.visible=true;stumpPreview.position.set(p.x,.22,p.z);stumpPreview.material.color.set(free?'#8fba78':'#c58979');renderDirty=true}else stumpPreview.visible=false;
  if(stumpArt.sync(stumpSelection)){renderDirty=true;renderer.shadowMap.needsUpdate=true;}
 }
 function beginStumpMove(id){
  if(regions?.active.id!=='farm'||driving||hop||state.tool!=='hand'||state.held||state.carryingHay)return {changed:false,message:'Deixe as mãos livres e aproxime-se de um toco da fazenda.'};
  const p=migrateFarmStumps(state)[id];if(!p||Math.hypot(p.x-state.player.x,p.z-state.player.z)>1.5)return {changed:false,message:'Aproxime-se do toco que quer mudar.'};
- cancelStumpMove();stumpSelection=id;expectedStumpPosition={...p};stumpGhost=stumpArt.carry(id);if(stumpGhost){stumpGhost.position.set(0,.59,.40);body.add(stumpGhost)}stop();syncStumps();return {changed:false,message:'Toco nas mãos. X coloca à sua frente; Y devolve ao local original.'};
+ cancelStumpMove();stumpSelection=id;expectedStumpPosition={...p};stumpGhost=stumpArt.carry(id);if(stumpGhost){stumpGhost.position.set(0,.59,.40);body.add(stumpGhost)}stop();syncStumps();return {changed:false,message:'Toco nas mãos. A prévia mostra o encaixe alinhado. X coloca; Y devolve.'};
 }
-function cancelStumpMove(){if(stumpGhost){body.remove(stumpGhost);stumpGhost=null}const had=!!stumpSelection;stumpSelection=null;expectedStumpPosition=null;if(had){stumpArt.sync();renderDirty=true;renderer.shadowMap.needsUpdate=true}return {changed:false,message:had?'Toco devolvido ao local original.':'Você está com as mãos livres.'}}
+function cancelStumpMove(){stumpPreview.visible=false;if(stumpGhost){body.remove(stumpGhost);stumpGhost=null}const had=!!stumpSelection;stumpSelection=null;expectedStumpPosition=null;if(had){stumpArt.sync();renderDirty=true;renderer.shadowMap.needsUpdate=true}return {changed:false,message:had?'Toco devolvido ao local original.':'Você está com as mãos livres.'}}
 function canPlaceStump(x,z,id){
+ if(economyState(state).horse.area==='farm'&&horseCart.colliders.some(c=>colliderContains(c,x,z,.27)))return false;
  const radius=.27,b=MAIN_FARM_BOUNDS;if(x<b[0]+.5||x>b[1]-.5||z<b[2]+.5||z>b[3]-.5)return false;
  for(const c of colliders)if(c.stumpId!==id&&colliderContains(c,x,z,radius))return false;
  for(const c of transportedHerd.colliders||[])if(colliderContains(c,x,z,radius))return false;
@@ -312,7 +315,7 @@ function canPlaceStump(x,z,id){
  const cartArea=d.trailer?d.area:d.trailerArea||'farm';if(cartArea==='farm'&&Number.isFinite(d.trailerX)&&Number.isFinite(d.trailerZ)&&colliderContains({x:d.trailerX,z:d.trailerZ,w:1.60,d:1.92,angle:d.trailerAngle},x,z,radius))return false;
  return Math.hypot(x-state.player.x,z-state.player.z)>.55;
 }
-function placeStump(){if(!stumpSelection)return {changed:false,message:'Pegue primeiro um toco com as mãos livres.'};if(regions?.active.id!=='farm'){cancelStumpMove();return {changed:false,message:'Coloque os tocos dentro da sua fazenda.'}}const x=Math.round((state.player.x+Math.sin(state.player.angle)*1.15)*4)/4,z=Math.round((state.player.z+Math.cos(state.player.angle)*1.15)*4)/4,r=moveFarmStump(state,stumpSelection,x,z,{expected:expectedStumpPosition,canPlace:canPlaceStump});if(r.changed){cancelStumpMove();syncStumps()}return r}
+function placeStump(){if(!stumpSelection)return {changed:false,message:'Pegue primeiro um toco com as mãos livres.'};if(regions?.active.id!=='farm'){cancelStumpMove();return {changed:false,message:'Coloque os tocos dentro da sua fazenda.'}}const p=stumpTarget(),r=moveFarmStump(state,stumpSelection,p.x,p.z,{expected:expectedStumpPosition,canPlace:canPlaceStump});if(r.changed){cancelStumpMove();syncStumps()}return r}
 
 function animalCanWalk(x,z,radius=.43,id,area,property){const key=property||propertyKey(state,area),ground=herdGround(key);if(!ground)return false;const b=ground.bounds;if(x<b[0]+radius||x>b[1]-radius||z<b[2]+radius||z>b[3]-radius)return false;for(const c of ground.colliders){const passableStump=c.jumpable===true&&c.height<=.50&&(c.kind==='low-stump'||['boundary-stump','natural-stump'].includes(c.label));if(!passableStump&&colliderContains(c,x,z,radius))return false;}const plots=key==='farm'?(state.homePlots||state.plots):state.homesteads?.lots?.[key.split(':')[1]]?.plots;if(!Array.isArray(plots))return false;const field=fieldForProperty(key),reach=.48+radius;if(nearPlots(plots,field,x,z,reach,(p,px,pz)=>!!(p.crop||p.obstacle)&&Math.abs(x-px)<reach&&Math.abs(z-pz)<reach))return false;if(!state.herdRoutes?.[id]&&area===regions?.active.id&&key===propertyKey(state,area)&&Math.hypot(x-state.player.x,z-state.player.z)<radius+.30)return false;return true}
 transportedHerd.setWalkability?.(animalCanWalk);
