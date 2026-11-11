@@ -71,7 +71,6 @@ export function serviceSign(k,a){
  k.interactions.push(point);k.signs.push(point);
  return group;
 }
- const map=new T.CanvasTexture(canvas);map.colorSpace=T.SRGBColorSpace;const mat=new T.MeshBasicMaterial({map,side:T.DoubleSide,toneMapped:false});mat.userData.regionOwned=true;mat.userData.seasonSurface='exclude';const g=new T.Group(),x=a.x+(a.x<0?3.55:-3.55),z=a.z+3.45;g.position.set(x,-1.2,z);g.rotation.y=.60;k.fixed.add(g);k.cyl(g,'#927858',0,.65,0,.07,1.3,'wood');k.box(g,'#9e8057',0,1.35,0,1.40,1.40,.14,'wood');const picture=new T.Mesh(new T.PlaneGeometry(1.26,1.26),mat);picture.position.set(0,1.35,.079);g.add(picture);k.roundSolid(x,z,.09);const p={type:'info',x,z,radius:1.5,label:a.name,data:{name:a.name,text:a.detail},sign:{x,y:.15,z,width:1.40,height:1.40,rotation:.60}};k.interactions.push(p);k.signs.push(p);return g;}
 export function serviceFrontage(k,a){const F=k.fixed,out=a.x+(a.x<0?-4.1:4.1),z=a.z,side=a.x<0?-1:1;serviceSign(k,a);
  if(a.id==='agroShop'){for(let i=0;i<3;i++){k.cyl(F,['#b7a472','#c6b88a','#a89a74'][i],out,-.7,z-1+i*.8,.30,.9,'fabric');k.roundSolid(out,z-1+i*.8,.33)}k.box(F,'#a59574',out,-.2,z+1.45,.85,.65,.75,'wood');k.solid(out,z+1.45,.9,.8)}
  if(a.id==='vetClinic'){for(const dx of[-1.6,1.6]){const p=k.plant(a.x+dx,z+2.75,.8,'#aab68b');p.position.y=-1.15}for(let i=0;i<6;i++)k.box(F,i%2?'#deeee5':'#86aca2',a.x-2.8+(i+.5)*.93,1.0,z+2.1,.95,.10,1.15,'fabric');k.box(F,'#99b2a9',out,-.70,z,.9,1,.5,'wood');k.roundSolid(out,z,.55)}

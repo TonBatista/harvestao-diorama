@@ -28,7 +28,7 @@ import * as T from './three.module.js';
 import {createTractor} from './tractor-art.js?v=0.47';
 import {ANIMALS,animalStatus} from './animal-care.js?v=0.47';
 import {createTransportDisplay} from './transport-art.js?v=0.51';
-import {createRegionManager,isIndoorArea} from './region-manager.js?v=0.51';
+import {createRegionManager,isIndoorArea} from './region-manager.js?v=0.51.1';
 import {terrainTexture} from './terrain-materials.js?v=0.47';
 import {loadMiniatureMaterials,miniatureTexture,miniatureLens,contactTexture,soilEdgeTexture} from './miniature-materials.js?v=0.47';
 import {artisanMaterial,cottage,canopyGeometry,meadowGeometry,treeCrown} from './art-direction.js?v=0.47';

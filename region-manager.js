@@ -1,5 +1,5 @@
 import {addVillageStreets} from './village-streets.js?v=0.50';
-import {SERVICES,addVillageServices,addHorseFacilities,buildAgro,buildVet,buildClothes,buildArt,buildBirdClub,buildMechanic,buildHaras,buildHarasOffice} from './village-services.js?v=0.51';
+import {SERVICES,addVillageServices,addHorseFacilities,buildAgro,buildVet,buildClothes,buildArt,buildBirdClub,buildMechanic,buildHaras,buildHarasOffice} from './village-services.js?v=0.51.1';
 import {addVillageExpansion} from './village-expansion.js?v=0.50';
 import {buildResidentHome,addCherryScenery} from './rural-village.js?v=0.50';
 import {buildCapoeiraHall} from './alforria-academy.js?v=0.50';

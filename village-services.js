@@ -1,5 +1,5 @@
 import {SERVICES,SERVICE_BOUNDS} from './service-layout.js?v=0.50';
-import {serviceFrontage} from './service-signs.js?v=0.50';
+import {serviceFrontage} from './service-signs.js?v=0.51.1';
 export {SERVICES} from './service-layout.js?v=0.50';
 import * as T from './three.module.js';
 import {artisanMaterial} from './art-direction.js?v=0.47';
