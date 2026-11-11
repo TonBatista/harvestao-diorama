@@ -1,3 +1,4 @@
+import {mountDeveloperTools} from './developer-tools.js?v=0.48';
 import {economyState,mountRuralEconomy} from './rural-economy.js?v=0.47';
 import {mountToolScroller} from './tool-scroller.js?v=0.47';
 import {mountSleepTransition} from './sleep-transition.js?v=0.47';
@@ -26,7 +27,7 @@ import {mountPhotographyUI} from './photo-ui.js?v=0.47';
 import {migrateBirding} from './birding.js?v=0.47';
 import {mountJoystick} from './controls.js?v=0.47';
 import {mountZoomControls} from './camera-controls.js?v=0.47';
-import {createWorld} from './world.js?v=0.47';
+import {createWorld} from './world.js?v=0.48';
 const $=id=>document.getElementById(id),KEY='harvestao-v2';let state=freshState(),storageOK=true,hasProgress=false;
 try{const data=JSON.parse(localStorage.getItem(KEY));if(validSave(data)){state=data;hasProgress=true}}catch{}
 state.inventory??=[];migrateAnimalCare(state);migrateBirding(state);migrateHomesteads(state);migrateTransport(state);migrateProfile(state);migrateSeedStorage(state);migrateCultivation(state);migrateFarmLayout(state);
@@ -74,6 +75,7 @@ const farmEditor=mountFarmEditor({state,world,beforeOpen(){endX(true);resetJoy()
 const organizeFarmButton=document.createElement('button');organizeFarmButton.type='button';organizeFarmButton.id='organizeFarmButton';organizeFarmButton.className='secondary';organizeFarmButton.textContent='Organizar construções';$('menu').insertBefore(organizeFarmButton,$('helpButton'));organizeFarmButton.onclick=()=>farmEditor.open();
 const ruralUtilityDialog=document.createElement('dialog');ruralUtilityDialog.id='ruralUtilityDialog';ruralUtilityDialog.setAttribute('aria-labelledby','ruralUtilityTitle');document.body.append(ruralUtilityDialog);
 function openRuralUtility(title,text,buttons){endX(true);resetJoy();keys.clear();world.stop();ruralUtilityDialog.replaceChildren();const close=document.createElement('button');close.type='button';close.className='close';close.setAttribute('aria-label','Fechar');close.textContent='×';close.onclick=()=>ruralUtilityDialog.close();const eyebrow=document.createElement('div');eyebrow.className='dialog-eyebrow';eyebrow.textContent='PAUSA NO CAMPO';const heading=document.createElement('h2');heading.id='ruralUtilityTitle';heading.textContent=title;const note=document.createElement('p');note.textContent=text;ruralUtilityDialog.append(close,eyebrow,heading,note);for(const option of buttons){const b=document.createElement('button');b.type='button';b.className=option.primary?'primary':'secondary';b.textContent=option.name;b.disabled=!!option.disabled;b.onclick=option.run;ruralUtilityDialog.append(b)}if(!ruralUtilityDialog.open)ruralUtilityDialog.showModal();ruralUtilityDialog.querySelector('button.primary:not([disabled]),button.secondary:not([disabled])')?.focus()}
+mountDeveloperTools({state,world,open:openRuralUtility,close:()=>ruralUtilityDialog.close(),save,hud,isSolo:()=>cooperative?.role==='solo'});
 const valleyActivities=mountValleyActivities({state,world,open:openRuralUtility,close:()=>ruralUtilityDialog.close(),save,hud,openWardrobe(){profileMenu.open(false)},isGuest:()=>cooperative?.role==='guest'});
 const ruralEconomy=mountRuralEconomy({state,world,open:openRuralUtility,close:()=>ruralUtilityDialog.close(),result,save,hud,profile:()=>profileMenu.open(false),album:()=>photography.openAlbum(),isGuest:()=>cooperative?.role==='guest'});
 function openToolRack(){openRuralUtility('Prateleira de ferramentas','Escolha o que levar ao campo. Ao guardar uma ferramenta, você fica com as mãos livres.',[
@@ -130,7 +132,7 @@ function refreshCooperative({restore=false,full=false,rebuildArea=false}={}){
 cooperative=mountCooperative({state,world,notify,writeLocal,refresh:refreshCooperative,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop()},onProfile(){profileReturn='room';profileMenu.open(false)}});
 document.getElementById('profileMenu').addEventListener('close',()=>{const destination=profileReturn;profileReturn='';if(destination==='room')cooperative.open();else if(destination==='title')titleScreen.open()});
 cooperative.menu.element.addEventListener('close',()=>{const reason=cooperative.menu.element.dataset.closeReason;if(roomsFromTitle&&reason==='back'){roomsFromTitle=false;titleScreen.open()}else if(reason==='play')roomsFromTitle=false});
-titleScreen=mountTitleScreen({build:'0.47.0',hasProgress,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop()},onPlay(){if(cooperative.blocked){roomsFromTitle=true;titleScreen.close();cooperative.open();return}titleScreen.close()},onNew(){if(cooperative.role!=='solo'){notify('Encerre a sala antes de iniciar outra fazenda.');return}newFromTitle=true;titleScreen.close();open('newDialog')},onProfile(){profileReturn='title';titleScreen.close();profileMenu.open(false)},onMultiplayer(){roomsFromTitle=true;titleScreen.close();cooperative.open()},onHelp(){helpFromTitle=true;titleScreen.close();open('welcome')}});
+titleScreen=mountTitleScreen({build:'0.48.0',hasProgress,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop()},onPlay(){if(cooperative.blocked){roomsFromTitle=true;titleScreen.close();cooperative.open();return}titleScreen.close()},onNew(){if(cooperative.role!=='solo'){notify('Encerre a sala antes de iniciar outra fazenda.');return}newFromTitle=true;titleScreen.close();open('newDialog')},onProfile(){profileReturn='title';titleScreen.close();profileMenu.open(false)},onMultiplayer(){roomsFromTitle=true;titleScreen.close();cooperative.open()},onHelp(){helpFromTitle=true;titleScreen.close();open('welcome')}});
 $('newDialog').addEventListener('close',()=>{if(newFromTitle){newFromTitle=false;titleScreen.open()}});
 $('welcome').addEventListener('close',()=>{if(helpFromTitle){helpFromTitle=false;titleScreen.open()}});
 const sleepTransition=mountSleepTransition({world,state,advance(){rest();clock=0},save,hud,audio:soundscape,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop();sleeping=true}});

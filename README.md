@@ -1,8 +1,16 @@
 # Harvestão — a vida no campo
 
-Versão 0.47.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.48.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
 [Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/)
+
+## Carroça e bairro de serviços — 0.48
+
+- O cavalo conduz a direção; o eixo da carroça segue o engate pela mesma restrição de barra usada no trator, com atraso nas curvas, articulação limitada e giro das rodas pelo deslocamento real. O motorista acompanha o banco e a rotação da carroça. A navegação verifica o espaço da carroça nas curvas.
+- Bairro dos seis serviços ampliado de 24 para 52 metros de comprimento. Prédios agora separados por 17 metros, com jardins entre as quadras e detalhes diferentes: sacos de ração, toldo veterinário, varal de roupas, cavalete, comedouro de aves e pneus/ferramentas. Cada entrada tem placa de madeira com ícone ilustrado próprio. Portas, saídas, nomes e pontos de retorno usam as novas coordenadas.
+- Sono com aproximação da cama, sentar, dobrar os joelhos, deitar e cobrir o corpo; despertar faz o movimento inverso.
+- Atalho exclusivo da interface de desenvolvimento: abrir o endereço com ?dev=1, depois Menu → Desenvolvedor · estação ou Alt+Shift+S. Escolha primavera/verão/outono/inverno sem avançar dias. Não aparece no endereço normal e só opera em modo solo. Por ser um jogo estático, o parâmetro habilita a interface local de desenvolvimento; não é autenticação ou privilégio de servidor.
+- No jogo normal, cada estação tem 30 dias. Dormir avança um dia; as setas do calendário somente consultam outras estações.
 
 ## Serviços, cavalos e produção — 0.47
 

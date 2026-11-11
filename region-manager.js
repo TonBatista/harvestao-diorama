@@ -1,4 +1,4 @@
-import {SERVICES,addVillageServices,addHorseFacilities,buildAgro,buildVet,buildClothes,buildArt,buildBirdClub,buildMechanic,buildHaras,buildHarasOffice} from './village-services.js?v=0.47';
+import {SERVICES,addVillageServices,addHorseFacilities,buildAgro,buildVet,buildClothes,buildArt,buildBirdClub,buildMechanic,buildHaras,buildHarasOffice} from './village-services.js?v=0.48';
 import {addVillageExpansion} from './village-expansion.js?v=0.47';
 import {buildResidentHome,addCherryScenery} from './rural-village.js?v=0.47';
 import {buildCapoeiraHall} from './alforria-academy.js?v=0.47';
@@ -18,7 +18,7 @@ import {migrateHomesteads,lotState} from './homestead-rules.js?v=0.47';
 import {addMapFauna} from './fauna-art.js?v=0.47';
 import {createKit} from './region-kit.js?v=0.47';
 import {buildHouse,buildBarn} from './region-interiors.js?v=0.47';
-import {buildVillage} from './region-village.js?v=0.47';
+import {buildVillage} from './region-village.js?v=0.48';
 import {buildMountain,buildBeach} from './region-nature.js?v=0.47';
 import {buildMarket} from './region-market.js?v=0.47';
 export const DESTINATIONS=[{id:'farm',label:'Sua fazenda',description:'Cultivo amplo, construções e caminhos até as bordas',icon:'✿'},{id:'house',label:'Sua casa',description:'Cozinha, lareira, quarto e descanso',icon:'⌂'},{id:'barn',label:'Celeiro',description:'Vacas, ovelhas, galinhas e cuidados',icon:'♧'},{id:'toolroom',label:'Quarto de ferramentas',description:'Prateleiras, sementes e bebidas refrescantes',icon:'⚒'},{id:'village',label:'Vila Santa Cruz',description:'Praça São Benedito, jardins, riacho e bairro do pomar',icon:'♜'},{id:'market',label:'Mercado da Vila',description:'Prateleiras e sementes das quatro estações',icon:'♧'},{id:'mountain',label:'Montanha da Lua',description:'Bosque, riacho, mina e águas termais',icon:'▲'},{id:'beach',label:'Praia das Conchas',description:'Grupo Alforria, mar, píer e praia ampliada',icon:'≈'}];
@@ -41,7 +41,7 @@ export function createRegionManager({scene,state,bake,farmRoot,farmColliders,onC
   sign('house',-3.15,2.5,'Sua casa');sign('barn',3.0,2.4,'Celeiro');sign('toolroom',2.5,2.2,'Quarto de ferramentas');
   entry('house',2.6,'Entrar em casa',[0,3.3]);entry('barn',2.5,'Entrar no celeiro',[0,4.4]);entry('toolroom',2.3,'Entrar no quarto de ferramentas',[0,3.3]);
   k.sign(23,-17,'Vila Santa Cruz →');k.sign(-20.5,5.8,'← Montanha');k.sign(9.6,24.5,'Praia ↓');
-  k.portal({x:24.9,z:-15,to:'village',spawn:[0,64],label:'Caminho da cidade',radius:1.4});
+  k.portal({x:24.9,z:-15,to:'village',spawn:[0,90],label:'Caminho da cidade',radius:1.4});
   k.portal({x:-20.9,z:8,to:'mountain',spawn:[0,13],label:'Trilha da montanha',radius:1.4});
   k.portal({x:12,z:24.8,to:'beach',spawn:[-13.5,9],label:'Trilha da praia',radius:1.4});
   const shipping=farmPoint(state,'shipping',0,1.5),well=farmPoint(state,'well',0,1.5),hammock=farmPoint(state,'hammock',0,1.7);
