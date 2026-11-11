@@ -1,4 +1,4 @@
-import {mountFarmJournal} from './farm-journal.js?v=0.47';
+import {mountFarmJournal} from './farm-journal.js?v=0.51';
 import {SPECIES,migrateBirding,recordSighting,listRecords,getBirdingProgress} from './birding.js?v=0.47';
 
 const cameraIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h4l2-3h6l2 3h4v14H3z"/><circle cx="12" cy="13.5" r="4"/><path d="M17.5 10h1"/></svg>';

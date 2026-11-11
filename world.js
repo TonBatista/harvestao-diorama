@@ -1,6 +1,6 @@
 import {bedPose} from './sleep-pose.js?v=0.48';
-import {economyState} from './rural-economy.js?v=0.50';
-import {createHorseCart} from './horse-cart.js?v=0.50';
+import {economyState} from './rural-economy.js?v=0.51';
+import {createHorseCart} from './horse-cart.js?v=0.51';
 import {clearSnow} from './snow-rules.js?v=0.47';
 import {terrainHeight} from './valley-terrain.js?v=0.50';
 import {createActivityArt} from './valley-life.js?v=0.50';
@@ -13,7 +13,7 @@ import {migrateFarmStumps,findFarmStump,moveFarmStump,snapFarmStump} from './far
 import {createFarmStumpArt} from './farm-stumps-art.js?v=0.49';
 import {createRemoteFarmer,validRemotePose} from './remote-farmer.js?v=0.50';
 import {vehicleAccess} from './vehicle-access.js?v=0.47';
-import {buildHomestead} from './region-homesteads.js?v=0.50';
+import {buildHomestead} from './region-homesteads.js?v=0.51';
 import {colliderContains,planAutoHop,hopPosition} from './collision-rules.js?v=0.47';
 import {createFarmPets} from './farm-pets.js?v=0.47';
 import {createNightVisitors} from './night-visitors.js?v=0.47';
@@ -27,13 +27,13 @@ import {solveTrailer} from './trailer-physics.js?v=0.47';
 import * as T from './three.module.js';
 import {createTractor} from './tractor-art.js?v=0.47';
 import {ANIMALS,animalStatus} from './animal-care.js?v=0.47';
-import {createTransportDisplay} from './transport-art.js?v=0.47';
-import {createRegionManager,isIndoorArea} from './region-manager.js?v=0.50';
+import {createTransportDisplay} from './transport-art.js?v=0.51';
+import {createRegionManager,isIndoorArea} from './region-manager.js?v=0.51';
 import {terrainTexture} from './terrain-materials.js?v=0.47';
 import {loadMiniatureMaterials,miniatureTexture,miniatureLens,contactTexture,soilEdgeTexture} from './miniature-materials.js?v=0.47';
 import {artisanMaterial,cottage,canopyGeometry,meadowGeometry,treeCrown} from './art-direction.js?v=0.47';
-import {TILE,CROPS,frontTile} from './simulation.js?v=0.47';
-import {createCropArt} from './crop-art.js?v=0.47';
+import {TILE,CROPS,frontTile} from './simulation.js?v=0.51';
+import {createCropArt} from './crop-art.js?v=0.51';
 import {createFarmer} from './farmer-art.js?v=0.47';
 const seedGeo=new T.SphereGeometry(1,5,3);
 const geo={box:new T.BoxGeometry(1,1,1),ball:new T.SphereGeometry(1,16,12),cylinder:new T.CylinderGeometry(1,1,1,12),cone:new T.ConeGeometry(1,1,12),leaf:new T.SphereGeometry(1,8,5)};
@@ -177,9 +177,39 @@ function setNetworkRole(role){cancelStumpMove();networkRole=['guest','host'].inc
 function setVehiclePermission(fn){vehiclePermission=typeof fn==='function'?fn:()=>true}
 function cancelVehicleControl(){horseRiding=false;driving=false;vehicleTravel=0;stop();renderDirty=true;renderer.shadowMap.needsUpdate=true}function setAvatar(profile){setAppearance(profile);if(regions?.active.id==='farm')regions.active.label=profile.farmName;renderDirty=true;renderer.shadowMap.needsUpdate=true}
 const wrapAngle=angle=>T.MathUtils.euclideanModulo(angle+Math.PI,Math.PI*2)-Math.PI;state.player.angle=Number.isFinite(state.player.angle)?wrapAngle(state.player.angle):Math.PI;farmer.rotation.y=state.player.angle;
-const waterHandleGeometry=new T.TorusGeometry(.15,.025,5,14);const equipment=new T.Group();arms[1].add(equipment);function toolModel(id){renderDirty=true;renderer.shadowMap.needsUpdate=true;equipment.clear();if(id==='hand'||id==='seed')return;if(id==='camera'){box(equipment,'#6d7b69',0,-.38,.13,.36,.23,.19);box(equipment,'#414b42',0,-.39,.245,.30,.15,.06);const lens=cyl(equipment,'#33413f',0,-.39,.30,.10,.10);lens.rotation.x=Math.PI/2;const glass=cyl(equipment,'#9fb8af',0,-.39,.357,.071,.012);glass.rotation.x=Math.PI/2;box(equipment,'#c5c0a7',.10,-.245,.13,.075,.035,.07);box(equipment,'#c9c1a2',-.11,-.29,.235,.065,.045,.018);return}if(id==='water'){cyl(equipment,'#6f9293',0,-.43,.15,.17,.29);const handle=new T.Mesh(waterHandleGeometry,mat('#9fb2a5'));handle.position.set(0,-.25,.15);equipment.add(handle);let spout=cyl(equipment,'#a3b7ab',0,-.4,.4,.035,.3);spout.rotation.x=1.1;ball(equipment,'#b8c5ae',0,-.33,.54,.09,.035,.07)}else{let h=cyl(equipment,'#a6824b',0,-.34,.3,.035,.85);h.rotation.x=Math.PI/2;if(id==='snowShovel'){const scoop=box(equipment,'#9cb4b4',0,-.34,.76,.53,.10,.37);scoop.rotation.x=-.25;box(equipment,'#c3c9b7',0,-.32,.94,.54,.13,.035)}if(id==='hoe')box(equipment,'#879390',0,-.35,.7,.27,.2,.055);if(id==='axe')box(equipment,'#8c9992',.03,-.34,.65,.31,.07,.24);if(id==='hammer')box(equipment,'#7c8782',0,-.34,.65,.4,.2,.22);if(id==='sickle'){let blade=box(equipment,'#bcc6ab',.1,-.34,.65,.37,.035,.08);blade.rotation.y=.5}}}toolModel(state.tool);
+const waterHandleGeometry=new T.TorusGeometry(.15,.025,5,14);const equipment=new T.Group();arms[1].add(equipment);function toolModel(id){renderDirty=true;renderer.shadowMap.needsUpdate=true;equipment.clear();if(id==='hand'||id==='seed')return;
+ if(id==='milker'){
+  cyl(equipment,'#849b98',0,-.46,.16,.153,.33);
+  cyl(equipment,'#c6d2c8',0,-.28,.16,.153,.033);
+  const handle=new T.Mesh(waterHandleGeometry,mat('#727a6c'));handle.position.set(0,-.25,.16);equipment.add(handle);
+  const tube=cyl(equipment,'#554b42',.15,-.36,.22,.032,.24);tube.rotation.z=.84;
+  cyl(equipment,'#a4b3a7',.236,-.45,.26,.048,.13);return;
+ }
+ if(id==='shears'){
+  for(const side of [-1,1]){
+   const blade=box(equipment,'#b7c7c0',side*.065,-.30,.31,.065,.040,.31);
+   blade.rotation.y=side*.36;
+   ball(equipment,'#805947',side*.091,-.30,.11,.077,.047,.067);
+  }
+  ball(equipment,'#606c64',0,-.273,.235,.035,.018,.034);return;
+ }
+ if(id==='camera'){box(equipment,'#6d7b69',0,-.38,.13,.36,.23,.19);box(equipment,'#414b42',0,-.39,.245,.30,.15,.06);const lens=cyl(equipment,'#33413f',0,-.39,.30,.10,.10);lens.rotation.x=Math.PI/2;const glass=cyl(equipment,'#9fb8af',0,-.39,.357,.071,.012);glass.rotation.x=Math.PI/2;box(equipment,'#c5c0a7',.10,-.245,.13,.075,.035,.07);box(equipment,'#c9c1a2',-.11,-.29,.235,.065,.045,.018);return}if(id==='water'){cyl(equipment,'#6f9293',0,-.43,.15,.17,.29);const handle=new T.Mesh(waterHandleGeometry,mat('#9fb2a5'));handle.position.set(0,-.25,.15);equipment.add(handle);let spout=cyl(equipment,'#a3b7ab',0,-.4,.4,.035,.3);spout.rotation.x=1.1;ball(equipment,'#b8c5ae',0,-.33,.54,.09,.035,.07)}else{let h=cyl(equipment,'#a6824b',0,-.34,.3,.035,.85);h.rotation.x=Math.PI/2;if(id==='snowShovel'){const scoop=box(equipment,'#9cb4b4',0,-.34,.76,.53,.10,.37);scoop.rotation.x=-.25;box(equipment,'#c3c9b7',0,-.32,.94,.54,.13,.035)}if(id==='hoe')box(equipment,'#879390',0,-.35,.7,.27,.2,.055);if(id==='axe')box(equipment,'#8c9992',.03,-.34,.65,.31,.07,.24);if(id==='hammer')box(equipment,'#7c8782',0,-.34,.65,.4,.2,.22);if(id==='sickle'){let blade=box(equipment,'#bcc6ab',.1,-.34,.65,.37,.035,.08);blade.rotation.y=.5}}}toolModel(state.tool);
 const playerShadow=new T.Mesh(shadowGeometry,new T.MeshBasicMaterial({map:contactTexture(),transparent:true,opacity:.30,depthWrite:false}));playerShadow.scale.set(.67,.67,.67);playerShadow.renderOrder=1;scene.add(playerShadow);
-const carried=new T.Group();body.add(carried);let lastHeld=null;function heldModel(){renderDirty=true;renderer.shadowMap.needsUpdate=true;carried.clear();if(state.held){if(state.held==='egg'){ball(carried,'#efe5c8',0,0,0,.16,.22,.16);ball(carried,'#f9f0d8',-.045,.075,.10,.06,.10,.045)}else cropModel(carried,{crop:state.held,age:CROPS[state.held].days},0,0,true);carried.position.set(0,2.05,.08)}lastHeld=state.held}
+const carried=new T.Group();body.add(carried);let lastHeld=null;function heldModel(){renderDirty=true;renderer.shadowMap.needsUpdate=true;carried.clear();if(state.held){if(state.held==='egg'){ball(carried,'#efe5c8',0,0,0,.16,.22,.16);ball(carried,'#f9f0d8',-.045,.075,.10,.06,.10,.045)}else if(state.held==='milk'||state.held==='mayo'){
+  const milk=state.held==='milk',color=milk?'#f0e9d5':'#e8d6a0';
+  cyl(carried,color,0,-.020,0,.139,.31);
+  ball(carried,color,0,.113,0,.135,.08,.135);
+  cyl(carried,milk?'#89a19c':'#b19864',0,.19,0,.091,.060);
+  cyl(carried,milk?'#b1c2b0':'#e7dcc0',0,-.05,0,.141,.115);
+ }else if(state.held==='wool'){
+  for(let i=0;i<9;i++){
+   const angle=i*2.4;
+   ball(carried,i%3?'#ece4cd':'#d7ccb2',Math.sin(angle)*.094,(i%3-1)*.076,Math.cos(angle)*.091,.12,.11,.12);
+  }
+ }else if(state.held==='cheese'){
+  cyl(carried,'#e3b967',0,-.04,0,.19,.19);
+  cyl(carried,'#eed197',0,.058,0,.187,.02);
+ }else if(CROPS[state.held])cropModel(carried,{crop:state.held,age:CROPS[state.held].days},0,0,true);carried.position.set(0,2.05,.08)}lastHeld=state.held}
 const target=new T.Mesh(new T.PlaneGeometry(1.18,1.18),new T.MeshBasicMaterial({color:'#ffe6a1',transparent:true,opacity:.065,depthWrite:false,side:T.DoubleSide}));target.rotation.x=-Math.PI/2;target.position.y=.14;scene.add(target);const border=new T.LineSegments(new T.EdgesGeometry(new T.PlaneGeometry(1.16,1.16)),new T.LineBasicMaterial({color:'#fff0ad',transparent:true,opacity:.55}));border.rotation.x=-Math.PI/2;border.position.y=.145;scene.add(border);
 const pollenGeometry=new T.BufferGeometry(),pollenPosition=new Float32Array(120*3);for(let i=0;i<120;i++){pollenPosition[i*3]=rand(i+301)*28-14;pollenPosition[i*3+1]=.4+rand(i+401)*3;pollenPosition[i*3+2]=rand(i+501)*26-12}pollenGeometry.setAttribute('position',new T.BufferAttribute(pollenPosition,3));const pollen=new T.Points(pollenGeometry,new T.PointsMaterial({color:'#fff0b5',size:.035,transparent:true,opacity:.5,depthWrite:false}));farmArt.add(pollen);
 const activityArt=createActivityArt(state,(x,z)=>!blocked(x,z),()=>networkRole!=='guest');scene.add(activityArt.root);
@@ -212,7 +242,30 @@ function canEnterArea(id){if((driving||horseRiding)&&isIndoorArea(id))return fal
 function clearDismountPoint(x,z){return !playerBlocked(x,z,false,true)&&!(regions?.active.portals||[]).some(p=>Math.hypot(x-p.x,z-p.z)<(p.autoRadius??Math.min(.85,p.radius??1.4))+.55)}
 
 function refreshVehicle(){updateTractor(0);renderDirty=true;renderer.shadowMap.needsUpdate=true}
-function toggleHorse(){const h=economyState(state).horse;if(horseRiding){const p=horseCart.driverPose;for(const side of[-1,1]){const x=p.x+Math.cos(p.angle)*side*1.8,z=p.z-Math.sin(p.angle)*side*1.8;if(!playerBlocked(x,z,false,true)){horseRiding=false;state.player.x=x;state.player.z=z;stop();renderDirty=true;return {changed:true,message:'Você desceu da carroça.'}}}return {changed:false,message:'Estacione em um espaço livre para descer.'}}if(driving||state.held||state.carryingHay||!h.owned||h.area!==regions.active.id||Math.min(Math.hypot(h.x-state.player.x,h.z-state.player.z),Math.hypot(horseCart.driverPose.x-state.player.x,horseCart.driverPose.z-state.player.z))>3)return {changed:false,message:'Aproxime-se do cavalo com as mãos livres.'};if(networkRole==='guest')return {changed:false,message:'O dono da fazenda conduz o cavalo nesta versão.'};horseRiding=true;state.player.x=h.x;state.player.z=h.z;state.player.angle=h.angle;stop();return {changed:true,message:'Direcional para passear · Y para descer.'}}
+function toggleHorse(){
+  const h=economyState(state).horse;
+  if(horseRiding){
+   const p=horseCart.driverPose;
+   for(const distance of [1.55,2.15,2.8])for(const side of [-1,1]){
+    const x=p.x+Math.cos(p.angle)*side*distance,z=p.z-Math.sin(p.angle)*side*distance;
+    if(!clearDismountPoint(x,z))continue;
+    horseRiding=false;state.player.x=x;state.player.z=z;stop();renderDirty=true;
+    return {changed:true,message:'Você desmontou.'};
+   }
+   return {changed:false,message:'Estacione em um espaço livre para descer.'};
+  }
+  if(driving||hop||stumpSelection||state.held||state.carryingHay||!h.owned||h.area!==regions.active.id||Math.min(Math.hypot(h.x-state.player.x,h.z-state.player.z),Math.hypot(horseCart.driverPose.x-state.player.x,horseCart.driverPose.z-state.player.z))>3)return {changed:false,message:'Aproxime-se do cavalo com as mãos livres.'};
+  if(networkRole==='guest')return {changed:false,message:'O dono da fazenda conduz o cavalo nesta versão.'};
+  horseRiding=true;state.player.x=h.x;state.player.z=h.z;state.player.angle=h.angle;stop();
+  return {changed:true,message:'X abre as opções do cavalo. Y desmonta.'};
+ }
+ function toggleHorseCart(){
+  if(driving||networkRole==='guest')return {changed:false,message:'Estacione o trator e use o cavalo da sua fazenda.'};
+  const h=economyState(state).horse,collisions=horseCollision(h.x,h.z,false);
+  const result=horseCart.toggle(regions.active.id,horseRiding,(after,before)=>collisions.allows(after,before));
+  if(result.changed){stop();renderDirty=true;renderer.shadowMap.needsUpdate=true}
+  return result;
+ }
 function toggleTractor(){if(horseRiding)return {changed:false,message:'Desça da carroça primeiro.'};if(stumpSelection)return {changed:false,message:'Coloque ou devolva o toco antes de usar o trator.'};if(hop)return{changed:false,message:'Espere terminar o pulinho antes de usar o trator.'};const d=tractorData();if(driving){const candidates=[[-1.25,0],[1.25,0],[0,1.6],[0,-1.6],[-2,0],[2,0],[0,2.4],[0,-2.4]];let point=null;for(const [x,z]of candidates){const a=d.angle,p=[d.x+x*Math.cos(a)+z*Math.sin(a),d.z-x*Math.sin(a)+z*Math.cos(a)];if(clearDismountPoint(p[0],p[1])){point=p;break}}if(!point)return {changed:false,message:'Afaste o trator das portas e estacione em um espaço livre para descer.'};driving=false;state.player.x=point[0];state.player.z=point[1];stop();renderDirty=true;renderer.shadowMap.needsUpdate=true;return {changed:true,message:'Você desceu do trator. Aproxime-se e use X para dirigir.'}}
 if(!nearTractor())return {changed:false,message:'Aproxime-se do trator estacionado na fazenda.'};if(state.held||state.carryingHay)return {changed:false,message:'Guarde o que está nas mãos antes de subir no trator.'};if(vehiclePermission()===false)return {changed:false,message:'O outro jogador está usando o trator. Espere ele descer.'};driving=true;state.player.x=d.x;state.player.z=d.z;state.player.angle=d.angle;actionTime=0;stop();renderDirty=true;renderer.shadowMap.needsUpdate=true;return {changed:true,message:'No trator! Direcional dirige · X liga/desliga a roçadeira · Y desce.'}}
 function vehicleAction(){const d=tractorData();if(!driving)return {changed:false,message:'Entre no trator para usar a roçadeira.'};d.cutter=!d.cutter;renderDirty=true;return {changed:true,message:d.cutter?'Roçadeira ligada. Passe sobre as ervas; pedras e galhos precisam de ferramentas.':'Roçadeira desligada.'}}
@@ -233,6 +286,56 @@ function trackArea(){return (regions?.active.id||'farm')+':'+(regions?.active.lo
 function trackGround(x,z){const region=regions?.active;if(!region||region.indoors||!['farm','homestead'].includes(region.id)||!regions.fits(region,x,z))return null;const field=fieldForState(state),col=Math.round((x-field.x)/TILE),row=Math.round((z-field.z)/TILE);if(col>=0&&col<field.cols&&row>=0&&row<field.rows){const p=state.plots[row*field.cols+col];if(p?.crop||p?.obstacle||!isPlantablePlot(p,field,state))return null;return 'soil'}return 'grass'}
 function trackGroundHeight(x,z){const field=fieldForState(state),col=Math.round((x-field.x)/TILE),row=Math.round((z-field.z)/TILE);if(col>=0&&col<field.cols&&row>=0&&row<field.rows){const p=state.plots[row*field.cols+col],xx=x-(field.x+col*TILE),zz=z-(field.z+row*TILE);if(p?.tilled){const edge=Math.max(0,1-Math.pow(Math.abs(xx)/.59,8))*Math.max(0,1-Math.pow(Math.abs(zz)/.59,8));return .034+edge*(.064+.019*Math.cos(xx*Math.PI*7)+.012*Math.sin(zz*14+xx*9))}}const main=field.cols===MAIN_FIELD.cols&&field.rows===MAIN_FIELD.rows,xx=x-(main?soilCenterX:.875),zz=z-(main?soilCenterZ:3.875);return Math.abs(xx)<(main?soilWidth/2:8.4)&&Math.abs(zz)<(main?soilDepth/2:8.4)?.023+.012*Math.sin(xx*7.1+zz*8.3)+.009*Math.sin(zz*14.3-xx*7)+.009*Math.sin(xx*2.9-zz*3.7):.035}
 function stop(){velocity.set(0,0,0);speed=0;if(hop)recoverHop(hop)}
+ // Test the horse and axle footprints with their own clearances.
+ function horseCollision(x,z,includeParked=true){
+  const area=regions.active.id,lot=state.homesteads?.selected,b=regions.active.bounds;
+  const nearby=(c)=>Math.abs(c.x-x)<5+Math.max(c.r||0,c.w||0,c.d||0,c.rx||0,c.rz||0)
+    &&Math.abs(c.z-z)<5+Math.max(c.r||0,c.w||0,c.d||0,c.rx||0,c.rz||0);
+  const solids=regions.active.colliders.filter(c=>!c.jumpable&&!c.stumpId&&nearby(c));
+  for(const c of transportedHerd.colliders||[])if(nearby(c))solids.push(c);
+  const d=tractorData();
+  if(d.area===area&&(area!=='homestead'||d.lotId===lot))solids.push({x:d.x,z:d.z,w:1.35,d:2.1,angle:d.angle});
+  if((d.trailer?d.area:d.trailerArea||'farm')===area&&(area!=='homestead'||(d.trailer?d.lotId:d.trailerLot)===lot)&&Number.isFinite(d.trailerX))solids.push({x:d.trailerX,z:d.trailerZ,w:1.60,d:1.92,angle:d.trailerAngle});
+  if(includeParked&&!horseCart.attached){
+   const parked=horseCart.colliders(area).slice(1);
+   solids.push(...parked);
+  }
+  if(area==='farm'||area==='homestead'){
+   const field=fieldForState(state);
+   nearPlots(state.plots,field,x,z,4.8,(p,px,pz)=>{
+    if((p.obstacle&&p.obstacle!=='weed')||(p.crop&&p.age>=CROPS[p.crop].days*.5))solids.push({x:px,z:pz,w:.60,d:.60});
+    return false;
+   });
+  }
+  function penetration(p,c){
+   if(!colliderContains(c,p.x,p.z,p.r))return 0;
+   let lo=0,hi=p.r+Math.max(c.r||0,c.w||0,c.d||0,c.rx||0,c.rz||0);
+   for(let i=0;i<7;i++){
+    const depth=(lo+hi)/2;
+    if(colliderContains(c,p.x,p.z,p.r-depth))lo=depth;else hi=depth;
+   }
+   return hi;
+  }
+  const boundary=p=>Math.max(0,b[0]-p.x+p.r,p.x+p.r-b[1],b[2]-p.z+p.r,p.z+p.r-b[3]);
+  return {allows(after,before){
+   const depth=(points,c)=>Math.max(...points.map(p=>penetration(p,c)));
+   if(Math.max(...after.map(boundary))>Math.max(...before.map(boundary))+.002)return false;
+   return solids.every(c=>depth(after,c)<=depth(before,c)+.001);
+  }};
+ }
+ function moveHorse(x,z,dx,dz,angle,oldAngle){
+  if(dx===0&&dz===0&&angle===oldAngle)return;
+  const h=economyState(state).horse,start=horseCart.samples(h),collision=horseCollision(x,z);
+  // Try the full movement, then slide, then turn in place to steer away.
+  for(const [xx,zz,a] of [[x+dx,z+dz,angle],[x+dx,z,angle],[x,z+dz,angle],[x,z,angle],
+   [x+dx,z+dz,oldAngle],[x+dx,z,oldAngle],[x,z+dz,oldAngle]]){
+   if(xx===x&&zz===z&&a===oldAngle)continue;
+   const next={x:xx,z:zz,angle:a};
+   if(!collision.allows(horseCart.samples(h,next),start))continue;
+   horseCart.commit(h,next);Object.assign(state.player,next);return;
+  }
+  state.player.angle=oldAngle;
+ }
 function move(dx,dy,dt,run){
  isRunning=run;if(hammockTime>0){stop();return false}if(dt<=0)return false;hopCooldown=Math.max(0,hopCooldown-dt);if(hop)return advanceHop(dt);if(actionTime>0){stop();return false}
  const oldX=state.player.x,oldZ=state.player.z,oldAngle=state.player.angle;
@@ -260,7 +363,7 @@ function move(dx,dy,dt,run){
  gait+=distance/(1.05+blend*.47)*Math.PI*2;
  return distance>1e-6;
 }
-function update(dt,moving){const activityRevision=activityArt.controls.revision;activityArt.controls.update(dt,regions?.active.id,terrainHeight(regions?.active.id,state.player.x,state.player.z));if(activityRevision!==activityArt.controls.revision)renderDirty=true;refreshFarmLayout();syncStumps();if(hammockTime>0){hammockTime=Math.max(0,hammockTime-dt);if(hammockTime===0){farmer.rotation.z=0;farmer.rotation.x=0;if(hammockExit){state.player.x=hammockExit.x;state.player.z=hammockExit.z}hammockExit=null;renderDirty=true}}if(dt===0&&!renderDirty&&lastHeld===state.held)return;t+=dt;alertTime=Math.max(0,alertTime-dt);alertSprite.visible=alertTime>0;if(alertTime>0){alertSprite.position.set(state.player.x,1.82+jumpHeight+Math.sin((1.45-alertTime)*5)*.035,state.player.z);const pop=Math.min(1,(1.45-alertTime)*9);alertSprite.scale.set(.32*pop,.48*pop,1);alertMaterial.opacity=Math.min(1,alertTime*4)}regions?.update(dt,t);transportedHerd.update(networkRole==='guest'?0:dt,t,regions?.active.id);equipment.visible=!driving&&(state.tool==='camera'||state.tool==='snowShovel'||!regions||regions.isFarm||regions.active.id==='homestead');pollen.visible=state.season===0||state.season===1;pollen.rotation.y=Math.sin(t*.05)*.025;pollen.position.y=Math.sin(t*.3)*.05;actionTime=Math.max(0,actionTime-dt);if(pendingEffect){pendingEffect.delay-=dt;if(pendingEffect.delay<=0){emitEffect(pendingEffect.type);pendingEffect=null}}updateTractor(vehicleTravel);horseCart.update(dt,regions?.active.id,horseRiding,moving&&horseRiding,t,networkRole!=='guest');vehicleTravel=0;wildlifeDefense.update(dt);const habitat={player:state.player,area:regions?.active.id,bounds:regions?.active.bounds,blocked,indoors:!!regions?.indoors};farmPets.update(dt,habitat);nightVisitors.update(dt,habitat);const visitor=nightVisitors.status;if(visitor.active&&!driving)companion.watchVisitor(nightVisitors.guardTarget(),visitorChase&&visitor.retreating);if(!visitor.active)visitorChase=false;if(visitor.alertSerial!==lastVisitorAlert){lastVisitorAlert=visitor.alertSerial;if(visitor.active)showAlert('danger')}if(!sleepScene)companion.update(dt,{player:state.player,area:regions?.active.id,driving,blocked,indoors:!!regions?.indoors,bounds:regions?.active.bounds,trailer:{attached:tractorData().trailer,empty:!tractorData().cargo,x:tractorData().trailerX,z:tractorData().trailerZ,angle:tractorData().trailerAngle,visible:tractor.trailer.visible}});if(sleepScene)companion.sleepPose(dt,sleepScene.stage);else companion.root.position.y=companion.elevation+terrainHeight(regions?.active.id,companion.root.position.x,companion.root.position.z);tractorTracks.update(dt,{tractor:tractorData(),driving,area:trackArea(),indoors:!!regions?.indoors,season:state.season,groundAt:trackGround,heightAt:trackGroundHeight});farmer.position.set(state.player.x-(driving?Math.sin(state.player.angle)*.50:0),(driving?.52:.05+jumpHeight)+terrainHeight(regions?.active.id,state.player.x,state.player.z),state.player.z-(driving?Math.cos(state.player.angle)*.50:0));playerShadow.position.set(state.player.x,.06+terrainHeight(regions?.active.id,state.player.x,state.player.z),state.player.z);playerShadow.scale.setScalar(.67*(1-jumpHeight*.22));playerShadow.material.opacity=.30*(1-jumpHeight*.35);if(!Number.isFinite(state.player.angle))state.player.angle=Number.isFinite(farmer.rotation.y)?farmer.rotation.y:Math.PI;if(!Number.isFinite(farmer.rotation.y))farmer.rotation.y=state.player.angle;const diff=wrapAngle(state.player.angle-farmer.rotation.y);farmer.rotation.y=wrapAngle(farmer.rotation.y+diff*(1-Math.exp(-dt*18)));motion+=((moving?Math.min(1,speed/2.4):0)-motion)*(1-Math.exp(-dt*20));runBlend+=(T.MathUtils.smoothstep(speed,2.1,4.2)-runBlend)*(1-Math.exp(-dt*12));const bounce=(1-Math.cos(gait*2))*(.006+runBlend*.012)*motion;
+function update(dt,moving){const activityRevision=activityArt.controls.revision;activityArt.controls.update(dt,regions?.active.id,terrainHeight(regions?.active.id,state.player.x,state.player.z));if(activityRevision!==activityArt.controls.revision)renderDirty=true;refreshFarmLayout();syncStumps();if(hammockTime>0){hammockTime=Math.max(0,hammockTime-dt);if(hammockTime===0){farmer.rotation.z=0;farmer.rotation.x=0;if(hammockExit){state.player.x=hammockExit.x;state.player.z=hammockExit.z}hammockExit=null;renderDirty=true}}if(dt===0&&!renderDirty&&lastHeld===state.held)return;t+=dt;alertTime=Math.max(0,alertTime-dt);alertSprite.visible=alertTime>0;if(alertTime>0){alertSprite.position.set(state.player.x,1.82+jumpHeight+Math.sin((1.45-alertTime)*5)*.035,state.player.z);const pop=Math.min(1,(1.45-alertTime)*9);alertSprite.scale.set(.32*pop,.48*pop,1);alertMaterial.opacity=Math.min(1,alertTime*4)}regions?.update(dt,t);transportedHerd.update(networkRole==='guest'?0:dt,t,regions?.active.id);updateAnimalHeart(dt);equipment.visible=!driving&&!state.held&&!state.carryingHay&&(state.tool==='camera'||state.tool==='snowShovel'||state.tool==='milker'||state.tool==='shears'||!regions||regions.isFarm||regions.active.id==='homestead');pollen.visible=state.season===0||state.season===1;pollen.rotation.y=Math.sin(t*.05)*.025;pollen.position.y=Math.sin(t*.3)*.05;actionTime=Math.max(0,actionTime-dt);if(pendingEffect){pendingEffect.delay-=dt;if(pendingEffect.delay<=0){emitEffect(pendingEffect.type);pendingEffect=null}}updateTractor(vehicleTravel);horseCart.update(dt,regions?.active.id,horseRiding,moving&&horseRiding,t,networkRole!=='guest');vehicleTravel=0;wildlifeDefense.update(dt);const habitat={player:state.player,area:regions?.active.id,bounds:regions?.active.bounds,blocked,indoors:!!regions?.indoors};farmPets.update(dt,habitat);nightVisitors.update(dt,habitat);const visitor=nightVisitors.status;if(visitor.active&&!driving)companion.watchVisitor(nightVisitors.guardTarget(),visitorChase&&visitor.retreating);if(!visitor.active)visitorChase=false;if(visitor.alertSerial!==lastVisitorAlert){lastVisitorAlert=visitor.alertSerial;if(visitor.active)showAlert('danger')}if(!sleepScene)companion.update(dt,{player:state.player,area:regions?.active.id,driving,blocked,indoors:!!regions?.indoors,bounds:regions?.active.bounds,trailer:{attached:tractorData().trailer,empty:!tractorData().cargo,x:tractorData().trailerX,z:tractorData().trailerZ,angle:tractorData().trailerAngle,visible:tractor.trailer.visible}});if(sleepScene)companion.sleepPose(dt,sleepScene.stage);else companion.root.position.y=companion.elevation+terrainHeight(regions?.active.id,companion.root.position.x,companion.root.position.z);tractorTracks.update(dt,{tractor:tractorData(),driving,area:trackArea(),indoors:!!regions?.indoors,season:state.season,groundAt:trackGround,heightAt:trackGroundHeight});farmer.position.set(state.player.x-(driving?Math.sin(state.player.angle)*.50:0),(driving?.52:.05+jumpHeight)+terrainHeight(regions?.active.id,state.player.x,state.player.z),state.player.z-(driving?Math.cos(state.player.angle)*.50:0));playerShadow.position.set(state.player.x,.06+terrainHeight(regions?.active.id,state.player.x,state.player.z),state.player.z);playerShadow.scale.setScalar(.67*(1-jumpHeight*.22));playerShadow.material.opacity=.30*(1-jumpHeight*.35);if(!Number.isFinite(state.player.angle))state.player.angle=Number.isFinite(farmer.rotation.y)?farmer.rotation.y:Math.PI;if(!Number.isFinite(farmer.rotation.y))farmer.rotation.y=state.player.angle;const diff=wrapAngle(state.player.angle-farmer.rotation.y);farmer.rotation.y=wrapAngle(farmer.rotation.y+diff*(1-Math.exp(-dt*18)));motion+=((moving?Math.min(1,speed/2.4):0)-motion)*(1-Math.exp(-dt*20));runBlend+=(T.MathUtils.smoothstep(speed,2.1,4.2)-runBlend)*(1-Math.exp(-dt*12));const bounce=(1-Math.cos(gait*2))*(.006+runBlend*.012)*motion;
 const blinkPhase=t%4.7,blink=blinkPhase>4.49?1-Math.sin((blinkPhase-4.49)/.21*Math.PI)*.94:1;for(const eye of eyes)eye.scale.y=.083*blink;body.position.y=bounce+Math.sin(t*2.1)*.005*(1-motion);body.rotation.x=(.035+runBlend*.065)*motion;head.rotation.z=Math.sin(gait)*.018*motion;
 const actionProgress=1-actionTime/.72,hit=actionTime>0?Math.sin(Math.max(0,(actionProgress-.24)/.76)*Math.PI):0;
 body.scale.set(1+hit*.018,1-hit*.025,1+hit*.018);if(actionTime>0&&(actionTool==='hand'||actionTool==='seed'))body.rotation.x=Math.sin(actionProgress*Math.PI)*.28;
@@ -326,32 +429,40 @@ function placeStump(){if(!stumpSelection)return {changed:false,message:'Pegue pr
 function animalCanWalk(x,z,radius=.43,id,area,property){const key=property||propertyKey(state,area),ground=herdGround(key);if(!ground)return false;const b=ground.bounds;if(x<b[0]+radius||x>b[1]-radius||z<b[2]+radius||z>b[3]-radius)return false;for(const c of ground.colliders){const passableStump=c.jumpable===true&&c.height<=.50&&(c.kind==='low-stump'||['boundary-stump','natural-stump'].includes(c.label));if(!passableStump&&colliderContains(c,x,z,radius))return false;}const plots=key==='farm'?(state.homePlots||state.plots):state.homesteads?.lots?.[key.split(':')[1]]?.plots;if(!Array.isArray(plots))return false;const field=fieldForProperty(key),reach=.48+radius;if(nearPlots(plots,field,x,z,reach,(p,px,pz)=>!!(p.crop||p.obstacle)&&Math.abs(x-px)<reach&&Math.abs(z-pz)<reach))return false;if(!state.herdRoutes?.[id]&&area===regions?.active.id&&key===propertyKey(state,area)&&Math.hypot(x-state.player.x,z-state.player.z)<radius+.30)return false;return true}
 transportedHerd.setWalkability?.(animalCanWalk);
 const alertCanvas=document.createElement('canvas');alertCanvas.width=64;alertCanvas.height=96;const aq=alertCanvas.getContext('2d');aq.fillStyle='#f7e3ac';aq.beginPath();aq.roundRect(6,4,52,76,23);aq.fill();aq.strokeStyle='#9e7d4e';aq.lineWidth=3;aq.stroke();aq.fillStyle='#725735';aq.font='bold 61px Georgia';aq.textAlign='center';aq.fillText('!',32,65);const alertMap=new T.CanvasTexture(alertCanvas),alertMaterial=new T.SpriteMaterial({map:alertMap,transparent:true,depthTest:false,toneMapped:false}),alertSprite=new T.Sprite(alertMaterial);alertSprite.visible=false;alertSprite.renderOrder=25;scene.add(alertSprite);let alertTime=0;function showAlert(kind='bird'){alertTime=1.45;alertSprite.visible=true;alertMaterial.color.set(kind==='danger'?'#f2c7a4':'#fff4cf');renderDirty=true}
+const heartCanvas=document.createElement('canvas');
+heartCanvas.width=heartCanvas.height=64;
+const heartInk=heartCanvas.getContext('2d');
+heartInk.beginPath();heartInk.moveTo(32,54);
+heartInk.bezierCurveTo(16,42,7,34,7,22);heartInk.bezierCurveTo(7,9,25,6,32,19);
+heartInk.bezierCurveTo(39,6,57,9,57,22);heartInk.bezierCurveTo(57,34,48,42,32,54);
+heartInk.closePath();heartInk.fillStyle='#df8096';heartInk.fill();
+heartInk.strokeStyle='#f9d6d8';heartInk.lineWidth=3;heartInk.stroke();
+const heartMap=new T.CanvasTexture(heartCanvas);
+heartMap.colorSpace=T.SRGBColorSpace;
+const animalHeart=new T.Sprite(new T.SpriteMaterial({map:heartMap,transparent:true,depthTest:false,depthWrite:false,toneMapped:false}));
+animalHeart.visible=false;animalHeart.renderOrder=26;scene.add(animalHeart);
+let animalHeartTarget=null,animalHeartArea=null,animalHeartTime=0;
+function showAnimalHeart(id){
+ const subjects=[...(regions.active.photoSubjects||[]),...transportedHerd.photoSubjects];
+ const subject=subjects.find(a=>(a.id==='barn-'+id||a.id==='pasture-'+id)&&a.object?.visible);
+ if(!subject)return;
+ animalHeartTarget=subject;animalHeartArea=regions.active;
+ animalHeartTime=1.25;renderDirty=true;
+}
+function updateAnimalHeart(dt){
+ if(!animalHeartTarget||animalHeartArea!==regions.active){animalHeart.visible=false;animalHeartTarget=null;return}
+ animalHeartTime=Math.max(0,animalHeartTime-dt);
+ animalHeart.visible=animalHeartTime>0&&animalHeartTarget.object.visible;
+ if(!animalHeart.visible){animalHeartTarget=null;return}
+ const age=1.25-animalHeartTime;
+ animalHeartTarget.object.getWorldPosition(animalHeart.position);
+ animalHeart.position.y+=(animalHeartTarget.speciesId==='chicken'?.85:animalHeartTarget.speciesId==='sheep'?1.13:1.56)+age*.39;
+ animalHeart.scale.setScalar(.40*Math.min(1,.45+age*5));
+ animalHeart.material.opacity=Math.min(1,animalHeartTime*3.8);
+}
 const photographPosition=new T.Vector3(),photographClip=new T.Vector3(),photoCanvas=document.createElement('canvas');photoCanvas.width=384;photoCanvas.height=256;const photoContext=photoCanvas.getContext('2d');
 function photoTargets(){const subjects=[...(regions?.active.photoSubjects||[]),...transportedHerd.photoSubjects],result=[];for(const subject of subjects){if(!subject.object)continue;let visible=true;for(let o=subject.object;o;o=o.parent)if(!o.visible){visible=false;break}if(!visible)continue;subject.object.getWorldPosition(photographPosition);photographPosition.y+=subject.offsetY||0;const distance=Math.hypot(photographPosition.x-state.player.x,photographPosition.z-state.player.z);if(distance>10)continue;photographClip.copy(photographPosition).project(camera);const screenX=(photographClip.x+1)/2,screenY=(1-photographClip.y)/2,inFrame=photographClip.z>=-1&&photographClip.z<=1&&screenX>.04&&screenX<.96&&screenY>.06&&screenY<.93,centering=Math.max(0,1-Math.hypot(screenX-.5,screenY-.5)*1.5),score=Math.round(100*(centering*.65+Math.max(0,1-distance/10)*.35));result.push({id:subject.id,speciesId:subject.speciesId,name:subject.name,area:subject.area||regions.active.id,x:photographPosition.x,z:photographPosition.z,screenX,screenY,distance,inFrame,score})}return result}
 function capturePhoto(subject){lens.render(scene,camera);const source=renderer.domElement,w=source.width,h=source.height,cropW=Math.min(w,h*1.5)*.75,cropH=cropW*2/3,cx=Math.max(cropW/2,Math.min(w-cropW/2,(subject?.screenX??.5)*w)),cy=Math.max(cropH/2,Math.min(h-cropH/2,(subject?.screenY??.5)*h));photoContext.drawImage(source,cx-cropW/2,cy-cropH/2,cropW,cropH,0,0,384,256);return photoCanvas.toDataURL('image/jpeg',.55)}
 function pickSign(clientX,clientY){const rect=canvas.getBoundingClientRect();const ray=new T.Raycaster();ray.setFromCamera(new T.Vector2((clientX-rect.left)/rect.width*2-1,1-(clientY-rect.top)/rect.height*2),camera);let best=null,score=Infinity;for(const point of regions.active.signs||[]){const s=point.sign;if(!s)continue;const corners=[];for(const side of[-1,1])for(const up of[-1,1]){const dx=side*s.width/2,v=new T.Vector3(s.x+Math.cos(s.rotation)*dx,s.y+up*s.height/2,s.z-Math.sin(s.rotation)*dx).project(camera);if(v.z>=-1&&v.z<=1)corners.push([rect.left+(v.x+1)*rect.width/2,rect.top+(1-v.y)*rect.height/2])}if(corners.length!==4)continue;const xs=corners.map(p=>p[0]),ys=corners.map(p=>p[1]),left=Math.min(...xs)-9,right=Math.max(...xs)+9,top=Math.min(...ys)-9,bottom=Math.max(...ys)+9;if(clientX>=left&&clientX<=right&&clientY>=top&&clientY<=bottom){const d=Math.hypot(clientX-(left+right)/2,clientY-(top+bottom)/2);if(d<score){best=point;score=d}}}return best}
-return {get animalVoices(){const subjects=[...(regions?.active.photoSubjects||[]),...transportedHerd.photoSubjects],targets=[...farmPets.soundTargets];for(const a of subjects){if(!['cow','sheep','chicken'].includes(a.speciesId)||!a.object)continue;let visible=true;for(let o=a.object;o;o=o.parent)if(!o.visible){visible=false;break}if(visible){a.object.getWorldPosition(photographPosition);targets.push({speciesId:a.speciesId,x:photographPosition.x,z:photographPosition.z})}}return targets.map(a=>({...a,distance:Math.hypot(a.x-state.player.x,a.z-state.player.z)})).filter(a=>a.distance<12)},setSleepScene,activities:activityArt.controls,canEnterArea,canUsePortal,refreshFarmLayout,restInHammock,beginStumpMove,cancelStumpMove,placeStump,get stumpSelection(){return stumpSelection},setRemotePose,clearRemotePose,multiplayerTick,setNetworkRole,setVehiclePermission,cancelVehicleControl,get localNetworkPose(){const p=safePlayer();return {x:p.x,z:p.z,angle:p.angle,jump:jumpHeight,...networkLocation(),profile:{...state.profile},driving,moving:motion>.05}},setAvatar,get safePlayer(){return safePlayer()},petFarmAnimal(id){renderDirty=true;const r=farmPets.pet(id);if(r.changed){stop();actionTool='hand';actionTime=.72}return r},get visitorStatus(){return nightVisitors.status},observeVisitor:()=>nightVisitors.observe(),dismissVisitor(){const r=nightVisitors.dismiss();if(r.changed){visitorChase=true;companion.watchVisitor(nightVisitors.guardTarget(),true);renderDirty=true}return r},whistleDog(){renderDirty=true;return companion.whistle()},petDog(){const pet=companion.pet();if(pet){stop();actionTool='hand';actionTime=.72;renderDirty=true;renderer.shadowMap.needsUpdate=true}return pet},defendThreat:target=>wildlifeDefense.defend(target),get companionStatus(){return companion.status},get trackStats(){return tractorTracks.stats},get seasonVisual(){return seasonalScenery.inspect()},pickSign,toggleTractor,vehicleAction,toggleTrailer,refreshVehicle,toggleHorse,toggleHorseCart,get horseCartAttached(){return horseCart.attached},get horseRiding(){return horseRiding},get driving(){return driving},get tractorStatus(){const access=vehicleAccess(state,regions?.active.id||'farm',{driving});return {...tractorData(),...access,driving,near:access.nearDriver,serviceReason:access.reason,speed:driving?speed:0}},renderer,scene,camera,photoTargets,capturePhoto,showAlert,observeFrame,setZoom,travel:(id,spawn,restore=false)=>{if(!restore&&!canEnterArea(id))return regions.active;refreshFarmLayout();return regions.travel(id,spawn,restore)},nearby:()=>{const horse=horseCart.point(regions?.active.id);if(!driving&&horse&&Math.hypot(state.player.x-horse.x,state.player.z-horse.z)<horse.radius)return horse;const tree=!driving?activityArt.interactions.find(p=>p.type==='christmasTree'&&Math.hypot(state.player.x-p.x,state.player.z-p.z)<p.radius):null;if(tree)return tree;if(!driving&&state.carryingHay){const feed=[...regions.active.interactions,...transportedHerd.interactions].filter(p=>p.type==='feed'&&Math.hypot(state.player.x-p.x,state.player.z-p.z)<(p.radius||1.05)).sort((a,b)=>Number(animalStatus(state,a.data.animalId).fed)-Number(animalStatus(state,b.data.animalId).fed)||Math.hypot(state.player.x-a.x,state.player.z-a.z)-Math.hypot(state.player.x-b.x,state.player.z-b.z))[0];if(feed)return feed}let point=regions.nearby(),distance=point?Math.hypot(state.player.x-point.x,state.player.z-point.z):Infinity;if(!driving&&nearTractor()&&(!point||point.type==='portal'))return {type:'tractor',label:'Dirigir trator'};const stump=regions.isFarm&&!driving&&!stumpSelection&&!state.held&&!state.carryingHay&&state.tool==='hand'?findFarmStump(state,state.player.x,state.player.z,1.1):null;if(stump&&stump.distance<distance){point={type:'farmStump',x:stump.x,z:stump.z,radius:1.1,label:'Pegar toco para mudar de lugar',data:{id:stump.id}};distance=stump.distance}for(const candidate of [...transportedHerd.interactions,...(!driving&&state.tool==='hand'?activityArt.interactions:[]),...[farmPets.nearby(state.player),nightVisitors.nearby(state.player)].filter(Boolean)]){const d=Math.hypot(state.player.x-candidate.x,state.player.z-candidate.z);if(d<(candidate.radius||1.6)&&d<distance){point=candidate;distance=d}}const dog=companion.status,dogDistance=Math.hypot(state.player.x-dog.x,state.player.z-dog.z);if(!driving&&dog.present!==false&&dog.mode!=='riding'&&dogDistance<1.15&&dogDistance<distance)return {type:'dogPet',label:'Fazer carinho em '+dog.name,radius:1.15};return point||(driving||nearTractor()?{type:'tractor',label:driving?'Descer do trator':'Dirigir trator'}:null)},get area(){return regions.active.id},get region(){return regions.active},get destinations(){return regions.destinations},get zoom(){return {value:zoomValue,target:zoomTarget,min:minimumZoom,max:maximumZoom}},get performance(){return {pixelRatio:renderer.getPixelRatio(),maximumPixelRatio,frameAverage,plotBuilds,plotRegions:plotChunks.size,grassRegions:grassCells.size}},get animation(){return {moving:motion>.05,running:isRunning,phase:gait,travel,speed,actionTime,jumping:!!hop,jumpHeight,hopCount,hips:legs.map(l=>l.rotation.x),knees:knees.map(l=>l.rotation.x)}},rebuild,move,stop,update,toolModel,effect,act(id=state.tool){stop();actionTool=id;actionTime=.72},get locations(){return regions?.active.id==='homestead'?{house:{x:.5,z:-7.5},shipping:{x:5.2,z:-5.3},well:{x:11.6,z:.4}}:{house:farmPoint(state,'house',0,2.6),shipping:farmPoint(state,'shipping',0,1.5),well:farmPoint(state,'well',0,1.5)}},get busy(){return actionTime>0||!!hop||hammockTime>0}};
-} function toggleHorse(){
-  const h=economyState(state).horse;
-  if(horseRiding){
-   const p=horseCart.driverPose;
-   for(const distance of [1.55,2.15,2.8])for(const side of [-1,1]){
-    const x=p.x+Math.cos(p.angle)*side*distance,z=p.z-Math.sin(p.angle)*side*distance;
-    if(!clearDismountPoint(x,z))continue;
-    horseRiding=false;state.player.x=x;state.player.z=z;stop();renderDirty=true;
-    return {changed:true,message:'Você desmontou.'};
-   }
-   return {changed:false,message:'Estacione em um espaço livre para descer.'};
-  }
-  if(driving||hop||stumpSelection||state.held||state.carryingHay||!h.owned||h.area!==regions.active.id||Math.min(Math.hypot(h.x-state.player.x,h.z-state.player.z),Math.hypot(horseCart.driverPose.x-state.player.x,horseCart.driverPose.z-state.player.z))>3)return {changed:false,message:'Aproxime-se do cavalo com as mãos livres.'};
-  if(networkRole==='guest')return {changed:false,message:'O dono da fazenda conduz o cavalo nesta versão.'};
-  horseRiding=true;state.player.x=h.x;state.player.z=h.z;state.player.angle=h.angle;stop();
-  return {changed:true,message:'X abre as opções do cavalo. Y desmonta.'};
- }
- function toggleHorseCart(){
-  if(driving||networkRole==='guest')return {changed:false,message:'Estacione o trator e use o cavalo da sua fazenda.'};
-  const h=economyState(state).horse,collisions=horseCollision(h.x,h.z,false);
-  const result=horseCart.toggle(regions.active.id,horseRiding,(after,before)=>collisions.allows(after,before));
-  if(result.changed){stop();renderDirty=true;renderer.shadowMap.needsUpdate=true}
-  return result;
- }
+return {get animalVoices(){const subjects=[...(regions?.active.photoSubjects||[]),...transportedHerd.photoSubjects],targets=[...farmPets.soundTargets];for(const a of subjects){if(!['cow','sheep','chicken'].includes(a.speciesId)||!a.object)continue;let visible=true;for(let o=a.object;o;o=o.parent)if(!o.visible){visible=false;break}if(visible){a.object.getWorldPosition(photographPosition);targets.push({speciesId:a.speciesId,x:photographPosition.x,z:photographPosition.z})}}return targets.map(a=>({...a,distance:Math.hypot(a.x-state.player.x,a.z-state.player.z)})).filter(a=>a.distance<12)},setSleepScene,activities:activityArt.controls,canEnterArea,canUsePortal,refreshFarmLayout,restInHammock,beginStumpMove,cancelStumpMove,placeStump,get stumpSelection(){return stumpSelection},setRemotePose,clearRemotePose,multiplayerTick,setNetworkRole,setVehiclePermission,cancelVehicleControl,get localNetworkPose(){const p=safePlayer();return {x:p.x,z:p.z,angle:p.angle,jump:jumpHeight,...networkLocation(),profile:{...state.profile},driving,moving:motion>.05}},setAvatar,get safePlayer(){return safePlayer()},petFarmAnimal(id){renderDirty=true;const r=farmPets.pet(id);if(r.changed){stop();actionTool='hand';actionTime=.72}return r},get visitorStatus(){return nightVisitors.status},observeVisitor:()=>nightVisitors.observe(),dismissVisitor(){const r=nightVisitors.dismiss();if(r.changed){visitorChase=true;companion.watchVisitor(nightVisitors.guardTarget(),true);renderDirty=true}return r},whistleDog(){renderDirty=true;return companion.whistle()},petDog(){const pet=companion.pet();if(pet){stop();actionTool='hand';actionTime=.72;renderDirty=true;renderer.shadowMap.needsUpdate=true}return pet},defendThreat:target=>wildlifeDefense.defend(target),get companionStatus(){return companion.status},get trackStats(){return tractorTracks.stats},get seasonVisual(){return seasonalScenery.inspect()},pickSign,toggleTractor,vehicleAction,toggleTrailer,refreshVehicle,toggleHorse,toggleHorseCart,get horseCartAttached(){return horseCart.attached},get horseRiding(){return horseRiding},get driving(){return driving},get tractorStatus(){const access=vehicleAccess(state,regions?.active.id||'farm',{driving});return {...tractorData(),...access,driving,near:access.nearDriver,serviceReason:access.reason,speed:driving?speed:0}},renderer,scene,camera,photoTargets,capturePhoto,showAlert,showAnimalHeart,observeFrame,setZoom,travel:(id,spawn,restore=false)=>{if(!restore&&!canEnterArea(id))return regions.active;refreshFarmLayout();return regions.travel(id,spawn,restore)},nearby:()=>{const horse=horseCart.point(regions?.active.id);if(!driving&&horse&&Math.hypot(state.player.x-horse.x,state.player.z-horse.z)<horse.radius)return horse;const tree=!driving?activityArt.interactions.find(p=>p.type==='christmasTree'&&Math.hypot(state.player.x-p.x,state.player.z-p.z)<p.radius):null;if(tree)return tree;if(!driving&&state.carryingHay){const feed=[...regions.active.interactions,...transportedHerd.interactions].filter(p=>p.type==='feed'&&Math.hypot(state.player.x-p.x,state.player.z-p.z)<(p.radius||1.05)).sort((a,b)=>Number(animalStatus(state,a.data.animalId).fed)-Number(animalStatus(state,b.data.animalId).fed)||Math.hypot(state.player.x-a.x,state.player.z-a.z)-Math.hypot(state.player.x-b.x,state.player.z-b.z))[0];if(feed)return feed}let point=regions.nearby(p=>state.carryingHay||p.type!=='feed'),distance=point?Math.hypot(state.player.x-point.x,state.player.z-point.z):Infinity;if(!driving&&nearTractor()&&(!point||point.type==='portal'))return {type:'tractor',label:'Dirigir trator'};const stump=regions.isFarm&&!driving&&!stumpSelection&&!state.held&&!state.carryingHay&&state.tool==='hand'?findFarmStump(state,state.player.x,state.player.z,1.1):null;if(stump&&stump.distance<distance){point={type:'farmStump',x:stump.x,z:stump.z,radius:1.1,label:'Pegar toco para mudar de lugar',data:{id:stump.id}};distance=stump.distance}for(const candidate of [...transportedHerd.interactions,...(!driving&&state.tool==='hand'?activityArt.interactions:[]),...[farmPets.nearby(state.player),nightVisitors.nearby(state.player)].filter(Boolean)]){const d=Math.hypot(state.player.x-candidate.x,state.player.z-candidate.z);if(d<(candidate.radius||1.6)&&d<distance){point=candidate;distance=d}}const dog=companion.status,dogDistance=Math.hypot(state.player.x-dog.x,state.player.z-dog.z);if(!driving&&dog.present!==false&&dog.mode!=='riding'&&dogDistance<1.15&&dogDistance<distance)return {type:'dogPet',label:'Fazer carinho em '+dog.name,radius:1.15};return point||(driving||nearTractor()?{type:'tractor',label:driving?'Descer do trator':'Dirigir trator'}:null)},get area(){return regions.active.id},get region(){return regions.active},get destinations(){return regions.destinations},get zoom(){return {value:zoomValue,target:zoomTarget,min:minimumZoom,max:maximumZoom}},get performance(){return {pixelRatio:renderer.getPixelRatio(),maximumPixelRatio,frameAverage,plotBuilds,plotRegions:plotChunks.size,grassRegions:grassCells.size}},get animation(){return {moving:motion>.05,running:isRunning,phase:gait,travel,speed,actionTime,jumping:!!hop,jumpHeight,hopCount,hips:legs.map(l=>l.rotation.x),knees:knees.map(l=>l.rotation.x)}},rebuild,move,stop,update,toolModel,effect,act(id=state.tool){stop();actionTool=id;actionTime=.72},get locations(){return regions?.active.id==='homestead'?{house:{x:.5,z:-7.5},shipping:{x:5.2,z:-5.3},well:{x:11.6,z:.4}}:{house:farmPoint(state,'house',0,2.6),shipping:farmPoint(state,'shipping',0,1.5),well:farmPoint(state,'well',0,1.5)}},get busy(){return actionTime>0||!!hop||hammockTime>0}};
+}

@@ -1,14 +1,15 @@
+import {STARTER_TOOLS,packedTools,validPackedTools} from './tool-loadout.js?v=0.51';
 import {migrateFarmLayout,validFarmLayout,validateFarmLayout} from './farm-customization.js?v=0.47';
 import {MAIN_FIELD,LEGACY_FIELD,MAIN_PLOT_COUNT,LEGACY_PLOT_COUNT,migrateCultivation} from './cultivation-layout.js?v=0.47';
 import {migrateFarmStumps,validFarmStumps} from './farm-stumps.js?v=0.49';
-import {CROPS,ITEMS,TOOLS,validSave} from './simulation.js?v=0.47';
+import {CROPS,ITEMS,TOOLS,validSave} from './simulation.js?v=0.51';
 import {ANIMALS} from './animal-care.js?v=0.47';
 
 // Network data has its own schema. Visual release numbers never participate in
 // compatibility checks, and aliases/local settings never cross the wire.
 const SHARED=['version','farmName','day','season','year','minutes','weather','money','shipping','earned','lumber','seedChest','seedStorageVersion','homePlots','homesteads','animalCare','animalLocations','animalWander','herdRoutes','tractor','coopDriver','farmPets','nightVisits','eggCollections','gathered','farmStumps','farmLayout'];
 const CLOCK=new Set(['day','season','year','minutes','weather']);
-const PERSONAL=['seedItemsVersion','inventory','held','bags','seed','tool','carryingHay','stamina','fatigue','water'];
+const PERSONAL=['seedItemsVersion','inventory','held','bags','seed','tool','packedTools','carryingHay','stamina','fatigue','water'];
 const BAD=new Set(['__proto__','prototype','constructor']);
 const ANIMAL_IDS=new Set(ANIMALS.map(a=>a.id)),LOT_IDS=new Set(['willow','sunrise','pine']);
 const object=v=>v!==null&&typeof v==='object'&&!Array.isArray(v)&&(Object.getPrototypeOf(v)===Object.prototype||Object.getPrototypeOf(v)===null);
@@ -98,12 +99,14 @@ export function diffShared(before,after){
 function validPersonal(value){
  if(!object(value)||!bounded(value)||Object.keys(value).some(k=>!PERSONAL.includes(k)))return false;
  if(!Array.isArray(value.inventory)||value.inventory.length>24||!value.inventory.every(item)||(value.held!==null&&!item(value.held))||!counts(value.bags)||!crop(value.seed)||!TOOLS.includes(value.tool))return false;
+ if(value.packedTools!==undefined&&!validPackedTools(value.packedTools))return false;
  if(typeof value.carryingHay!=='boolean'||value.carryingHay&&value.held)return false;
  return ['stamina','fatigue','water'].every(k=>number(value[k],0,100));
 }
-export function capturePersonal(state){return clone({seedItemsVersion:1,inventory:state.inventory||[],held:state.held||null,bags:state.bags||{},seed:crop(state.seed)?state.seed:'turnip',tool:TOOLS.includes(state.tool)?state.tool:'hand',carryingHay:state.carryingHay===true,stamina:state.stamina??100,fatigue:state.fatigue??0,water:state.water??100})}
-export function applyPersonal(state,data){if(!validPersonal(data))return false;Object.assign(state,clone(data));return true}
-export function resetVisitorPersonal(state){const data={seedItemsVersion:1,inventory:[],held:null,bags:{},seed:'turnip',tool:'hand',carryingHay:false,stamina:100,fatigue:0,water:100};Object.assign(state,data);return capturePersonal(state)}
+export function capturePersonal(state){return clone({seedItemsVersion:1,inventory:state.inventory||[],held:state.held||null,bags:state.bags||{},seed:crop(state.seed)?state.seed:'turnip',tool:TOOLS.includes(state.tool)?state.tool:'hand',carryingHay:state.carryingHay===true,stamina:state.stamina??100,fatigue:state.fatigue??0,water:state.water??100,packedTools:packedTools(state)})}
+function withPackedTools(data){const {packedTools=[...STARTER_TOOLS],...rest}=data;return {...rest,packedTools}}
+export function applyPersonal(state,data){if(!validPersonal(data))return false;Object.assign(state,clone(withPackedTools(data)));return true}
+export function resetVisitorPersonal(state){const data={seedItemsVersion:1,inventory:[],held:null,bags:{},seed:'turnip',tool:'hand',packedTools:[...STARTER_TOOLS],carryingHay:false,stamina:100,fatigue:0,water:100};Object.assign(state,data);return capturePersonal(state)}
 function readPath(root,path){let parent=root;for(const key of path.slice(0,-1)){if(!own(parent,key)||!object(parent[key])&&!Array.isArray(parent[key]))return null;parent=parent[key]}return {parent,key:path.at(-1)}}
 function validEntry(v){return object(v)&&typeof v.exists==='boolean'&&Object.keys(v).every(k=>k==='exists'||k==='value')&&(!v.exists||own(v,'value')&&bounded(v.value))}
 /** Validate every comparison and the final model before mutating anything. The
@@ -112,7 +115,8 @@ export function applyTransaction(state,transaction,expectedPersonal){
  const conflict={ok:false,message:'A fazenda mudou enquanto você agia. Seu inventário foi restaurado; tente novamente.'};
  if(!object(transaction)||!Array.isArray(transaction.patches)||transaction.patches.length>400||!validPersonal(transaction.personal))return {ok:false,message:'Ação multiplayer inválida.'};
  if(expectedPersonal!==undefined&&!validPersonal(expectedPersonal))return {ok:false,message:'Sessão do visitante inválida.'};
- if(transaction.beforePersonal!==undefined&&expectedPersonal!==undefined&&!equal(transaction.beforePersonal,expectedPersonal))return conflict;
+ if(transaction.beforePersonal!==undefined&&expectedPersonal!==undefined&&
+   (!validPersonal(transaction.beforePersonal)||!equal(withPackedTools(transaction.beforePersonal),withPackedTools(expectedPersonal))))return conflict;
  const current=sharedSnapshot(state),candidate=clone(current),seen=new Set();
  for(const patch of transaction.patches){
   if(!object(patch)||!Array.isArray(patch.path)||patch.path.length<1||patch.path.length>9||patch.path.some(k=>typeof k!=='string'&&!Number.isInteger(k)||BAD.has(k)||typeof k==='number'&&(k<0||k>=MAIN_PLOT_COUNT)))return {ok:false,message:'Caminho de ação inválido.'};

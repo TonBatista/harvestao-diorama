@@ -6,8 +6,8 @@ import {artisanMaterial} from './art-direction.js?v=0.47';
 import {createKit} from './region-kit.js?v=0.50';
 import {createInteriorRoom,table,chair,shelf,rug,vase,npc,group} from './rural-room.js?v=0.50';
 import {addResident} from './new-residents.js?v=0.50';
-import {horseModel} from './horse-cart.js?v=0.50';
-import {economyState} from './rural-economy.js?v=0.50';
+import {horseModel} from './horse-cart.js?v=0.51';
+import {economyState} from './rural-economy.js?v=0.51';
 export function addVillageServices(region){if(region.id!=='village')return;const k=createKit();for(const a of SERVICES){const h=k.house(a.x,a.z,5.8,4.1,a.color,a.id==='mechanic'?'#707f7e':a.id==='clothesShop'?'#9d7e92':a.id==='birdClub'?'#6d9080':'#8a8079');h.position.y=-1.2;k.portal({x:a.x-.5,z:a.z+2.65,to:a.id,label:a.name,spawn:[0,3.4],autoRadius:.78});serviceFrontage(k,a);for(const side of[-1,1]){const p=k.plant(a.x+side*3.35,a.z-.4,.85,side>0?'#b9a5b0':'#d7bd82');p.position.y=-1.18}}for(const side of[-1,1])for(const z of[59,76]){const p=k.tree(side*11,z,.76);p.position.y=-1.2;const bed=k.floor('#9cae7b',6,5,side*11,z,-1.18,'moss');for(let i=0;i<7;i++){const plant=k.plant(side*11+Math.sin(i*2.4)*2,z+Math.cos(i*2.4)*1.7,.60,i%2?'#b99aa8':'#d4bd83');plant.position.y=-1.15}}const e=k.finish({id:'village-services',indoors:true,bounds:SERVICE_BOUNDS});region.fixed.add(e.fixed);region.dynamic.add(e.dynamic);region.colliders.push(...e.colliders);region.portals.push(...e.portals);region.interactions.push(...e.interactions);region.signs.push(...e.signs);}
 export function buildService(state,id){const a=SERVICES.find(a=>a.id===id);const k=createInteriorRoom({id,label:a.name,w:12,d:10,wall:id==='vetClinic'?'#f0f2e9':a.color,wallKind:id==='vetClinic'?'plain':'stone',returnTo:'village',returnSpawn:[a.x-.5,a.z+3.3]}),F=k.fixed;
  const desk=table(k,0,-2.7,3,1.2,.88);chair(k,0,-3.7);vase(k,desk,1,.98,0,'#a6b49a');npc(k,{name:a.owner,text:'Seja bem-vindo a '+a.name+'. Aproxime-se do balcão para conhecer nossos serviços.',x:2.3,z:-2.5,shirt:a.shirt,hair:id==='agroShop'?'#8a7965':'#795f48'});k.interact({type:id,x:0,z:-1.25,radius:1.5,label:a.name+' · serviços'});

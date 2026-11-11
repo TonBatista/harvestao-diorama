@@ -1,3 +1,4 @@
+import {ownsTool} from './tool-loadout.js?v=0.51';
 import * as T from './three.module.js';
 import {createInteriorRoom,group,C,table,shelf,rug,vase,lantern} from './rural-room.js?v=0.50';
 function hangingTool(k,parent,x,y,z,kind){
@@ -13,10 +14,33 @@ function hangingTool(k,parent,x,y,z,kind){
 function seedPackets(k,parent,x,y,z){
  for(let i=0;i<5;i++){const xx=x+(i-2)*.28,packet=k.box(parent,['#c4d1a8','#d8bf86','#c1a8bc','#b8c8be','#dec6a4'][i],xx,y,z,.23,.34,.055,'fabric');packet.rotation.z=(i-2)*.035;k.box(parent,'#eee2be',xx,y+.1,z+.035,.17,.045,.012);k.ball(parent,['#b69466','#8da178','#b57867','#a8859e','#c6a25f'][i],xx,y-.015,z+.035,.055,.06,.012);k.box(parent,'#778b61',xx,y+.055,z+.05,.025,.055,.008);}
 }
-export function buildToolRoom(){
+export function buildToolRoom(state={}){
  const k=createInteriorRoom({id:'toolroom',label:'Quarto de ferramentas',w:10,d:9,wall:'#d4c4a2',floor:'#b49970',wallKind:'wood',returnTo:'farm',returnSpawn:[6,-17],windows:true}),F=k.fixed;
  const seeds=shelf(k,-2.8,-3.85,2.85,'packets');for(let row=0;row<3;row++)seedPackets(k,seeds,0,.36+row*.63,.12);
  k.box(F,'#a38860',2.15,1.73,-4.22,3.6,1.68,.13,'wood');for(let i=0;i<6;i++){k.cyl(F,'#716d53',.65+i*.60,2.2,-4.09,.025,.13).rotation.x=Math.PI/2;hangingTool(k,F,.65+i*.60,1.70,-3.98,['hoe','axe','hammer','sickle','water','snowShovel'][i]);}
+
+ k.box(F,'#aa8d62',2.15,.88,-4.06,3.5,.105,.56,'wood');
+ const storedTool=id=>{
+  const model=group(k.dynamic,0,0,0);
+  const refresh=()=>{model.visible=!state.packedTools?.includes(id)};
+  refresh();k.animate(refresh);
+  return model;
+ };
+ if(ownsTool(state,'milker')){
+  const model=storedTool('milker');
+  k.cyl(model,'#879d99',1.43,1.12,-3.96,.16,.39);
+  k.cyl(model,'#bacbc3',1.43,1.32,-3.96,.165,.045);
+  k.beam(model,'#514b44',[1.43,1.35,-3.96],[1.74,1.18,-3.94],.034,'plain');
+  k.cyl(model,'#929d92',1.74,1.13,-3.94,.055,.13);
+ }
+ if(ownsTool(state,'shears')){
+  const model=storedTool('shears');
+  for(const side of [-1,1]){
+   const blade=k.box(model,'#b8c6bc',2.75+side*.066,1.14,-3.96,.055,.31,.065);
+   blade.rotation.z=-side*.32;
+   k.ball(model,'#765543',2.75+side*.112,.985,-3.96,.071,.055,.049);
+  }
+ }
  const work=table(k,-3.78,-.25,1.52,2.55,.82);k.box(work,'#c9b084',0,.91,0,1.65,.08,2.64,'wood');k.box(work,'#b9c5af',0,.97,.35,.94,.035,.61,'fabric');k.beam(work,'#99794f',[-.35,1.01,-.75],[.35,1.01,-.20],.04,'wood');k.box(work,'#718376',-.35,1.01,-.75,.25,.13,.21);k.cyl(work,'#a78c60',.4,1.10,-.88,.12,.31,'wood');
  const boots=group(F,-3.6,0,2.1);for(const s of[-1,1]){k.cyl(boots,'#697b64',s*.21,.30,0,.14,.54);k.ball(boots,'#6f8066',s*.21,.09,.12,.16,.10,.25);k.cyl(boots,'#56664e',s*.21,.58,0,.145,.055);}k.solid(-3.6,2.1,.82,.65,{height:.65});
  const cold=group(F,3.65,0,-.45);k.box(cold,'#b1c2b5',0,.66,0,1.75,1.28,1.28);k.box(cold,'#d4d8c3',0,1.34,0,1.86,.14,1.38);k.box(cold,'#7c9385',0,1.42,.08,1.43,.025,1.0);k.box(cold,'#5f786d',0,1.46,.22,.55,.045,.075);k.box(cold,'#e4d5ab',0,.88,.65,.72,.21,.015);for(const xx of[-.66,.66])k.box(cold,'#73877b',xx,.09,0,.15,.17,1.15);k.solid(3.65,-.45,1.91,1.43,{height:1.48});

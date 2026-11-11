@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {CROPS} from './simulation.js?v=0.47';
+import {CROPS} from './simulation.js?v=0.51';
 import {miniatureTexture} from './miniature-materials.js?v=0.47';
 
 // Every shape and material is shared: world.js can merge a whole field by material.

@@ -1,5 +1,5 @@
 import {residentPortrait} from './resident-portraits.js?v=0.47';
-import {LOTS,BUILDINGS,migrateHomesteads,purchaseLot,selectLot,lotState,clearLotDebris,constructBuilding,buyLumber} from './homestead-rules.js?v=0.47';
+import {LOTS,BUILDINGS,migrateHomesteads,purchaseLot,selectLot,lotState,clearLotDebris,constructBuilding,buyLumber} from './homestead-rules.js?v=0.51';
 import {ANIMALS} from './animal-care.js?v=0.47';
 import {migrateTransport,transportRoster,loadAnimal,unloadAnimal,transportArea,herdStatus,ringHerd,recoverHerd,indoorLocation} from './transport-rules.js?v=0.47';
 export function mountExpansionUI({state,world,notify,save,hud,beforeOpen,goArea,playBell=()=>{},horseConstruction=()=>{}}){

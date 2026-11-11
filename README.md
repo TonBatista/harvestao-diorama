@@ -1,8 +1,12 @@
 # Harvestão — a vida no campo
 
-Versão 0.50.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.51.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
 [Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/)
+
+## Ferramentas e coleta no celeiro — 0.51
+
+Compre a ordenhadeira manual e a tesoura de tosquia na Agro Santa Cruz. Na casinha de ferramentas, escolha o que levar ou guardar. A seleção vale para a mochila e a barra inferior. Use X junto da vaca com a ordenhadeira ou junto da ovelha com a tesoura. Use X com as mãos livres para recolher ovos nos ninhos ou fazer carinho nos animais. O produto vai para as mãos e pode ser guardado na mochila ou entregue na caixa de vendas.
 
 ## Ruas da Vila Santa Cruz e carroça — 0.50
 

@@ -1,6 +1,6 @@
 import {solveHorseCart,cartSamples,cartWorldPose} from './horse-cart-physics.js?v=0.50';
 import * as T from './three.module.js';
-import {economyState} from './rural-economy.js?v=0.50';
+import {economyState} from './rural-economy.js?v=0.51';
 import {terrainHeight} from './valley-terrain.js?v=0.50';
 export function horseModel(){const root=new T.Group(),horse=new T.Group(),cart=new T.Group(),legs=[],wheels=[],mats=new Map(),sphere=new T.SphereGeometry(1,12,8),box=new T.BoxGeometry(1,1,1),cyl=new T.CylinderGeometry(1,1,1,12);root.add(horse,cart);
  function part(p,g,c,x,y,z,sx,sy,sz){let m=mats.get(c);if(!m){m=new T.MeshStandardMaterial({color:c,roughness:.85});mats.set(c,m)}const o=new T.Mesh(g,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=o.receiveShadow=true;p.add(o);return o}

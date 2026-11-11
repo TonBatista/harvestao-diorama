@@ -26,7 +26,7 @@ const isItem=id=>itemInfo(id)!==null;
 export const SEASONS=['Primavera','Verão','Outono','Inverno'];
 const isCrop=id=>typeof id==='string'&&Object.hasOwn(CROPS,id);
 export function cropsForSeason(season){return Object.entries(CROPS).filter(([,crop])=>crop.season===season)}
-export const TOOLS=['hand','hoe','water','seed','sickle','axe','hammer','camera','snowShovel'];
+export {TOOLS} from './tool-loadout.js?v=0.51';
 export {TILE} from './cultivation-layout.js?v=0.47';
 import {TILE} from './cultivation-layout.js?v=0.47';
 export const FIELD=LEGACY_FIELD;
@@ -54,14 +54,23 @@ export function syncSeedPacks(s){s.bags={};for(const id of s.inventory||[]){cons
 export function migrateSeedStorage(s){const chest=seedCounts(s.seedChest);s.inventory??=[];if(s.seedItemsVersion!==1){for(const[id,n]of Object.entries(seedCounts(s.bags))){const carried=Math.min(n,Math.max(0,BAG_CAPACITY-s.inventory.length));s.inventory.push(...Array(carried).fill('seeds:'+id));chest[id]=(chest[id]||0)+n-carried}s.seedItemsVersion=1}s.seedStorageVersion=1;s.seedChest=chest;syncSeedPacks(s);return chest}
 export function returnSeeds(s){migrateSeedStorage(s);let n=0;s.inventory=s.inventory.filter(id=>{const c=ITEMS[id]?.cropId;if(!c)return true;s.seedChest[c]=(s.seedChest[c]||0)+1;n++;return false});syncSeedPacks(s);if(s.tool==='seed')s.tool='hand';return {changed:n>0,message:n+' pacotes devolvidos ao baú.'}}
 export function takeSeed(s,id){migrateSeedStorage(s);if(!isCrop(id)||!(s.seedChest[id]>0))return {changed:false,message:'Não há sacos desta semente no baú.'};if(s.inventory.length>=BAG_CAPACITY)return {changed:false,message:'A mochila está cheia.'};s.seedChest[id]--;s.inventory.push('seeds:'+id);s.seed=id;syncSeedPacks(s);return {changed:true,message:'Um pacote de '+CROPS[id].name+' na mochila. Você pode levar mais.'}}
+export function availableEggs(s,place){
+ const day=s.year+'-'+s.season+'-'+s.day,collections=s.eggCollections||{};
+ const inside=place==='farm'?'barn':place.startsWith('homestead:')?'homesteadBarn:'+place.split(':')[1]:place;
+ const hens=ANIMALS.filter(a=>{
+  if(a.species!=='chicken'||(s.animalLocations?.[a.id]||'barn')!==inside)return false;
+  const status=animalStatus(s,a.id);
+  return status.alive&&!status.sick;
+ });
+ return hens.filter((hen,i)=>!(i===0&&collections[place]===day)&&
+  !Object.entries(collections).some(([key,value])=>value===day&&key.endsWith(':'+hen.id)));
+}
 export function collectEgg(s,key='barn'){
  if(s.held||s.carryingHay)return {changed:false,message:'Deixe as mãos livres para pegar o ovo.'};
- const day=s.year+'-'+s.season+'-'+s.day,place=typeof key==='string'?key.slice(0,80):'barn';s.eggCollections??={};
- const inside=place==='farm'?'barn':place.startsWith('homestead:')?'homesteadBarn:'+place.split(':')[1]:place;
- const hens=ANIMALS.filter(a=>a.species==='chicken'&&animalStatus(s,a.id).alive&&!animalStatus(s,a.id).sick&&(s.animalLocations?.[a.id]||'barn')===inside);
- const hen=hens.find(a=>s.eggCollections[place+':'+a.id]!==day&&!(a===hens[0]&&s.eggCollections[place]===day));
- if(!hen)return {changed:false,message:'Os ovos de hoje já foram recolhidos. Cada galinha saudável põe um por manhã.'};
- s.eggCollections[place+':'+hen.id]=day;s.held='egg';return {changed:true,rebuildArea:true,message:'Ovo de '+hen.name+' nas mãos. X guarda na mochila.'};
+ const place=typeof key==='string'?key.slice(0,80):'barn',hen=availableEggs(s,place)[0];
+ if(!hen)return {changed:false,message:'Não há ovos no ninho. Cada galinha saudável põe um por manhã.'};
+ s.eggCollections??={};s.eggCollections[place+':'+hen.id]=s.year+'-'+s.season+'-'+s.day;
+ s.held='egg';return {changed:true,rebuildArea:true,message:'Ovo de '+hen.name+' nas mãos. X guarda na mochila.'};
 }
 /** A charged pour waters a row of three in front of the avatar, using only the water available. */
 export function waterThree(s){

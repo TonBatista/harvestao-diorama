@@ -65,7 +65,15 @@ async function sleepPiano(){await start();if(!ctx||preferences.muted)return;cons
   for(let i=0;i<count;i++){const at=ctx.currentTime+.02+i*(duration+.10),o=ctx.createOscillator(),g=ctx.createGain(),filter=ctx.createBiquadFilter(),vibrato=ctx.createOscillator(),depth=ctx.createGain();o.type=cow||sheep?'sawtooth':'triangle';const hz=cow?108:sheep?290:pig?100:duck?390:650;o.frequency.setValueAtTime(hz*(cow?.8:1.15),at);o.frequency.linearRampToValueAtTime(hz,at+duration*.3);o.frequency.exponentialRampToValueAtTime(hz*(cow?.64:.65),at+duration);filter.type='bandpass';filter.frequency.value=cow?430:sheep?1050:pig?430:duck?1100:1600;filter.Q.value=cow?1.3:1;vibrato.frequency.value=sheep?17:cow?5:35;depth.gain.value=sheep?26:cow?6:15;vibrato.connect(depth);depth.connect(o.frequency);g.gain.setValueAtTime(.0001,at);g.gain.linearRampToValueAtTime(loud,at+.035);g.gain.exponentialRampToValueAtTime(.0001,at+duration);o.connect(filter);filter.connect(g);g.connect(ambient);farmSynthVoices.add(o);o.onended=()=>{farmSynthVoices.delete(o);try{vibrato.stop()}catch{}o.disconnect();filter.disconnect();g.disconnect();vibrato.disconnect();depth.disconnect()};o.start(at);vibrato.start(at);o.stop(at+duration+.03)}
  }
  function playFarmCall(target){const species=target.speciesId,recording=farmRecordings[species];stopFarmCall();if(!recording){synthFarmCall(species,target.distance);return}let audio=farmAudioCache.get(species);if(!audio){audio=new Audio(recording.url);audio.preload='none';farmAudioCache.set(species,audio)}try{audio.currentTime=0}catch{}const call={audio,species,area:world.area,end:farmTime+recording.seconds};farmCall=call;audio.volume=farmVolume(target.distance);audio.play().then(()=>{if(farmCall!==call||document.hidden||isPaused())audio.pause()}).catch(()=>{if(farmCall===call){farmCall=null;synthFarmCall(species,target.distance)}})}
+ async function animalCall(speciesId){
+  if(!['cow','sheep','chicken','rooster','duck','pig'].includes(speciesId))return;
+  const area=world.area;
+  await start();
+  if(area!==world.area||document.hidden||isPaused()||preferences.muted||preferences.master<=0||preferences.ambience<=0)return;
+  farmHeard.set(speciesId,farmTime);nextFarmCall=farmTime+5;
+  playFarmCall({speciesId,distance:1});
+ }
  function updateFarmCalls(dt){if(!(dt>0)||document.hidden||isPaused()||preferences.muted||preferences.master<=0||preferences.ambience<=0)return;farmTime+=dt;farmCheck+=dt;if(farmCheck<1||farmTime<nextFarmCall)return;farmCheck=0;const candidates=(world.animalVoices||[]).filter(a=>a.distance<10&&farmTime-(farmHeard.get(a.speciesId)??-100)>(a.speciesId==='rooster'?45:18)).sort((a,b)=>(farmHeard.get(a.speciesId)??-100)-(farmHeard.get(b.speciesId)??-100)||a.distance-b.distance);if(!candidates.length)return;const target=candidates[0];farmHeard.set(target.speciesId,farmTime);nextFarmCall=farmTime+6+Math.random()*5;playFarmCall(target)}
 
-refresh();return {sleepPiano,rooster,update,bell,bark,whistle,open(){menuButton.click()}};
+refresh();return {sleepPiano,rooster,update,bell,bark,whistle,animalCall,open(){menuButton.click()}};
 }
