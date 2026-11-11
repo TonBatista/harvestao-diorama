@@ -1,12 +1,76 @@
 import * as T from './three.module.js';
-export function serviceSign(k,a){const canvas=document.createElement('canvas');canvas.width=canvas.height=256;const q=canvas.getContext('2d');q.fillStyle='#eedbb0';q.beginPath();q.roundRect(9,9,238,238,29);q.fill();q.strokeStyle='#b19462';q.lineWidth=7;q.stroke();q.lineCap=q.lineJoin='round';
- const ellipse=(x,y,rx,ry,color)=>{q.fillStyle=color;q.beginPath();q.ellipse(x,y,rx,ry,0,0,Math.PI*2);q.fill()},line=(points,color,width)=>{q.strokeStyle=color;q.lineWidth=width;q.beginPath();points.forEach(([x,y],i)=>i?q.lineTo(x,y):q.moveTo(x,y));q.stroke()};
- if(a.id==='agroShop'){q.fillStyle='#bda16d';q.beginPath();q.roundRect(66,62,124,142,13);q.fill();q.fillStyle='#f5e8bf';q.fillRect(76,93,104,87);line([[128,159],[128,105]],'#6d8a58',9);ellipse(108,119,23,12,'#8da56a');ellipse(148,108,22,13,'#769655');line([[73,74],[184,74]],'#88724d',9)}
- if(a.id==='vetClinic'){ellipse(125,150,43,33,'#739a8f');for(const [x,y]of[[75,101],[107,80],[145,81],[177,105]])ellipse(x,y,15,19,'#91b4a5');line([[181,165],[181,210]],'#b87969',13);line([[159,187],[204,187]],'#b87969',13)}
- if(a.id==='clothesShop'){line([[78,72],[102,60],[115,84],[141,84],[155,60],[180,72],[206,111],[176,130],[163,109],[163,200],[91,200],[91,109],[77,130],[51,111],[78,72]],'#987fa6',12);q.fillStyle='#bfa9ca';q.fillRect(99,113,56,78);line([[118,61],[127,51],[140,58],[133,74]],'#9c8257',7)}
- if(a.id==='artSchool'){ellipse(128,133,78,65,'#b48f5d');ellipse(115,139,14,19,'#eedbb0');for(const [x,y,c]of[[88,104,'#ba7e76'],[124,86,'#e2c27b'],[165,103,'#8ea574'],[176,145,'#8f9fb1']])ellipse(x,y,12,13,c);line([[97,198],[173,75]],'#6e755e',12);line([[173,75],[184,56]],'#b08b62',16)}
- if(a.id==='birdClub'){ellipse(126,143,61,40,'#889e83');ellipse(165,107,28,29,'#aabb8e');q.fillStyle='#cfab69';q.beginPath();q.moveTo(188,108);q.lineTo(214,120);q.lineTo(188,126);q.fill();ellipse(173,102,4,5,'#465747');ellipse(111,145,31,21,'#6f8b77');line([[92,180],[150,180]],'#997c57',8);line([[114,170],[115,181]],'#997c57',5);line([[81,149],[48,137],[69,170]],'#6c8274',13)}
- if(a.id==='mechanic'){line([[79,183],[155,105]],'#879b99',30);ellipse(169,88,35,33,'#9fb0a6');q.fillStyle='#eedbb0';q.beginPath();q.moveTo(149,58);q.lineTo(170,90);q.lineTo(197,63);q.lineTo(204,37);q.lineTo(144,36);q.fill();ellipse(78,182,12,12,'#eedbb0');line([[65,72],[180,190]],'#b0956e',15);ellipse(185,195,13,15,'#8d7460')}
+const TAU=Math.PI*2;
+const signDisk=new T.CylinderGeometry(1,1,1,36);
+signDisk.userData.shared=true;
+const oval=(x,y,w,h)=>{const shape=new T.Shape();shape.absellipse(x,y,w,h,0,TAU,false,0);return shape};
+function polygon(points){
+ const shape=new T.Shape();
+ points.forEach(([x,y],i)=>i===0?shape.moveTo(x,y):shape.lineTo(x,y));
+ shape.closePath();
+ return shape;
+}
+const rectangle=(x,y,w,h)=>polygon([[x-w/2,y-h/2],[x+w/2,y-h/2],[x+w/2,y+h/2],[x-w/2,y+h/2]]);
+export function serviceSign(k,a){
+ const group=new T.Group(),x=a.x+2.15,z=a.z+2.42,y=2.03;
+ group.position.set(x,-1.2+y,z);group.rotation.y=.08;k.fixed.add(group);
+ const disk=k.mesh(group,signDisk,'#96643d',0,0,0,.53,.13,.53,'wood');
+ disk.rotation.x=Math.PI/2;
+ const face=k.mesh(group,signDisk,'#c49861',0,0,.069,.48,.035,.48,'wood');
+ face.rotation.x=Math.PI/2;
+ const rim=k.mesh(group,new T.TorusGeometry(.493,.018,6,36),'#6f513c',0,0,.069,1,1,1,'wood');
+ rim.castShadow=true;
+ k.box(group,'#594d3f',0,.66,-.21,.10,.34,.055);
+ k.beam(group,'#544d40',[0,.71,-.23],[0,.71,.05],.028);
+ k.beam(group,'#584b3c',[0,.55,-.22],[0,.70,.025],.019);
+ for(const hook of [-.18,.18]){
+  k.beam(group,'#5e503f',[0,.70,.02],[hook,.50,.02],.014);
+  k.ball(group,'#735e47',hook,.466,.077,.022,.024,.014);
+ }
+ function carve(shape,color,z=.087){
+  const geometry=new T.ExtrudeGeometry(shape,{depth:.018,bevelEnabled:true,bevelSegments:1,bevelSize:.010,bevelThickness:.010,curveSegments:10});
+  k.mesh(group,geometry,color,0,0,z,1,1,1);
+ }
+ if(a.id==='agroShop'){
+  carve(polygon([[-.19,.25],[.19,.25],[.16,.14],[.22,-.23],[.13,-.28],[-.15,-.28],[-.22,-.23],[-.16,.14]]),'#ede0ac');
+  carve(rectangle(0,.20,.35,.045),'#a17e4b',.111);
+  carve(rectangle(0,-.045,.033,.22),'#627e4d',.111);
+  carve(oval(-.067,.035,.080,.038),'#739454',.114);
+  carve(oval(.071,.082,.087,.040),'#8ba360',.114);
+ }else if(a.id==='vetClinic'){
+  carve(oval(-.050,-.055,.16,.119),'#688f88');
+  for(const [px,py] of [[-.215,.102],[-.103,.189],[.032,.194],[.149,.113]])carve(oval(px,py,.054,.068),'#7da69a');
+  carve(rectangle(.175,-.179,.19,.052),'#b36455',.113);
+  carve(rectangle(.175,-.179,.052,.19),'#b36455',.114);
+ }else if(a.id==='clothesShop'){
+  carve(polygon([[-.15,.23],[-.073,.27],[-.053,.17],[.053,.17],[.073,.27],[.15,.23],[.28,.083],[.168,.010],[.121,.067],[.135,-.23],[-.135,-.23],[-.121,.067],[-.168,.010],[-.28,.083]]),'#9877a5');
+  carve(rectangle(0,-.026,.025,.34),'#c5a5c7',.111);
+  carve(rectangle(-.077,.016,.063,.060),'#b28cbd',.111);
+  for(const yy of [.07,-.05,-.16])carve(oval(.001,yy,.014,.014),'#e3cca1',.133);
+ }else if(a.id==='artSchool'){
+  const palette=oval(-.045,-.025,.285,.215);
+  const hole=new T.Path();hole.absellipse(-.168,-.081,.044,.058,0,TAU,true,0);palette.holes.push(hole);
+  carve(palette,'#ad7950');
+  for(const [px,py,c] of [[-.204,.065,'#b56867'],[-.078,.116,'#e4bb66'],[.043,.087,'#859b64'],[.088,-.050,'#779cae']])carve(oval(px,py,.045,.043),c,.112);
+  carve(polygon([[.023,-.265],[.246,.190],[.276,.169],[.073,-.279]]),'#6f5947',.117);
+  carve(polygon([[.231,.15],[.244,.239],[.305,.291],[.317,.213],[.278,.129]]),'#d3a77c',.126);
+ }else if(a.id==='birdClub'){
+  carve(polygon([[-.105,-.080],[-.316,.006],[-.254,-.137],[-.112,-.153]]),'#537a68');
+  carve(oval(-.034,-.061,.196,.120),'#7c9d78');
+  carve(oval(.127,.071,.109,.105),'#9eae80');
+  carve(oval(-.084,-.081,.117,.064),'#628374',.111);
+  carve(polygon([[.22,.104],[.329,.058],[.219,.035]]),'#d2a355');
+  carve(oval(.151,.108,.019,.021),'#353d36',.117);
+  carve(rectangle(-.036,-.202,.265,.032),'#85603e');
+ }else{
+  carve(polygon([[-.27,-.20],[-.235,-.26],[-.165,-.248],[.119,.044],[.229,.057],[.294,.134],[.298,.238],[.198,.148],[.132,.210],[.202,.300],[.103,.273],[.037,.197],[.041,.107]]),'#899e9a');
+  carve(polygon([[.157,-.259],[.199,-.222],[-.131,.130],[-.173,.094]]),'#ab7f51',.115);
+  carve(polygon([[-.173,.094],[-.243,.167],[-.258,.226],[-.205,.231],[-.130,.132]]),'#c0c1b2',.116);
+ }
+ const point={type:'info',x,z:z+.70,radius:1.3,label:a.name,data:{name:a.name,text:a.detail},
+  sign:{x,y:y-1.2,z:z+.105,width:1.08,height:1.10,rotation:.08}};
+ k.interactions.push(point);k.signs.push(point);
+ return group;
+}
  const map=new T.CanvasTexture(canvas);map.colorSpace=T.SRGBColorSpace;const mat=new T.MeshBasicMaterial({map,side:T.DoubleSide,toneMapped:false});mat.userData.regionOwned=true;mat.userData.seasonSurface='exclude';const g=new T.Group(),x=a.x+(a.x<0?3.55:-3.55),z=a.z+3.45;g.position.set(x,-1.2,z);g.rotation.y=.60;k.fixed.add(g);k.cyl(g,'#927858',0,.65,0,.07,1.3,'wood');k.box(g,'#9e8057',0,1.35,0,1.40,1.40,.14,'wood');const picture=new T.Mesh(new T.PlaneGeometry(1.26,1.26),mat);picture.position.set(0,1.35,.079);g.add(picture);k.roundSolid(x,z,.09);const p={type:'info',x,z,radius:1.5,label:a.name,data:{name:a.name,text:a.detail},sign:{x,y:.15,z,width:1.40,height:1.40,rotation:.60}};k.interactions.push(p);k.signs.push(p);return g;}
 export function serviceFrontage(k,a){const F=k.fixed,out=a.x+(a.x<0?-4.1:4.1),z=a.z,side=a.x<0?-1:1;serviceSign(k,a);
  if(a.id==='agroShop'){for(let i=0;i<3;i++){k.cyl(F,['#b7a472','#c6b88a','#a89a74'][i],out,-.7,z-1+i*.8,.30,.9,'fabric');k.roundSolid(out,z-1+i*.8,.33)}k.box(F,'#a59574',out,-.2,z+1.45,.85,.65,.75,'wood');k.solid(out,z+1.45,.9,.8)}

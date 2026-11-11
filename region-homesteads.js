@@ -1,7 +1,7 @@
-import {addNewResidents} from './new-residents.js?v=0.47';
-import {addInteriorEntrances} from './interior-catalog.js?v=0.47';
+import {addNewResidents} from './new-residents.js?v=0.50';
+import {addInteriorEntrances} from './interior-catalog.js?v=0.50';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.47';
+import {createKit} from './region-kit.js?v=0.50';
 import {LOTS,BUILDINGS,DEBRIS,migrateHomesteads,lotState} from './homestead-rules.js?v=0.47';
 import {farmGround,farmMeadow,countryTrack,homesteadLandscape,lakeLotLandscape,lakeShorePlants} from './farm-landscape.js?v=0.47';
 const TAU=Math.PI*2;

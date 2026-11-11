@@ -52,11 +52,11 @@ async function sleepPiano(){await start();if(!ctx||preferences.muted)return;cons
  let roosterAudio=null;
  function stopRooster(){if(roosterAudio){roosterAudio.pause();try{roosterAudio.currentTime=0}catch{}}}
  function syncRooster(){if(!roosterAudio)return;const p=state.audioSettings||preferences;if(document.hidden||p.muted||p.master<=0||p.ambience<=0){stopRooster();return}roosterAudio.volume=Math.min(1,(p.master??.7)*(p.ambience??.65)*.65)}
- async function rooster(){await start();const p=state.audioSettings||preferences;if(document.hidden||p.muted||p.master<=0||p.ambience<=0)return false;if(!roosterAudio){roosterAudio=new Audio(new URL('./rooster-v040-1.mp3',import.meta.url).href);roosterAudio.preload='none'}stopRooster();syncRooster();try{await roosterAudio.play();return true}catch{return false}}
+ async function rooster(){await start();const p=state.audioSettings||preferences;if(document.hidden||p.muted||p.master<=0||p.ambience<=0)return false;if(!roosterAudio){roosterAudio=new Audio(new URL('./galo2.mp3',import.meta.url).href);roosterAudio.preload='none'}stopRooster();syncRooster();try{await roosterAudio.play();return true}catch{return false}}
 
 
  // Nearby animals call occasionally. Only one recording is active, loaded on demand.
- const farmRecordings={pig:{url:'https://upload.wikimedia.org/wikipedia/commons/4/4a/Mudchute_pig_2.ogg',seconds:1},duck:{url:'https://upload.wikimedia.org/wikipedia/commons/f/fa/Anas_platyrhynchos_-_Mallard_-_XC62258.ogg',seconds:3.6},rooster:{url:new URL('./rooster-v040-1.mp3',import.meta.url).href,seconds:8}};
+ const farmRecordings={pig:{url:'https://upload.wikimedia.org/wikipedia/commons/4/4a/Mudchute_pig_2.ogg',seconds:1},duck:{url:'https://upload.wikimedia.org/wikipedia/commons/f/fa/Anas_platyrhynchos_-_Mallard_-_XC62258.ogg',seconds:3.6},rooster:{url:new URL('./galo2.mp3',import.meta.url).href,seconds:3}};
  const farmAudioCache=new Map(),farmHeard=new Map(),farmSynthVoices=new Set();let farmCall=null,farmTime=0,nextFarmCall=3,farmCheck=0;
  const farmVolume=d=>Math.max(0,.58*(1-d/13))*(preferences.master??.7)*(preferences.ambience??.65);
  function stopFarmCall(){if(farmCall){farmCall.audio.pause();farmCall=null}for(const voice of farmSynthVoices)try{voice.stop()}catch{}farmSynthVoices.clear()}

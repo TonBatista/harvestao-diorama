@@ -1,5 +1,5 @@
 import {snowArea,parkedSnowballs,parkSnowball,crushSnow,expireSnowballs} from './snow-play.js?v=0.47';
-import {terrainHeight} from './valley-terrain.js?v=0.47';
+import {terrainHeight} from './valley-terrain.js?v=0.50';
 import * as T from './three.module.js';
 import {farmPoint,farmObject,FARM_OBJECTS} from './farm-customization.js?v=0.47';
 import {clearSnow} from './snow-rules.js?v=0.47';

@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.47';
+import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.50';
 
 function info(k,x,z,name,text,radius=1.5){k.interact({x,z,label:name,type:'info',radius,data:{name,text}})}
 function barrel(k,x,z,scale=1){const g=group(k.fixed,x,0,z);k.cyl(g,'#a0835a',0,.45*scale,0,.34*scale,.88*scale,'wood');for(const y of [.12,.45,.77])k.cyl(g,'#6d756b',0,y*scale,0,.35*scale,.045*scale);k.cyl(g,'#c4a579',0,.90*scale,0,.31*scale,.04*scale,'wood');k.roundSolid(x,z,.35*scale,{height:.94*scale});return g}
@@ -8,7 +8,7 @@ function crate(k,x,z,w=.85){const p=k.fixed;k.box(p,'#ad8c5e',x,.38,z,w,.76,.75,
 function crystal(k,x,y,z,scale,color){const geometry=new T.OctahedronGeometry(.24,0),material=new T.MeshStandardMaterial({color,roughness:.29,metalness:.07,emissive:color,emissiveIntensity:.13});material.userData.regionOwned=true;const mesh=new T.Mesh(geometry,material);mesh.position.set(x,y,z);mesh.scale.set(.8*scale,1.9*scale,.8*scale);mesh.rotation.set(.13,.4+x,.20);mesh.castShadow=true;k.fixed.add(mesh);return mesh}
 
 export function buildSmithy(){
- const k=createInteriorRoom({id:'smithy',label:'Ferraria do Miguel',w:12,d:10,wall:'#b5ad99',floor:'#8a7863',floorKind:'stone',returnTo:'village',returnSpawn:[9,13.3]}),F=k.fixed,D=k.dynamic;
+ const k=createInteriorRoom({id:'smithy',label:'Ferraria do Miguel',w:12,d:10,wall:'#b5ad99',floor:'#8a7863',floorKind:'stone',returnTo:'village',returnSpawn:[23,14.65]}),F=k.fixed,D=k.dynamic;
  // A stone hearth with a brick chimney and a pocket of glowing coals.
  k.box(F,'#8a8d7d',-3.7,.48,-3.55,3.0,.96,1.7,'stone');k.box(F,'#5d6258',-3.7,1.24,-4.06,2.65,1.0,.45,'stone');for(const x of[-5.0,-2.4])k.box(F,'#a49f88',x,1.27,-3.55,.30,1.57,1.7,'stone');k.box(F,'#a9a58e',-3.7,1.98,-3.56,2.95,.27,1.72,'stone');k.box(F,'#8d9381',-3.7,2.50,-3.95,1.20,.88,.9,'stone');k.box(F,'#373d36',-3.7,.985,-3.45,2.13,.035,1.2);for(let i=0;i<11;i++)k.ball(F,i%2?'#ad7450':'#c38b5a',-4.55+(i%6)*.33,1.04+Math.floor(i/6)*.05,-3.67+Math.floor(i/6)*.46,.18,.09,.15,'stone');k.solid(-3.7,-3.55,3.05,1.75);
  const fire=group(D,-3.7,1.10,-3.51);for(let i=0;i<4;i++){const flame=k.ball(fire,i%2?'#e6be72':'#cf955b',-.63+i*.41,.13,-.02+(i%2)*.18,.13,.27,.12);flame.material=flame.material.clone();flame.material.userData.regionOwned=true;flame.material.emissive.set('#c68141');flame.material.emissiveIntensity=.28;}k.animate((dt,t)=>{fire.scale.y=.91+Math.sin(t*6.2)*.09;fire.rotation.y=Math.sin(t*2.6)*.035});

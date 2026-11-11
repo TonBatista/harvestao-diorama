@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.47';
+import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.50';
 
 // Small domestic objects reuse the room kit and are merged with its static art.
 function cup(k,p,x,y,z,color='#d9cfb3'){
@@ -16,7 +16,7 @@ function barrel(k,x,z,s=1){k.cyl(k.fixed,'#997b55',x,.48*s,z,.39*s,.94*s,'wood')
 function info(k,x,z,name,text){k.interact({x,z,type:'info',label:name,data:{name,text},radius:1.4})}
 
 export function buildInn(){
- const k=createInteriorRoom({id:'inn',label:'Pousada Girassol',w:14,d:11,wall:'#ded0ad',returnTo:'village',returnSpawn:[9.5,2.1]}),F=k.fixed;
+ const k=createInteriorRoom({id:'inn',label:'Pousada Girassol',w:14,d:11,wall:'#ded0ad',returnTo:'village',returnSpawn:[23.5,3.25]}),F=k.fixed;
  rug(k,0,1.3,2.0,5.1,'#9b7768');rug(k,3,-.3,4.6,3.5,'#9caa88');
  const desk=group(F,-4.45,0,-3.75);k.box(desk,C.dark,0,.58,0,3.5,1.16,1.03,'wood');for(let i=0;i<10;i++)k.box(desk,i%2?C.oak:C.trim,-1.54+i*.34,.55,.53,.28,.97,.035,'wood');k.box(desk,'#c8aa76',0,1.21,0,3.75,.15,1.21,'wood');k.solid(-4.45,-3.75,3.75,1.21);
  const ledger=k.box(desk,'#8c9a7d',-.55,1.32,.18,.67,.09,.50,'fabric');ledger.rotation.y=.15;k.box(desk,'#e5d7b6',-.55,1.374,.18,.59,.014,.43);for(let i=0;i<5;i++)k.box(desk,'#a19878',-.55,1.386,.03+i*.075,.43,.003,.008);
@@ -36,7 +36,7 @@ export function buildInn(){
 }
 
 export function buildRosaHouse(){
- const k=createInteriorRoom({id:'rosaHouse',label:'Casa da Rosa',w:12,d:10,wall:'#ddd4bd',returnTo:'village',returnSpawn:[10.75,-7.0]}),F=k.fixed;
+ const k=createInteriorRoom({id:'rosaHouse',label:'Casa da Rosa',w:12,d:10,wall:'#ddd4bd',returnTo:'village',returnSpawn:[20.75,-17.95]}),F=k.fixed;
  rug(k,2.8,1.9,3.7,3.8,'#a58b96');rug(k,-3.3,-2.1,3.8,2.4,'#a3a585');
  const sew=table(k,-3.7,-3.1,3.35,1.25,.83);k.box(sew,'#b78e9a',.7,.92,.1,1.23,.055,.88,'fabric');for(let i=0;i<5;i++)k.box(sew,'#e1c7bd',.2+i*.23,.955,.1,.012,.006,.82);k.box(sew,'#596a63',-.55,1.01,0,.88,.16,.48);k.box(sew,'#53635c',-.77,1.31,-.04,.20,.55,.20);k.box(sew,'#53635c',-.49,1.53,-.04,.75,.18,.21);k.box(sew,'#53635c',-.15,1.36,-.04,.15,.38,.19);k.beam(sew,'#c3c7b2',[-.15,1.23,.01],[-.15,1.08,.01],.012,'plain');const handwheel=k.cyl(sew,C.dark,-.97,1.51,-.04,.20,.06);handwheel.rotation.z=Math.PI/2;for(let i=0;i<3;i++)k.cyl(sew,['#a68caa','#b4b486','#c58d7d'][i],.3+i*.24,1.08,-.35,.08,.23);chair(k,-3.7,-1.75,Math.PI);
  shelf(k,-4.55,-4.55,2.3,'jars');for(let j=0;j<3;j++)k.box(F,['#ae9aaf','#9ca77f','#c9ae88'][j],-4.9+j*.55,1.0,-4.2,.46,.15,.46,'fabric');

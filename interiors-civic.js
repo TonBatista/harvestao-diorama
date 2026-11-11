@@ -1,6 +1,6 @@
-import {addNewResidents} from './new-residents.js?v=0.47';
+import {addNewResidents} from './new-residents.js?v=0.50';
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.47';
+import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.50';
 
 const botanicals=['#80936c','#9ea57d','#bc9b8d','#d6c68d'];
 function info(k,x,z,name,text,radius=1.35){k.interact({x,z,label:name,type:'info',data:{name,text},radius})}
@@ -15,7 +15,7 @@ function bottle(k,p,x,y,z,color='#a0b7a5',r=.10){k.cyl(p,color,x,y+r*1.5,z,r,r*3
 function leafPrint(k,x,z){const g=group(k.fixed,x,1.78,z);k.box(g,C.oak,0,0,0,1.22,1.46,.08,'wood');k.box(g,'#e2d5b6',0,0,.046,1.07,1.30,.018);for(let i=0;i<5;i++){const y=-.4+i*.19,s=i%2?-1:1;k.beam(g,'#85946a',[0,-.5,.061],[0,.48,.061],.012,'plain');const l=k.ball(g,'#8fa177',s*.14,y,.064,.21,.065,.019);l.rotation.z=s*.4}return g}
 
 export function buildChapel(state={}){
- const k=createInteriorRoom({id:'chapel',label:'Capela Sta Julieta',w:12,d:11,wall:'#ded6bd',returnTo:'village',returnSpawn:[-9.5,-6.5]}),F=k.fixed;
+ const k=createInteriorRoom({id:'chapel',label:'Capela Sta Julieta',w:12,d:11,wall:'#ded6bd',returnTo:'village',returnSpawn:[-19.5,-18.35]}),F=k.fixed;
  rug(k,0,.35,1.65,8.5,'#a69b82');for(const x of[-.72,.72])k.box(F,'#d5c398',x,.068,.35,.035,.01,8.2);
  for(const z of[-.75,1.35,3.45])for(const s of[-1,1])pew(k,s*3.15,z,3.25);
  // A timber-framed stained glass garden catches the warm afternoon light.
@@ -37,7 +37,7 @@ export function buildChapel(state={}){
 }
 
 export function buildLibrary(){
- const k=createInteriorRoom({id:'library',label:'Biblioteca do Vale',w:13,d:10.5,wall:'#d3d8c0',returnTo:'village',returnSpawn:[2.3,-7.3]}),F=k.fixed;
+ const k=createInteriorRoom({id:'library',label:'Biblioteca do Vale',w:13,d:10.5,wall:'#d3d8c0',returnTo:'village',returnSpawn:[2.3,-18.85]}),F=k.fixed;
  for(const [x,w]of[[-5.4,1.65],[0,2.6],[5.4,1.65]])shelf(k,x,-4.55,w,'books');
  rug(k,.7,.45,4.35,4.25,'#9da58a');for(const x of[-1.24,2.64])k.box(F,'#d5c8a2',x,.066,.45,.055,.012,3.91);
  const reading=table(k,2.10,-.20,2.6,1.9,.80);for(const [x,z,a]of[[2.10,1.35,Math.PI],[3.90,-.2,-Math.PI/2]])chair(k,x,z,a);book(k,reading,-.60,.91,.22,'#8b9a77',true);book(k,reading,.60,.91,-.24,'#aa8b75',true);vase(k,reading,0,.92,-.53,'#b3a07b');
@@ -56,7 +56,7 @@ export function buildLibrary(){
 }
 
 export function buildClinic(){
- const k=createInteriorRoom({id:'clinic',label:'Clínica da Clara',w:12,d:10,wall:'#f1f2eb',wallKind:'plain',returnTo:'village',returnSpawn:[-10.7,12.5]}),F=k.fixed;
+ const k=createInteriorRoom({id:'clinic',label:'Clínica da Clara',w:12,d:10,wall:'#f1f2eb',wallKind:'plain',returnTo:'village',returnSpawn:[-23.7,13.6]}),F=k.fixed;
  rug(k,1.5,2.10,3.1,2.75,'#a0af9b');
  const bed=group(F,-3.72,0,-.65);for(const sx of[-.90,.90])for(const sz of[-1.36,1.36])k.cyl(bed,'#81948b',sx,.42,sz,.06,.80);k.box(bed,C.iron,0,.68,0,2.05,.12,3.08);k.box(bed,'#e3dfc7',0,.86,0,2.0,.28,3.0,'fabric');k.box(bed,'#7ec2ca',0,1.03,.42,2.04,.095,2.12,'fabric');k.box(bed,'#efe7cf',0,1.075,-1.04,1.61,.19,.65,'fabric');for(const sx of[-.92,.92])k.beam(bed,'#8b9c92',[sx,.65,-1.51],[sx,1.45,-1.51],.045,'plain');k.beam(bed,'#8b9c92',[-.92,1.43,-1.51],[.92,1.43,-1.51],.045,'plain');k.solid(-3.72,-.65,2.15,3.15);
  const screen=group(F,-2.15,0,-3.6);for(let col=0;col<3;col++){const x=-.63+col*.63,section=group(screen,x,0,(col%2)*.12);section.rotation.y=col%2?-.16:.16;for(const s of[-1,1])k.cyl(section,C.oak,s*.31,.90,0,.035,1.75);k.box(section,'#d9efed',0,1.05,0,.56,1.18,.04,'fabric');for(const y of[.42,1.68])k.box(section,C.trim,0,y,0,.60,.055,.065,'wood');k.solid(-2.15+x,-3.6+(col%2)*.12,.69,.10,{angle:col%2?-.16:.16,height:1.78})}

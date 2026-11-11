@@ -1,4 +1,4 @@
-export const SERVICE_BOUNDS=Object.freeze([-17,17,-15,94]);
+export {VILLAGE_BOUNDS as SERVICE_BOUNDS} from './village-layout.js?v=0.50';
 export const SERVICE_SPAWN=Object.freeze([0,90]);
 export const SERVICES=[
  {id:'agroShop',name:'Agro Santa Cruz',x:-10,z:51,color:'#a4ad89',owner:'Bento',shirt:'#8c9872',detail:'Ferramentas para o rebanho e máquinas para os produtos da fazenda.'},

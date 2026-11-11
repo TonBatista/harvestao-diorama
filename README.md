@@ -1,8 +1,14 @@
 # Harvestão — a vida no campo
 
-Versão 0.49.0. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.50.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
 [Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/)
+
+## Ruas da Vila Santa Cruz e carroça — 0.50
+
+A Praça São Benedito tem o triplo da área, com via de paralelepípedos ao redor, calçadas de mosaico, sarjetas e ciclovias. A passagem inclinada ao lado da escada leva os veículos à ponte e ao bairro de serviços. As placas de madeira da fachada identificam os seis comércios por seus ícones em relevo.
+
+Use X junto do cavalo ou montado para abrir o menu e acoplar ou estacionar a carroça. Para acoplar, leve o cavalo até a frente dela com a traseira voltada para o engate. Y desmonta. A carroça estacionada fica no mesmo cenário até você voltar para buscá-la.
 
 ## Cerca de tocos alinhada — 0.49
 

@@ -1,8 +1,8 @@
 import {artisanMaterial} from './art-direction.js?v=0.47';
 import {mergeParts} from './wildlife-art.js?v=0.47';
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.47';
-import {addResident,NEW_RESIDENTS} from './new-residents.js?v=0.47';
+import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.50';
+import {addResident,NEW_RESIDENTS} from './new-residents.js?v=0.50';
 import {colliderContains} from './scene-collisions.js?v=0.47';
 
 export const GAZEBO=Object.freeze({x:0,z:1.7,radius:2.65,floor:.45,columnRadius:2.45,stairHalfWidth:.92,tread:.48});
@@ -100,7 +100,7 @@ export function leafNormalMap(texture){const canvas=document.createElement('canv
 // Fixed instance counts keep the wind and petals light even when the whole farm is visible.
 export function addCherryScenery(region,state,heightAt=()=>0){
  if(region.indoors)return;const b=region.bounds,trees=[],plaza=region.id==='village';
- if(plaza)for(const x of[-4.25,4.25])for(const z of[-1.95,5.05])trees.push({x,z,s:1.05,plaza:true});
+ if(plaza)for(const x of[-7.2,7.2])for(const z of[-4.25,7.1])trees.push({x,z,s:1.05,plaza:true});
  const candidates=region.id==='farm'?[[-20,-21],[-20,-7],[-20,18],[24,-23],[24,-2],[24,15],[-9,24],[3,24]]:Array.from({length:8},(_,i)=>{const t=(Math.floor(i/2)+.8)/4.8;return[i%2?b[1]-2.4:b[0]+2.4,b[2]+2.6+t*(b[3]-b[2]-5.2)]});
  for(const [x,z]of candidates){if((region.portals||[]).some(p=>Math.hypot(x-p.x,z-p.z)<3)||(region.colliders||[]).some(c=>colliderContains(c,x,z,.8)))continue;trees.push({x,z,s:.9+(trees.length%3)*.09})}
  if(!trees.length)return;const root=new T.Group();root.name='winter-cherries';region.root.add(root);const matrix=new T.Matrix4(),pos=new T.Vector3(),scale=new T.Vector3(),q=new T.Quaternion(),up=new T.Vector3(0,1,0);

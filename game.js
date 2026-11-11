@@ -1,16 +1,16 @@
 import {mountDeveloperTools} from './developer-tools.js?v=0.48';
-import {economyState,mountRuralEconomy} from './rural-economy.js?v=0.47';
+import {economyState,mountRuralEconomy} from './rural-economy.js?v=0.50';
 import {mountToolScroller} from './tool-scroller.js?v=0.47';
 import {mountSleepTransition} from './sleep-transition.js?v=0.47';
-import {mountValleyActivities,residentPortrait} from './valley-life.js?v=0.47';
-import {routeForPortal} from './valley-terrain.js?v=0.47';
+import {mountValleyActivities,residentPortrait} from './valley-life.js?v=0.50';
+import {routeForPortal} from './valley-terrain.js?v=0.50';
 import {recoverTractorOnce} from './tractor-recovery.js?v=0.47';
 import {mountFarmEditor} from './farm-editor.js?v=0.47';
 import {migrateFarmLayout} from './farm-customization.js?v=0.47';
 import {createPortalTrigger} from './portal-trigger.js?v=0.47';
 import {migrateCultivation} from './cultivation-layout.js?v=0.47';
 import {mountTitleScreen} from './title-screen.js?v=0.47';
-import {mountCooperative} from './multiplayer.js?v=0.49';
+import {mountCooperative} from './multiplayer.js?v=0.50';
 import {mountTelescopeView} from './telescope-view.js?v=0.47';
 import {mountFieldInventory} from './field-inventory-ui.js?v=0.47';
 import {migrateProfile} from './profile-rules.js?v=0.47';
@@ -21,13 +21,13 @@ import {migrateHomesteads,selectLot,lotState} from './homestead-rules.js?v=0.47'
 import {migrateTransport,advanceHerd,propertyKey} from './transport-rules.js?v=0.47';
 import {freshState,validSave,ITEMS,migrateSeedStorage,collectEgg,waterThree,CROPS,SEASONS,TOOLS,frontTile,useTool,pick,ship,sleep,buy,advanceTime,stash,retrieve,BAG_CAPACITY} from './simulation.js?v=0.47';
 import {ANIMALS,migrateAnimalCare,pickHay,returnHay,feedAnimal,petAnimal,animalStatus,advanceAnimalDay} from './animal-care.js?v=0.47';
-import {mountSoundscape} from './soundscape.js?v=0.47';
+import {mountSoundscape} from './soundscape.js?v=0.50';
 import {mountFaunaEncounters} from './fauna-sounds.js?v=0.47';
 import {mountPhotographyUI} from './photo-ui.js?v=0.47';
 import {migrateBirding} from './birding.js?v=0.47';
 import {mountJoystick} from './controls.js?v=0.47';
 import {mountZoomControls} from './camera-controls.js?v=0.47';
-import {createWorld} from './world.js?v=0.49';
+import {createWorld} from './world.js?v=0.50';
 const $=id=>document.getElementById(id),KEY='harvestao-v2';let state=freshState(),storageOK=true,hasProgress=false;
 try{const data=JSON.parse(localStorage.getItem(KEY));if(validSave(data)){state=data;hasProgress=true}}catch{}
 state.inventory??=[];migrateAnimalCare(state);migrateBirding(state);migrateHomesteads(state);migrateTransport(state);migrateProfile(state);migrateSeedStorage(state);migrateCultivation(state);migrateFarmLayout(state);
@@ -57,7 +57,7 @@ function distance(loc){return Math.hypot(state.player.x-loc.x,state.player.z-loc
 function near(){if(world.area!=='farm'&&world.area!=='homestead')return '';if(world.area==='homestead')return '';const l=world.locations;if(distance(l.house)<1.35)return 'house';if(distance(l.shipping)<1.4)return 'shipping';if(distance(l.well)<1.6)return 'well';return ''}
 function acceptDialog(){const dialog=[...document.querySelectorAll('dialog[open]')].at(-1);if(!dialog||dialog.id==='areaLoading')return;if(dialog.id==='bag'&&state.held){document.getElementById('bagStash').click();return}const focused=document.activeElement;if(dialog.contains(focused)&&focused.tagName==='BUTTON'&&!focused.disabled&&!focused.classList.contains('close')&&!focused.classList.contains('profile-close')){focused.click();return}const button=dialog.querySelector('button.primary:not([disabled]),button[type="submit"]:not([disabled])');button?.click()}
 function cancelDialog(){const dialog=[...document.querySelectorAll('dialog[open]')].at(-1);if(!dialog||dialog.id==='areaLoading'||dialog.id==='titleScreen')return;if(dialog.id==='startMenu'&&!cooperative?.menu.canClose)return;if(dialog.id==='profileMenu'&&dialog.querySelector('.profile-close')?.hidden)return;const button=dialog.querySelector('button[data-close],button.close,button.profile-close:not([hidden]),button.profile-cancel:not([hidden])');if(button)button.click();else dialog.close()}
-function use(){if(paused()){acceptDialog();return}if(world.busy)return;if(world.stumpSelection){result(world.placeStump());return}const point=world.nearby(),n=near();if(point?.type==='christmasTree'&&!world.driving&&!state.held&&!state.carryingHay){explore(point);return}if(world.horseRiding){notify('Y para descer da carroça.');return}if(world.driving){result(world.vehicleAction());return}if(state.held){result(point?.type==='shipping'||n==='shipping'?ship(state):stash(state));return}if(state.carryingHay){if(point&&['feed','hayRack'].includes(point.type))explore(point);else notify('Leve o feno até um cocho ou devolva ao depósito.');return}if(state.tool==='camera'){photography.shoot();return}if(['pet','feed'].includes(point?.type)&&point.data?.animalId&&!state.carryingHay){ruralEconomy.handle({...point,type:'animalActions'});return}if(point&&(!['dogPet','farmPet'].includes(point.type)||state.tool==='hand')){explore(point);return}if(n==='shipping'){result(ship(state));return}if(n==='well'){state.water=100;world.act();notify('Regador reabastecido.');save();hud();return}if(world.area==='farm'||world.area==='homestead')result(useTool(state),state.tool);else notify('Aproxime-se de uma pessoa, porta ou objeto para usar X.')}
+function use(){if(paused()){acceptDialog();return}if(world.busy)return;if(world.stumpSelection){result(world.placeStump());return}const point=world.nearby(),n=near();if(point?.type==='christmasTree'&&!world.driving&&!state.held&&!state.carryingHay){explore(point);return}if(world.horseRiding){ruralEconomy.handle({type:'horse'});return}if(world.driving){result(world.vehicleAction());return}if(state.held){result(point?.type==='shipping'||n==='shipping'?ship(state):stash(state));return}if(state.carryingHay){if(point&&['feed','hayRack'].includes(point.type))explore(point);else notify('Leve o feno até um cocho ou devolva ao depósito.');return}if(state.tool==='camera'){photography.shoot();return}if(['pet','feed'].includes(point?.type)&&point.data?.animalId&&!state.carryingHay){ruralEconomy.handle({...point,type:'animalActions'});return}if(point&&(!['dogPet','farmPet'].includes(point.type)||state.tool==='hand')){explore(point);return}if(n==='shipping'){result(ship(state));return}if(n==='well'){state.water=100;world.act();notify('Regador reabastecido.');save();hud();return}if(world.area==='farm'||world.area==='homestead')result(useTool(state),state.tool);else notify('Aproxime-se de uma pessoa, porta ou objeto para usar X.')}
 function cancelOrRetrieve(){if(sleeping)return;if(paused()){cancelDialog();return}if(world.stumpSelection){const r=world.cancelStumpMove();notify(r?.message||'O toco ficou em seu lugar.');hud();return}if(world.horseRiding){result(world.toggleHorse());return}if(world.driving){result(world.toggleTractor());return}if(state.held||state.carryingHay){world.stop();notify(state.held?'X guarda este item na mochila.':'Devolva o feno ao depósito para liberar as mãos.');return}if(!state.inventory?.length){notify('A mochila está vazia.');return}select('hand');result(retrieve(state,state.inventory.length-1))}
 let xHeld=false,xCharged=false,xHoldTimer=null,snowStarted=0,snowHeld=false;
 function canShovel(){return !paused()&&!world.driving&&!world.horseRiding&&!state.held&&!state.carryingHay&&state.tool==='snowShovel'&&world.nearby()?.type!=='christmasTree'&&state.season===3&&!world.region.indoors&&cooperative?.role!=='guest'}
@@ -132,7 +132,7 @@ function refreshCooperative({restore=false,full=false,rebuildArea=false}={}){
 cooperative=mountCooperative({state,world,notify,writeLocal,refresh:refreshCooperative,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop()},onProfile(){profileReturn='room';profileMenu.open(false)}});
 document.getElementById('profileMenu').addEventListener('close',()=>{const destination=profileReturn;profileReturn='';if(destination==='room')cooperative.open();else if(destination==='title')titleScreen.open()});
 cooperative.menu.element.addEventListener('close',()=>{const reason=cooperative.menu.element.dataset.closeReason;if(roomsFromTitle&&reason==='back'){roomsFromTitle=false;titleScreen.open()}else if(reason==='play')roomsFromTitle=false});
-titleScreen=mountTitleScreen({build:'0.49.0',hasProgress,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop()},onPlay(){if(cooperative.blocked){roomsFromTitle=true;titleScreen.close();cooperative.open();return}titleScreen.close()},onNew(){if(cooperative.role!=='solo'){notify('Encerre a sala antes de iniciar outra fazenda.');return}newFromTitle=true;titleScreen.close();open('newDialog')},onProfile(){profileReturn='title';titleScreen.close();profileMenu.open(false)},onMultiplayer(){roomsFromTitle=true;titleScreen.close();cooperative.open()},onHelp(){helpFromTitle=true;titleScreen.close();open('welcome')}});
+titleScreen=mountTitleScreen({build:'0.50.0',hasProgress,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop()},onPlay(){if(cooperative.blocked){roomsFromTitle=true;titleScreen.close();cooperative.open();return}titleScreen.close()},onNew(){if(cooperative.role!=='solo'){notify('Encerre a sala antes de iniciar outra fazenda.');return}newFromTitle=true;titleScreen.close();open('newDialog')},onProfile(){profileReturn='title';titleScreen.close();profileMenu.open(false)},onMultiplayer(){roomsFromTitle=true;titleScreen.close();cooperative.open()},onHelp(){helpFromTitle=true;titleScreen.close();open('welcome')}});
 $('newDialog').addEventListener('close',()=>{if(newFromTitle){newFromTitle=false;titleScreen.open()}});
 $('welcome').addEventListener('close',()=>{if(helpFromTitle){helpFromTitle=false;titleScreen.open()}});
 const sleepTransition=mountSleepTransition({world,state,advance(){rest();clock=0},save,hud,audio:soundscape,beforeOpen(){endX(true);resetJoy();keys.clear();world.stop();sleeping=true}});

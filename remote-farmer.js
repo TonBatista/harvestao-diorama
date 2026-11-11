@@ -1,4 +1,4 @@
-import {terrainHeight} from './valley-terrain.js?v=0.47';
+import {terrainHeight} from './valley-terrain.js?v=0.50';
 import * as T from './three.module.js';
 import {createFarmer} from './farmer-art.js?v=0.47';
 const areas=new Set(['agroShop','vetClinic','clothesShop','artSchool','birdClub','mechanic','haras','harasOffice','residentHome','capoeiraHall','farm','house','barn','village','market','mountain','beach','lake','homestead','chapel','library','clinic','inn','rosaHouse','fisherHouse','smithy','carpenter','mine','lighthouse','lighthouseUpper','toolroom','valleyTrail']);
