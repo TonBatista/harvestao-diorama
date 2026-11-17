@@ -1,468 +1,52 @@
-import {bedPose} from './sleep-pose.js?v=0.48';
-import {economyState} from './rural-economy.js?v=0.51';
-import {createHorseCart} from './horse-cart.js?v=0.51';
-import {clearSnow} from './snow-rules.js?v=0.47';
-import {terrainHeight} from './valley-terrain.js?v=0.50';
-import {createActivityArt} from './valley-life.js?v=0.50';
-import {createFarmEntrance} from './farm-entrance.js?v=0.47';
-import {createFarmStructures} from './farm-structures.js?v=0.47';
-import {migrateFarmLayout,farmObject,farmPoint,farmPaths} from './farm-customization.js?v=0.47';
-import {MAIN_FIELD,LEGACY_FIELD,fieldForState,fieldForProperty,migrateCultivation,isPlantablePlot} from './cultivation-layout.js?v=0.47';
-import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.47';
-import {migrateFarmStumps,findFarmStump,moveFarmStump,snapFarmStump} from './farm-stumps.js?v=0.49';
-import {createFarmStumpArt} from './farm-stumps-art.js?v=0.49';
-import {createRemoteFarmer,validRemotePose} from './remote-farmer.js?v=0.50';
-import {vehicleAccess} from './vehicle-access.js?v=0.47';
-import {buildHomestead} from './region-homesteads.js?v=0.51';
-import {colliderContains,planAutoHop,hopPosition} from './collision-rules.js?v=0.47';
-import {createFarmPets} from './farm-pets.js?v=0.47';
-import {createNightVisitors} from './night-visitors.js?v=0.47';
-import {createCompanionDog} from './companion-dog.js?v=0.47';
-import {createWildlifeDefense} from './companion-threats.js?v=0.47';
-import {createTractorTracks} from './tractor-tracks.js?v=0.47';
-import {createSeasonalScenery} from './seasonal-scenery.js?v=0.47';
-import {createSeasonalParticles} from './seasonal-particles.js?v=0.47';
-import {propertyKey} from './transport-rules.js?v=0.47';
-import {solveTrailer} from './trailer-physics.js?v=0.47';
 import * as T from './three.module.js';
-import {createTractor} from './tractor-art.js?v=0.47';
-import {ANIMALS,animalStatus} from './animal-care.js?v=0.47';
-import {createTransportDisplay} from './transport-art.js?v=0.51';
-import {createRegionManager,isIndoorArea} from './region-manager.js?v=0.51.1';
-import {terrainTexture} from './terrain-materials.js?v=0.47';
-import {loadMiniatureMaterials,miniatureTexture,miniatureLens,contactTexture,soilEdgeTexture} from './miniature-materials.js?v=0.47';
-import {artisanMaterial,cottage,canopyGeometry,meadowGeometry,treeCrown} from './art-direction.js?v=0.47';
-import {TILE,CROPS,frontTile} from './simulation.js?v=0.51';
-import {createCropArt} from './crop-art.js?v=0.51';
-import {createFarmer} from './farmer-art.js?v=0.47';
-const seedGeo=new T.SphereGeometry(1,5,3);
+import {FIELD,TILE,CROPS,frontTile} from './simulation.js';
 const geo={box:new T.BoxGeometry(1,1,1),ball:new T.SphereGeometry(1,16,12),cylinder:new T.CylinderGeometry(1,1,1,12),cone:new T.ConeGeometry(1,1,12),leaf:new T.SphereGeometry(1,8,5)};
 const materials=new Map();function mat(c){if(!materials.has(c))materials.set(c,new T.MeshStandardMaterial({color:c,roughness:.9}));return materials.get(c)}
-function mesh(parent,g,color,x,y,z,sx=1,sy=sx,sz=sx){const m=new T.Mesh(g,typeof color==='string'?mat(color):color);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=Math.max(sx,sy,sz)>.12;m.receiveShadow=true;parent.add(m);return m}
+function mesh(parent,g,color,x,y,z,sx=1,sy=sx,sz=sx){const m=new T.Mesh(g,typeof color==='string'?mat(color):color);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
 const box=(p,c,x,y,z,sx,sy,sz)=>mesh(p,geo.box,c,x,y,z,sx,sy,sz),ball=(p,c,x,y,z,sx,sy=sx,sz=sx)=>mesh(p,geo.ball,c,x,y,z,sx,sy,sz),cyl=(p,c,x,y,z,r,h)=>mesh(p,geo.cylinder,c,x,y,z,r,h,r);
 const rand=n=>{const v=Math.sin(n*127.1+34.2)*43758.5453;return v-Math.floor(v)};
 function texture(a,b,repeat){const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');g.fillStyle=a;g.fillRect(0,0,256,256);for(let i=0;i<9000;i++){g.fillStyle=i%2?b:'#ffffff12';g.beginPath();g.ellipse(rand(i)*256,rand(i+999)*256,.3+rand(i+777)*2,.3+rand(i+444)*1.2,rand(i+111)*6,0,7);g.fill()}const tex=new T.CanvasTexture(c);tex.wrapS=tex.wrapT=T.RepeatWrapping;tex.repeat.set(repeat,repeat);tex.colorSpace=T.SRGBColorSpace;return tex}
-// Preserve indexed vertices while merging each visible region. This avoids
-// temporary geometry clones and repeated vertex transforms when a crop changes.
-function bake(group,cellSize=Infinity){
- group.updateMatrixWorld(true);const buckets=new Map(),preservedInstances=[];
- group.traverse(o=>{
-  if(o.isInstancedMesh){preservedInstances.push({object:o,matrix:o.matrixWorld.clone()});return;}if(!o.isMesh)return;let owner=o;while(owner.parent&&owner.parent!==group)owner=owner.parent;
-  const x=owner.matrixWorld.elements[12],z=owner.matrixWorld.elements[14],shadow=o.castShadow&&!o.material.userData.noShadow,key=Math.floor(x/cellSize)+':'+Math.floor(z/cellSize)+':'+o.material.id+':'+(shadow?1:0);
-  let bucket=buckets.get(key);if(!bucket)buckets.set(key,bucket={material:o.material,shadow,objects:[]});bucket.objects.push(o);
- });
- const result=new T.Group(),normalMatrix=new T.Matrix3();
- for(const {material,shadow,objects} of buckets.values()){
-  let vertexCount=0,indexCount=0;for(const o of objects){vertexCount+=o.geometry.attributes.position.count;indexCount+=o.geometry.index?.count||o.geometry.attributes.position.count}
-  const positions=new Float32Array(vertexCount*3),normals=new Float32Array(vertexCount*3),uvs=new Float32Array(vertexCount*2),indices=vertexCount>65535?new Uint32Array(indexCount):new Uint16Array(indexCount);
-  let vertexOffset=0,indexOffset=0;
-  for(const o of objects){
-   const g=o.geometry,p=g.attributes.position.array,n=g.attributes.normal?.array,uv=g.attributes.uv?.array,m=o.matrixWorld.elements;normalMatrix.getNormalMatrix(o.matrixWorld);const q=normalMatrix.elements,count=g.attributes.position.count;
-   for(let i=0;i<count;i++){
-    const j=i*3,k=(vertexOffset+i)*3,x=p[j],y=p[j+1],z=p[j+2];positions[k]=m[0]*x+m[4]*y+m[8]*z+m[12];positions[k+1]=m[1]*x+m[5]*y+m[9]*z+m[13];positions[k+2]=m[2]*x+m[6]*y+m[10]*z+m[14];
-    if(n){const nx=q[0]*n[j]+q[3]*n[j+1]+q[6]*n[j+2],ny=q[1]*n[j]+q[4]*n[j+1]+q[7]*n[j+2],nz=q[2]*n[j]+q[5]*n[j+1]+q[8]*n[j+2],length=Math.hypot(nx,ny,nz)||1;normals[k]=nx/length;normals[k+1]=ny/length;normals[k+2]=nz/length}
-    if(uv){const v=(vertexOffset+i)*2;uvs[v]=uv[i*2];uvs[v+1]=uv[i*2+1]}
-   }
-   const sourceIndex=g.index?.array,indexLength=sourceIndex?sourceIndex.length:count;for(let i=0;i<indexLength;i++)indices[indexOffset+i]=vertexOffset+(sourceIndex?sourceIndex[i]:i);indexOffset+=indexLength;vertexOffset+=count;
-  }
-  const geometry=new T.BufferGeometry();geometry.setAttribute('position',new T.BufferAttribute(positions,3));geometry.setAttribute('normal',new T.BufferAttribute(normals,3));geometry.setAttribute('uv',new T.BufferAttribute(uvs,2));geometry.setIndex(new T.BufferAttribute(indices,1));geometry.computeBoundingSphere();
-  const o=new T.Mesh(geometry,material);o.castShadow=shadow;o.receiveShadow=true;o.matrixAutoUpdate=false;result.add(o);
- }
- for(const {object,matrix} of preservedInstances){result.add(object);object.matrix.copy(matrix);matrix.decompose(object.position,object.quaternion,object.scale);object.matrixAutoUpdate=false;}result.updateMatrixWorld(true);result.matrixAutoUpdate=false;return result;
-}
-export async function createWorld(canvas,state){migrateCultivation(state);migrateFarmLayout(state);await loadMiniatureMaterials();const renderer=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});const maximumPixelRatio=Math.min(devicePixelRatio,matchMedia('(pointer: coarse)').matches?1.25:1.5);renderer.setPixelRatio(maximumPixelRatio);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;let renderDirty=true,shadowElapsed=0;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.12;const lens=miniatureLens(renderer);
-const scene=new T.Scene();scene.background=new T.Color('#a9b798');scene.fog=new T.FogExp2('#a9b798',.012);const camera=new T.OrthographicCamera(-10,10,10,-10,.1,100);const ambient=new T.HemisphereLight('#f5f2e8','#667657',1.18);scene.add(ambient);const sun=new T.DirectionalLight('#fff3df',3.25);sun.position.set(-10,19,9);sun.castShadow=true;const shadowSize=matchMedia('(pointer: coarse)').matches?1024:2048;sun.shadow.mapSize.set(shadowSize,shadowSize);Object.assign(sun.shadow.camera,{left:-14,right:14,top:14,bottom:-14,near:1,far:65});sun.shadow.normalBias=.025;sun.shadow.bias=-.0001;sun.shadow.radius=4;sun.shadow.blurSamples=8;scene.add(sun);scene.add(sun.target);
-let regions=null;const fixed=new T.Group(),forest=new T.Group(),colliders=[],farmTrees=[];
-const soilMap=miniatureTexture('earth',6),grassMap=miniatureTexture('moss',32);
-const soilWidth=MAIN_FIELD.cols*TILE,soilDepth=MAIN_FIELD.rows*TILE,soilCenterX=MAIN_FIELD.x+(MAIN_FIELD.cols-1)*TILE/2,soilCenterZ=MAIN_FIELD.z+(MAIN_FIELD.rows-1)*TILE/2,soilLeft=soilCenterX-soilWidth/2,soilRight=soilCenterX+soilWidth/2,soilTop=soilCenterZ-soilDepth/2,soilBottom=soilCenterZ+soilDepth/2;soilMap.repeat.set(soilWidth/2.8,soilDepth/2.8);
-for(const map of [soilMap,grassMap])map.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
-const groundMaterial=new T.MeshStandardMaterial({map:grassMap,color:'#bbd2a2',roughness:1,bumpMap:grassMap,bumpScale:.09});
-box(fixed,groundMaterial,0,-.22,0,70,.4,70);
-const soilMaterial=new T.MeshStandardMaterial({map:soilMap,bumpMap:soilMap,bumpScale:.065,roughness:1,color:'#d7c7ac'});soilMaterial.userData.noShadow=true;groundMaterial.userData.noShadow=true;soilMaterial.userData.seasonSurface='soil';groundMaterial.userData.seasonSurface='ground';
-const earthGeometry=new T.PlaneGeometry(soilWidth,soilDepth,128,128);earthGeometry.rotateX(-Math.PI/2);const ep=earthGeometry.attributes.position;
-for(let i=0;i<ep.count;i++){const x=ep.getX(i),z=ep.getZ(i);ep.setY(i,.012*Math.sin(x*7.1+z*8.3)+.009*Math.sin(z*14.3-x*7)+.009*Math.sin(x*2.9-z*3.7))}earthGeometry.computeVertexNormals();mesh(fixed,earthGeometry,soilMaterial,soilCenterX,.035,soilCenterZ);
-// Paths remain separate so each moved doorway reconnects to the perimeter lanes.
-const farmPathArt=new T.Group();farmPathArt.name='farm-paths-static';scene.add(farmPathArt);
-function syncFarmPaths(){for(const mesh of [...farmPathArt.children]){farmPathArt.remove(mesh);mesh.geometry?.dispose();mesh.material?.map?.dispose();mesh.material?.dispose()}for(const r of farmPaths(state)){const map=soilMap.clone();map.repeat.set(r.w/2.3,r.d/2.3);const material=soilMaterial.clone();material.map=material.bumpMap=map;material.color.set('#e0cfa9');const path=new T.Mesh(new T.PlaneGeometry(r.w,r.d,1,1),material);path.rotation.set(-Math.PI/2,0,r.angle||0);path.position.set(r.x,.065,r.z);path.receiveShadow=true;farmPathArt.add(path);}}
-syncFarmPaths();
-function tree(x,z,size=1){farmTrees.push({x,z,scale:size,evergreen:false});const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(size);cyl(g,artisanMaterial('#a5987b','bark'),0,1,0,.20,2);for(let i=0;i<5;i++){const a=i*1.256;let root=ball(g,artisanMaterial('#a5987b','bark'),Math.sin(a)*.15,.065,Math.cos(a)*.15,.08,.065,.29);root.rotation.y=a}const crown=treeCrown(x*13+z*7);crown.position.y=2.55;g.add(crown);forest.add(g);colliders.push({x,z,r:.38*size})}
-for(let i=0;i<20;i++)tree(-22+i*2.5,-27-rand(i)*1.4,1+rand(i+8)*.5);for(let i=0;i<16;i++){tree(-24-rand(i+17)*1.4,-25+i*3.35,1.05);tree(28+rand(i+9)*1.2,-25+i*3.35,.95+rand(i)*.35)}for(let i=0;i<12;i++)tree(-21+i*4.2,27.5+rand(i+712),.85+rand(i+813)*.25);
-for(const x of[-19,-15,-10,-5,1,7,13,19,24])tree(x,-25.1,.83);for(const x of[-18,-11,-4,3,20,25])tree(x,25.1,.8);for(const z of[-19,-12,-5,2,15,22])tree(-21.1,z,.78);for(const z of[-23,-8,0,8,16,23])tree(25.1,z,.78);
-// End grain follows irregular growth rings and radial hairline cracks.
-const cutMap=document.createElement('canvas');cutMap.width=cutMap.height=256;const cq=cutMap.getContext('2d');
-cq.fillStyle='#c6aa7c';cq.fillRect(0,0,256,256);
-for(let i=0;i<3300;i++){cq.fillStyle=i%2?'#fff0cd15':'#79573612';cq.fillRect(rand(i+777)*256,rand(i+111)*256,1.5,1)}
-for(let r=9;r<155;r+=6+rand(r)*4){cq.strokeStyle=r%2?'#82603d88':'#9b764b99';cq.lineWidth=.7+rand(r+1)*1.4;cq.beginPath();for(let k=0;k<=100;k++){const a=k*Math.PI*2/100,rr=r+Math.sin(a*3+r)*1.1+Math.sin(a*7-r)*.5,x=119+Math.cos(a)*rr,y=132+Math.sin(a)*rr*.96;k?cq.lineTo(x,y):cq.moveTo(x,y)}cq.stroke()}
-for(let i=0;i<5;i++){const a=rand(i+882)*6.28;cq.strokeStyle='#65482b99';cq.lineWidth=.75;cq.beginPath();cq.moveTo(119+Math.cos(a)*(57+rand(i)*35),132+Math.sin(a)*(57+rand(i)*35));cq.lineTo(119+Math.cos(a)*155,132+Math.sin(a)*155);cq.stroke()}
-const cutTexture=new T.CanvasTexture(cutMap);cutTexture.colorSpace=T.SRGBColorSpace;
-const cutMaterial=new T.MeshStandardMaterial({map:cutTexture,bumpMap:cutTexture,bumpScale:.008,roughness:1});
-const stumpArt=createFarmStumpArt(state,{barkMaterial:artisanMaterial('#c7b89a','bark'),cutMaterial,rootMaterial:artisanMaterial('#bcaa8c','bark')});scene.add(stumpArt.root);colliders.push(...stumpArt.colliders);let stumpSelection=null,stumpGhost=null,expectedStumpPosition=null;const stumpPreview=new T.Mesh(new T.RingGeometry(.30,.39,28),new T.MeshBasicMaterial({color:'#91b583',transparent:true,opacity:.85,side:T.DoubleSide,depthWrite:false}));stumpPreview.rotation.x=-Math.PI/2;stumpPreview.visible=false;scene.add(stumpPreview);
-function fence(x,z,rot=0){let g=new T.Group();g.position.set(x,0,z);g.rotation.y=rot;for(const dx of [-1,1]){box(g,'#a48048',dx,.48,0,.16,.96,.17);mesh(g,geo.cone,'#c3a16b',dx,1.01,0,.12,.16,.12)}for(const y of [.38,.76])box(g,'#bd9c63',0,y,0,2.1,.13,.11);fixed.add(g);colliders.push({x,z,w:2.1,d:.20,angle:rot,kind:'fence'})}
-for(let i=0;i<24;i++)fence(-21+i*2,26.2);for(let i=0;i<26;i++)fence(-22.2,-25+i*2,Math.PI/2);
-const farmStructures=createFarmStructures(state,bake);scene.add(farmStructures.root);colliders.push(...farmStructures.refresh());
-const farmEntrance=createFarmEntrance();scene.add(farmEntrance.root);colliders.push(...farmEntrance.colliders);
+function bake(group){group.updateMatrixWorld(true);const buckets=new Map();group.traverse(o=>{if(!o.isMesh)return;let g=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();g.applyMatrix4(o.matrixWorld);let a=buckets.get(o.material);if(!a)buckets.set(o.material,a=[]);a.push(g)});const result=new T.Group();for(const [m,gs] of buckets){const count=gs.reduce((n,g)=>n+g.attributes.position.count,0),geometry=new T.BufferGeometry();for(const [name,size] of [['position',3],['normal',3],['uv',2]]){const arr=new Float32Array(count*size);let off=0;for(const g of gs){const v=g.attributes[name];if(v)arr.set(v.array,off);off+=g.attributes.position.count*size}geometry.setAttribute(name,new T.BufferAttribute(arr,size))}const o=new T.Mesh(geometry,m);o.castShadow=true;o.receiveShadow=true;result.add(o);gs.forEach(g=>g.dispose())}return result}
+export function createWorld(canvas,state){const renderer=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.16;
+const scene=new T.Scene();scene.background=new T.Color('#a9b798');scene.fog=new T.FogExp2('#a9b798',.012);const camera=new T.OrthographicCamera(-10,10,10,-10,.1,100);const ambient=new T.HemisphereLight('#fff4d4','#6d7550',2.25);scene.add(ambient);const sun=new T.DirectionalLight('#ffdfaa',3.2);sun.position.set(-12,22,10);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-22,right:22,top:22,bottom:-22,near:1,far:65});sun.shadow.normalBias=.025;sun.shadow.bias=-.0001;sun.shadow.radius=3;scene.add(sun);scene.add(sun.target);
+const fixed=new T.Group(),colliders=[];const soilMap=texture('#a78350','#6c512a42',12),grassMap=texture('#677d37','#4b642e55',18),groundMaterial=new T.MeshStandardMaterial({map:grassMap,color:'#c5cf96',roughness:1});box(fixed,groundMaterial,0,-.22,0,70,.4,70);const soilMaterial=new T.MeshStandardMaterial({map:soilMap,bumpMap:soilMap,bumpScale:.045,roughness:1,color:'#e0c59d'});box(fixed,soilMaterial,.875,-.015,3.875,16.8,.12,16.8);
+// Worn paths and individually set stepping stones.
+box(fixed,'#bcab7e',0,-.005,-6.7,22,.07,2.1);box(fixed,'#baa677',10,-.004,0,2.4,.08,15);
+for(let i=0;i<12;i++){const m=ball(fixed,i%2?'#b4b09a':'#a39e87',1+Math.sin(i)*.15,.045,-8+i*.48,.36,.09,.24);m.rotation.y=i*.7}
+function tree(x,z,size=1){const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(size);cyl(g,'#735432',0,1,0,.23,2);for(let i=0;i<8;i++){const a=i*2.4,dx=Math.cos(a)*.65,dz=Math.sin(a)*.65;const b=cyl(g,'#735432',dx*.4,1.65,dz*.4,.09,1.1);b.rotation.z=-dx*.5;b.rotation.x=dz*.5;ball(g,['#5f8139','#769346','#8ca44d','#547633'][i%4],dx,2.3+rand(i+x)*.75,dz,.8,.85,.75)}fixed.add(g);colliders.push({x,z,r:.38*size})}
+for(let i=0;i<19;i++)tree(-19+i*2.2,-13-rand(i)*2,1+rand(i+8)*.55);for(let i=0;i<11;i++){tree(-13-rand(i+17)*2,-8+i*2.6,1.1);tree(16+rand(i+9)*2,-7+i*2.8,.9+rand(i)*.4)}
+function stump(x,z){cyl(fixed,'#74512c',x,.22,z,.19,.44);cyl(fixed,'#d6b47c',x,.448,z,.192,.018);for(let r=1;r<=3;r++){const ring=new T.Mesh(new T.TorusGeometry(r*.042,.004,3,16),mat('#a78250'));ring.rotation.x=-Math.PI/2;ring.position.set(x,.46,z);fixed.add(ring)}}
+for(let i=0;i<16;i++){stump(-7.8,-3+i);if(i<5||i>8)stump(9.6,-3+i)}
+function fence(x,z,rot=0){let g=new T.Group();g.position.set(x,0,z);g.rotation.y=rot;for(const dx of [-1,1]){box(g,'#a48048',dx,.48,0,.16,.96,.17);mesh(g,geo.cone,'#c3a16b',dx,1.01,0,.12,.16,.12)}for(const y of [.38,.76])box(g,'#bd9c63',0,y,0,2.1,.13,.11);fixed.add(g)}
+for(let i=0;i<11;i++)fence(-10+i*2,14);for(let i=0;i<7;i++)fence(-10,-1+i*2,Math.PI/2);
+function building(x,z,w,d,color,roof){const g=new T.Group();g.position.set(x,0,z);box(g,'#8c8976',0,.18,0,w+.25,.36,d+.25);box(g,color,0,1.35,0,w,2.35,d);for(let i=0;i<9;i++)box(g,'#b7a177',0,.43+i*.25,d/2+.016,w,.025,.025);for(const dx of [-w/2,w/2])box(g,'#765236',dx,1.3,d/2+.03,.17,2.4,.14);const roofGeom=new T.BufferGeometry();const a=[-w/2-.45,2.55,-d/2-.35,w/2+.45,2.55,-d/2-.35,0,3.7,-d/2-.35,-w/2-.45,2.55,d/2+.35,0,3.7,d/2+.35,w/2+.45,2.55,d/2+.35];roofGeom.setAttribute('position',new T.Float32BufferAttribute(a,3));roofGeom.computeVertexNormals();const ends=new T.Mesh(roofGeom,mat('#8d653f'));g.add(ends);for(const side of [-1,1]){const plane=box(g,roof,side*w*.25,3.12,0,w*.66,.15,d+.8);plane.rotation.z=-side*Math.atan(1.15/(w/2+.45));for(let j=0;j<7;j++)for(let i=0;i<4;i++){let xx=side*(.12+i*w*.14),yy=3.7-Math.abs(xx)*1.15/(w/2+.45);const tile=box(g,j%2?roof:'#89604b',xx,yy+.08,-d/2-.2+j*(d+.4)/6,w*.155,.09,(d+.4)/6-.025);tile.rotation.z=plane.rotation.z}}box(g,'#65452c',-.5,.85,d/2+.06,.88,1.7,.12);box(g,'#8b653e',-.5,.85,d/2+.14,.68,1.5,.05);ball(g,'#d7bb6d',-.22,.85,d/2+.19,.055);box(g,'#624c34',w*.28,1.5,d/2+.08,.91,.94,.12);box(g,'#9ebbb1',w*.28,1.5,d/2+.15,.74,.76,.05);box(g,'#e5ce98',w*.28,1.5,d/2+.19,.055,.8,.05);box(g,'#e5ce98',w*.28,1.5,d/2+.19,.78,.055,.05);box(g,'#77583b',w*.28,1.01,d/2+.27,1.02,.12,.32);for(let i=0;i<5;i++){ball(g,'#4f7036',w*.28-.35+i*.18,1.12,d/2+.29,.15);ball(g,'#d5b254',w*.28-.35+i*.18,1.24,d/2+.3,.07)}box(g,'#968b78',w*.25,3.55,-d*.2,.52,1.1,.6);box(g,'#b0a68f',w*.25,4.1,-d*.2,.65,.17,.71);fixed.add(g);colliders.push({x,z,w:w+.5,d:d+.5})}
+building(1,-10,4.5,3.6,'#e1c79c','#a76b4e');building(-7.5,-9,3.8,3.2,'#b4966b','#617575');building(11,-8.5,3,2.9,'#d8bb83','#9a7848');
+// Shipping crate, stone well and water.
+const shipping=new T.Group();shipping.position.set(5.2,0,-6.3);box(shipping,'#645036',0,.52,0,1.6,1.04,1.1);for(let j=0;j<4;j++){box(shipping,'#bb8b4d',0,.15+j*.24,.57,1.7,.21,.08);box(shipping,'#a77842',.86,.15+j*.24,0,.08,.21,1.12)}box(shipping,'#d5ac6e',0,1.08,0,1.85,.14,1.28);box(shipping,'#483b26',0,1.16,0,1.3,.025,.7);box(shipping,'#edd29c',0,.63,.625,.8,.36,.025);fixed.add(shipping);colliders.push({x:5.2,z:-6.3,w:1.8,d:1.3});
+const well=new T.Group();well.position.set(11.6,0,-.8);for(let j=0;j<3;j++)for(let i=0;i<12;i++){let a=(i+(j%2)*.5)*Math.PI/6;let b=box(well,['#8d9282','#a3a18e','#b0ad96'][i%3],Math.sin(a)*.72,.16+j*.24,Math.cos(a)*.72,.4,.22,.31);b.rotation.y=a}for(const x of [-.9,.9])box(well,'#755438',x,1.12,0,.13,2.24,.16);for(const side of [-1,1]){let roof=box(well,'#9d6747',side*.5,2.35,0,1.15,.12,1.7);roof.rotation.z=-side*.45}fixed.add(well);colliders.push({x:11.6,z:-.8,r:1});const waterMat=new T.MeshStandardMaterial({color:'#6baca5',roughness:.22,metalness:.15,transparent:true,opacity:.85});cyl(scene,waterMat,11.6,.18,-.8,.61,.04);
 // Long blades, clover and small meadow flowers rendered in one instanced draw call.
-const blade=meadowGeometry(),grassMaterial=new T.MeshStandardMaterial({color:'#acc779',roughness:1,side:T.DoubleSide});
-grassMaterial.userData.seasonSurface='grass';const grassCells=new Map(),dummy=new T.Object3D(),grassColor=new T.Color();let k=0;
-for(let i=0;k<20000&&i<300000;i++){
- const x=rand(i*3)*48-22,z=rand(i*3+1)*52-26;
- if(x>soilLeft-.10&&x<soilRight+.10&&z>soilTop-.10&&z<soilBottom+.10)continue;
- if(z>-7.8&&z<-5.6&&x>-11&&x<12)continue;
- if(x>8.8&&x<11.2&&z>-7.8&&z<7.5)continue;
- if(z<-7.6&&z>-12.3&&x>-10&&x<13)continue;
- const key=Math.floor(x/8)+':'+Math.floor(z/8);let cell=grassCells.get(key);if(!cell)grassCells.set(key,cell=[]);cell.push({i,x,z});k++;
+const blade=new T.ConeGeometry(.055,.36,3),grass=new T.InstancedMesh(blade,mat('#708c3d'),6500),dummy=new T.Object3D();let k=0;for(let i=0;k<6500&&i<30000;i++){let x=rand(i*3)*48-24,z=rand(i*3+1)*44-18;if(x>-8.3&&x<12.2&&z>-7.8&&z<13.4)continue;if(z<-6&&z>-12&&x>-11&&x<15)continue;dummy.position.set(x,.13,z);dummy.rotation.set((rand(i+18)-.5)*.4,rand(i+30)*6,(rand(i+20)-.5)*.4);dummy.scale.setScalar(.65+rand(i+29)*.9);dummy.updateMatrix();grass.setMatrixAt(k++,dummy.matrix);grass.setColorAt(k-1,new T.Color().setHSL(.21+rand(i)*.035,.38,.29+rand(i+2)*.14))}grass.count=k;grass.receiveShadow=true;scene.add(grass);
+for(let i=0;i<75;i++){const x=-9.5+rand(i*7)*1,z=-4+rand(i*7+1)*17;ball(fixed,i%3?'#ead694':'#b994be',x,.22,z,.065,.07,.065)}
+for(let i=0;i<170;i++){const x=-7.3+rand(i+180)*16,z=rand(i+190)>.5?-4.1:12.2;if(rand(i+200)>.4){const pebble=ball(fixed,['#9b8a6c','#b09b74','#887c63'][i%3],x,.07,z+(rand(i+210)-.5)*.5,.045+rand(i+220)*.05,.035,.06);pebble.rotation.y=i}}
+for(let i=0;i<100;i++){const x=-9+rand(i+240)*.8,z=-4+rand(i+250)*17;for(let j=0;j<3;j++){let leaf=mesh(fixed,geo.leaf,'#789545',x+Math.sin(j*2.1)*.07,.08,z+Math.cos(j*2.1)*.07,.07,.025,.1);leaf.rotation.y=j*2.1}}
+scene.add(bake(fixed));
+const plots=new T.Group();scene.add(plots);let plotCombined=null;function cropModel(parent,p,x,z,held=false){const c=CROPS[p.crop],stage=Math.min(1,p.age/c.days);if(stage<.15){for(let i=0;i<3;i++)ball(parent,'#d0b385',x+(i-1)*.12,.075,z,.05,.025,.035);return}let leafSize=.13+stage*.24;cyl(parent,'#537c37',x,.16,z,.025,.3);for(let i=0;i<6;i++){const a=i*Math.PI/3,m=mesh(parent,geo.leaf,i%2?'#50803b':'#789c45',x+Math.sin(a)*leafSize*.6,.14+stage*.11,z+Math.cos(a)*leafSize*.6,leafSize*.42,leafSize*.22,leafSize);m.rotation.y=a;m.rotation.x=-.35;const vein=box(parent,'#a4b873',x+Math.sin(a)*leafSize*.78,.16+stage*.12,z+Math.cos(a)*leafSize*.78,.012,.012,leafSize*1.1);vein.rotation.y=a;vein.rotation.x=-.13;}if(stage>=1){if(p.crop==='strawberry'||p.crop==='tomato'){for(let i=0;i<3;i++){const a=i*2.1;const xx=x+Math.sin(a)*.24,zz=z+Math.cos(a)*.24;ball(parent,p.crop==='strawberry'?'#ce4232':'#d95a36',xx,.18,zz,.145,.17,.14);if(p.crop==='strawberry')for(let j=0;j<9;j++)ball(parent,'#f7d17f',xx+Math.sin(j*1.3)*.11,.17+Math.cos(j*1.3)*.11,zz+.09,.009,.012,.009)}}else if(p.crop==='turnip'){ball(parent,'#eee1b4',x,.15,z,.24,.21,.24);mesh(parent,geo.cone,'#e8dfbd',x,.02,z,.055,.2,.055).rotation.z=Math.PI}else{for(let i=0;i<3;i++)ball(parent,'#c6a06a',x+(i-1)*.16,.15,z,.15,.13,.16)}}}
+const dry=new T.MeshStandardMaterial({map:texture('#84643d','#4e361f40',1),roughness:1});dry.bumpMap=dry.map;dry.bumpScale=.035;const wet=new T.MeshStandardMaterial({map:dry.map,bumpMap:dry.map,bumpScale:.025,color:'#736448',roughness:.76});
+function rebuild(){if(plotCombined){scene.remove(plotCombined);plotCombined.traverse(m=>{if(m.isMesh)m.geometry.dispose()})}const g=new T.Group();for(const p of state.plots){const x=FIELD.x+p.x*TILE,z=FIELD.z+p.z*TILE;if(p.tilled){box(g,p.wet?wet:dry,x,.055,z,1.15,.12,1.15);for(let i=0;i<4;i++)box(g,p.wet?'#51442e':'#765530',x-.4+i*.26,.119,z,.055,.018,1.05)}if(p.crop)cropModel(g,p,x,z);if(p.obstacle==='stone'){const rock=mesh(g,new T.IcosahedronGeometry(1,1),'#969a89',x,.21,z,.32,.26,.3);rock.rotation.y=p.x;ball(g,'#7d864f',x+.12,.23,z+.1,.13,.06,.1)}if(p.obstacle==='branch'){let b=cyl(g,'#805c35',x,.11,z,.09,.7);b.rotation.z=1.35;b.rotation.y=.5;let b2=cyl(g,'#b59055',x+.15,.12,z+.15,.045,.38);b2.rotation.z=.9;b2.rotation.y=-.6}if(p.obstacle==='weed')for(let i=0;i<5;i++){let leaf=mesh(g,geo.leaf,'#537b38',x+Math.sin(i)*.15,.15,z+Math.cos(i)*.15,.08,.08,.3);leaf.rotation.y=i;leaf.rotation.x=-.4}}plotCombined=bake(g);scene.add(plotCombined)}rebuild();
+// Articulated farmer: moss cap and overalls, ochre shirt, leather boots, violet scarf.
+const farmer=new T.Group(),body=new T.Group();farmer.add(body);scene.add(farmer);ball(body,'#cfa968',0,.81,0,.28,.34,.2);ball(body,'#627044',0,.63,.025,.285,.27,.22);box(body,'#647641',0,.85,.178,.36,.34,.06);for(const x of [-.16,.16]){box(body,'#4f6036',x,.99,.15,.075,.37,.06);ball(body,'#cbb568',x,.9,.223,.036)}const scarf=cyl(body,'#785095',0,1.14,0,.25,.13);const tail=mesh(body,geo.cone,'#8858a2',-.08,1,.23,.1,.32,.04);tail.rotation.z=-.35;
+const head=new T.Group();head.position.y=1.49;body.add(head);ball(head,'#edc89a',0,0,0,.4,.39,.34);ball(head,'#684631',0,.18,-.06,.4,.25,.32);for(const x of [-.39,.39])ball(head,'#e7ba89',x,-.025,0,.08,.1,.08);for(const x of [-.15,.15]){ball(head,'#392b22',x,-.025,.31,.046,.083,.026);ball(head,'#fff0ce',x-.013,.008,.335,.012,.02,.008);ball(head,'#e9a585',x*1.3,-.145,.28,.065,.028,.015)}ball(head,'#e5b483',0,-.1,.34,.045,.05,.05);ball(head,'#8a5b3d',0,-.22,.29,.052,.015,.014);for(let i=0;i<5;i++){let tuft=ball(head,'#765033',-.32+i*.095,.18-(i%2)*.055,.23,.11,.18,.09);tuft.rotation.z=-.5}const cap=ball(head,'#6e7e49',0,.28,-.025,.415,.25,.35);ball(head,'#53653a',0,.21,-.39,.33,.045,.24);box(head,'#d6bd85',0,.225,.318,.17,.052,.034);ball(head,'#809057',0,.52,-.03,.043,.035,.043);
+const arms=[],legs=[];for(const side of [-1,1]){const arm=new T.Group();arm.position.set(side*.32,1.01,0);ball(arm,'#dbb875',0,-.13,0,.125,.2,.13);ball(arm,'#f4e5c5',0,-.34,.025,.115,.13,.12);body.add(arm);arms.push(arm);const leg=new T.Group();leg.position.set(side*.155,.45,0);ball(leg,'#4c5e37',0,-.12,0,.13,.23,.14);ball(leg,'#6f4a30',0,-.34,.065,.145,.13,.23);box(leg,'#4b3926',0,-.42,.07,.27,.04,.36);body.add(leg);legs.push(leg)}
+const equipment=new T.Group();arms[1].add(equipment);function toolModel(id){equipment.clear();if(id==='hand'||id==='seed')return;if(id==='water'){cyl(equipment,'#6f9293',0,-.43,.15,.17,.29);const handle=new T.Mesh(new T.TorusGeometry(.15,.025,5,14),mat('#9fb2a5'));handle.position.set(0,-.25,.15);equipment.add(handle);let spout=cyl(equipment,'#a3b7ab',0,-.4,.4,.035,.3);spout.rotation.x=1.1;ball(equipment,'#b8c5ae',0,-.33,.54,.09,.035,.07)}else{let h=cyl(equipment,'#a6824b',0,-.34,.3,.035,.85);h.rotation.x=Math.PI/2;if(id==='hoe')box(equipment,'#879390',0,-.35,.7,.27,.2,.055);if(id==='axe')box(equipment,'#8c9992',.03,-.34,.65,.31,.07,.24);if(id==='hammer')box(equipment,'#7c8782',0,-.34,.65,.4,.2,.22);if(id==='sickle'){let blade=box(equipment,'#bcc6ab',.1,-.34,.65,.37,.035,.08);blade.rotation.y=.5}}}toolModel(state.tool);
+const carried=new T.Group();body.add(carried);let lastHeld=null;function heldModel(){carried.clear();if(state.held){cropModel(carried,{crop:state.held,age:CROPS[state.held].days},0,0,true);carried.position.set(0,2.05,.08)}lastHeld=state.held}
+const target=new T.Mesh(new T.PlaneGeometry(1.18,1.18),new T.MeshBasicMaterial({color:'#ffe6a1',transparent:true,opacity:.22,depthWrite:false,side:T.DoubleSide}));target.rotation.x=-Math.PI/2;target.position.y=.14;scene.add(target);const border=new T.LineSegments(new T.EdgesGeometry(new T.PlaneGeometry(1.16,1.16)),new T.LineBasicMaterial({color:'#fff0ad',transparent:true,opacity:.9}));border.rotation.x=-Math.PI/2;border.position.y=.145;scene.add(border);
+const pollenGeometry=new T.BufferGeometry(),pollenPosition=new Float32Array(120*3);for(let i=0;i<120;i++){pollenPosition[i*3]=rand(i+301)*28-14;pollenPosition[i*3+1]=.4+rand(i+401)*3;pollenPosition[i*3+2]=rand(i+501)*26-12}pollenGeometry.setAttribute('position',new T.BufferAttribute(pollenPosition,3));const pollen=new T.Points(pollenGeometry,new T.PointsMaterial({color:'#fff0b5',size:.035,transparent:true,opacity:.5,depthWrite:false}));scene.add(pollen);
+const particles=[];function effect(type){const p=frontTile(state);const x=p?FIELD.x+p.x*TILE:state.player.x,z=p?FIELD.z+p.z*TILE:state.player.z;for(let i=0;i<12;i++){const m=ball(scene,type==='water'?'#bbebed':type==='leaf'?'#94ac51':'#c4a36d',x,.5,z,.035);particles.push({m,v:new T.Vector3((rand(i+t)*2-1)*1.2,.6+rand(i+2)*1.3,(rand(i+3)*2-1)*1.2),life:.65})}}
+let viewHeight=12,t=0,actionTime=0;const follow=new T.Vector3(state.player.x,0,state.player.z),offset=new T.Vector3(9,13,9),right=new T.Vector3(.707,0,-.707),down=new T.Vector3(.707,0,.707);function resize(){const a=innerWidth/innerHeight;viewHeight=a<.7?13.5:12;camera.left=-viewHeight*a/2;camera.right=viewHeight*a/2;camera.top=viewHeight/2;camera.bottom=-viewHeight/2;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}resize();addEventListener('resize',resize);
+function blocked(x,z){if(x<-10||x>14||z<-13||z>13)return true;for(const c of colliders){if(c.r&&Math.hypot(x-c.x,z-c.z)<c.r+.23)return true;if(c.w&&Math.abs(x-c.x)<c.w/2+.2&&Math.abs(z-c.z)<c.d/2+.2)return true}for(const p of state.plots){if(!p.obstacle&&!(p.crop&&p.age>=CROPS[p.crop].days*.5))continue;const px=FIELD.x+p.x*TILE,pz=FIELD.z+p.z*TILE;if(Math.abs(x-px)<.44&&Math.abs(z-pz)<.44)return true}return false}
+function move(dx,dy,dt,run){const v=right.clone().multiplyScalar(dx).addScaledVector(down,dy);if(v.lengthSq()<.002||actionTime>0)return false;const len=Math.min(1,v.length());v.normalize();state.player.angle=Math.atan2(v.x,v.z);let nx=state.player.x+v.x*dt*(run?3.3:2.2)*len,nz=state.player.z+v.z*dt*(run?3.3:2.2)*len;if(!blocked(nx,state.player.z))state.player.x=nx;if(!blocked(state.player.x,nz))state.player.z=nz;return true}
+function update(dt,moving){t+=dt;pollen.rotation.y=Math.sin(t*.05)*.025;pollen.position.y=Math.sin(t*.3)*.05;actionTime=Math.max(0,actionTime-dt);farmer.position.set(state.player.x,0,state.player.z);let diff=Math.atan2(Math.sin(state.player.angle-farmer.rotation.y),Math.cos(state.player.angle-farmer.rotation.y));farmer.rotation.y+=diff*Math.min(1,dt*14);body.position.y=moving?Math.abs(Math.sin(t*13))*.025:Math.sin(t*2)*.007;for(let i=0;i<2;i++){legs[i].rotation.x=moving?Math.sin(t*13+i*Math.PI)*.48:0;arms[i].rotation.x=state.held?-2.3:actionTime>0?-Math.sin(actionTime/.55*Math.PI)*1.8:moving?-Math.sin(t*13+i*Math.PI)*.35:0}if(lastHeld!==state.held)heldModel();let p=frontTile(state);target.visible=border.visible=!!p;if(p){target.position.x=border.position.x=FIELD.x+p.x*TILE;target.position.z=border.position.z=FIELD.z+p.z*TILE}for(let i=particles.length-1;i>=0;i--){const q=particles[i];q.life-=dt;q.v.y-=dt*3;q.m.position.addScaledVector(q.v,dt);q.m.scale.multiplyScalar(.97);if(q.life<0){scene.remove(q.m);particles.splice(i,1)}}follow.lerp(new T.Vector3(state.player.x,0,state.player.z),Math.min(1,dt*4));const look=follow.clone().add(new T.Vector3(0,.2,-.9));camera.position.copy(look).add(offset);camera.lookAt(look);const evening=Math.max(0,Math.min(1,(state.minutes-960)/360));sun.intensity=3.2-evening*2.7;sun.color.set(state.weather==='rain'?'#e4e9d9':evening>.3?'#ffc08b':'#ffdfaa');ambient.intensity=state.weather==='rain'?1.6:2.25-evening*.9;scene.background.set(evening>.8?'#65747d':'#a9b798');renderer.render(scene,camera)}
+return {renderer,scene,farmer,camera,rebuild,move,update,toolModel,effect,act(){actionTime=.55},locations:{house:{x:.5,z:-7.5},shipping:{x:5.2,z:-5.3},well:{x:11.6,z:.4}},get busy(){return actionTime>0}};
 }
-const meadow=new T.Group();meadow.name='meadow-regions';
-for(const cell of grassCells.values()){
- const grass=new T.InstancedMesh(blade,grassMaterial,cell.length);
- for(let j=0;j<cell.length;j++){const {i,x,z}=cell[j];dummy.position.set(x,-.015,z);dummy.rotation.set((rand(i+18)-.5)*.4,rand(i+30)*6,(rand(i+20)-.5)*.4);dummy.scale.set(.72+rand(i+28)*.55,.72+rand(i+29)*.68,.72+rand(i+31)*.55);dummy.updateMatrix();grass.setMatrixAt(j,dummy.matrix);grass.setColorAt(j,grassColor.setHSL(.25+rand(i)*.035,.60,.34+rand(i+2)*.14))}
- grass.computeBoundingSphere();grass.receiveShadow=true;grass.matrixAutoUpdate=false;meadow.add(grass);
-}
-scene.add(meadow);
-for(let i=0;i<75;i++){const x=-21.5+rand(i*7)*.7,z=-24+rand(i*7+1)*48;ball(fixed,i%3?'#ead694':'#b994be',x,.22,z,.065,.07,.065)}
-for(let i=0;i<170;i++){const x=soilLeft+rand(i+180)*soilWidth,z=rand(i+190)>.5?soilTop-.35:soilBottom+.35;if(rand(i+200)>.4){const pebble=ball(fixed,['#9b8a6c','#b09b74','#887c63'][i%3],x,.07,z+(rand(i+210)-.5)*.5,.045+rand(i+220)*.05,.035,.06);pebble.rotation.y=i}}
-for(let i=0;i<100;i++){const x=-21.5+rand(i+240)*.7,z=-24+rand(i+250)*48;for(let j=0;j<3;j++){let leaf=mesh(fixed,geo.leaf,'#789545',x+Math.sin(j*2.1)*.07,.08,z+Math.cos(j*2.1)*.07,.07,.025,.1);leaf.rotation.y=j*2.1}}
-// Low moss clusters soften the transition around the cultivated clearing.
-const moss=new T.InstancedMesh(new T.IcosahedronGeometry(1,1),new T.MeshStandardMaterial({map:miniatureTexture('moss',1),bumpMap:miniatureTexture('moss',1),bumpScale:.05,color:'#d2d7a6',roughness:1}),900);
-for(let i=0;i<900;i++){const side=i%4,u=rand(i+601),j=(rand(i+602)-.5)*1.15;
-const x=side<2?soilLeft+u*soilWidth:(side===2?soilLeft:soilRight)+j;
-const z=side<2?(side===0?soilTop:soilBottom)+j:soilTop+u*soilDepth;
-dummy.position.set(x,.025,z);dummy.rotation.set(0,rand(i+604)*6,0);
-const size=.025+rand(i+605)*.10;dummy.scale.set(size,.009+rand(i+606)*.022,size*(.4+rand(i+610)*.7));dummy.updateMatrix();moss.setMatrixAt(i,dummy.matrix);
-moss.setColorAt(i,new T.Color().setHSL(.22+rand(i+607)*.035,.38,.42+rand(i+608)*.12));}
-moss.material.userData.seasonSurface='grass';moss.receiveShadow=true;scene.add(moss);
-const staticArt=bake(fixed);staticArt.name='static-art';scene.add(staticArt);const forestArt=bake(forest,8);forestArt.name='forest-regions';scene.add(forestArt);
-let seasonalScenery=null;
-const plots=new T.Group();scene.add(plots);const plotChunks=new Map();let plotBuilds=0;
-const contactMaterial=new T.MeshBasicMaterial({map:contactTexture(),transparent:true,opacity:.23,depthWrite:false});
-const shadowGeometry=new T.PlaneGeometry(1.05,1.05);shadowGeometry.rotateX(-Math.PI/2);
-const cropShadows=new T.InstancedMesh(shadowGeometry,contactMaterial,MAIN_FIELD.cols*MAIN_FIELD.rows);cropShadows.renderOrder=1;scene.add(cropShadows);const shadowDummy=new T.Object3D();
-const {cropModel,weedModel}=createCropArt();
-const dry=new T.MeshStandardMaterial({map:miniatureTexture('earth',.55),roughness:1});dry.bumpMap=dry.map;dry.bumpScale=.075;dry.color.set('#9b886d');dry.alphaMap=soilEdgeTexture();dry.transparent=true;dry.depthWrite=false;dry.userData.noShadow=true;dry.userData.seasonSurface='soil';const wet=new T.MeshStandardMaterial({map:dry.map,bumpMap:dry.map,bumpScale:.025,color:'#483b2b',roughness:.66,alphaMap:dry.alphaMap,transparent:true,depthWrite:false});wet.userData.noShadow=true;wet.userData.seasonSurface='soil';
-// Rounded soil mounds with shallow, continuous furrows.
-const bedGeometry=new T.PlaneGeometry(1.18,1.18,12,12);bedGeometry.rotateX(-Math.PI/2);
-const bedPositions=bedGeometry.attributes.position;
-for(let i=0;i<bedPositions.count;i++){let x=bedPositions.getX(i),z=bedPositions.getZ(i);const cx=Math.max(0,Math.abs(x)-.45),cz=Math.max(0,Math.abs(z)-.45),len=Math.hypot(cx,cz);if(len>.14){x=Math.sign(x)*(.45+cx/len*.14);z=Math.sign(z)*(.45+cz/len*.14)}const edge=Math.max(0,1-Math.pow(Math.abs(x)/.59,8))*Math.max(0,1-Math.pow(Math.abs(z)/.59,8));bedPositions.setXYZ(i,x+Math.sin(z*37+x*11)*.015*(1-edge),.001+edge*(.064+.019*Math.cos(x*Math.PI*7)+.012*Math.sin(z*14+x*9)),z+Math.cos(x*29-z*13)*.015*(1-edge))}bedGeometry.computeVertexNormals();
-function rebuild(){
- seasonalScenery?.updateSnowMask(state);
- const field=fieldForState(state);let shadowCount=0;
- for(const p of state.plots){if(!p.crop)continue;const growth=Math.min(1,p.age/CROPS[p.crop].days);if(growth<.15)continue;shadowDummy.position.set(field.x+p.x*TILE,.087,field.z+p.z*TILE);shadowDummy.scale.setScalar(.25+growth*.48);shadowDummy.updateMatrix();cropShadows.setMatrixAt(shadowCount++,shadowDummy.matrix)}
- cropShadows.count=shadowCount;cropShadows.instanceMatrix.needsUpdate=true;cropShadows.computeBoundingSphere();
- const regions=new Map();for(const p of state.plots){const key=Math.floor(p.x/4)+':'+Math.floor(p.z/4);let items=regions.get(key);if(!items)regions.set(key,items=[]);items.push(p)}
- let changed=false;
- for(const [key,items] of regions){
-  const signature=[field.x,field.z,field.cols,field.rows].join(':')+'|'+items.map(p=>[p.x,p.z,p.tilled,p.wet,p.crop,p.age,p.obstacle].join(',')).join(';'),old=plotChunks.get(key);
-  if(old?.signature===signature)continue;
-  if(old){seasonalScenery?.release(old.art);plots.remove(old.art);old.art.traverse(o=>{if(o.isMesh)o.geometry.dispose()})}
-  const g=new T.Group();for(const p of items){const x=field.x+p.x*TILE,z=field.z+p.z*TILE;if(p.tilled){mesh(g,bedGeometry,p.wet?wet:dry,x,.045,z);for(let i=0;i<9;i++){const seed=p.x*97+p.z*13+i;mesh(g,seedGeo,p.wet?'#66533b':'#8b6a45',x+(rand(seed)-.5)*.96,.083,z+(rand(seed+30)-.5)*.96,.018+rand(seed+50)*.018,.013,.025)}}if(p.crop)cropModel(g,p,x,z);if(p.obstacle==='stone'){const rock=mesh(g,new T.IcosahedronGeometry(1,2),artisanMaterial('#a4ab98','stone'),x,.21,z,.32,.26,.3);rock.rotation.y=p.x;ball(g,'#7d864f',x+.12,.23,z+.1,.13,.06,.1)}if(p.obstacle==='branch'){let b=cyl(g,artisanMaterial('#9f8d69','bark'),x,.11,z,.09,.7);b.rotation.z=1.35;b.rotation.y=.5;let b2=cyl(g,'#b59055',x+.15,.12,z+.15,.045,.38);b2.rotation.z=.9;b2.rotation.y=-.6}if(p.obstacle==='weed')weedModel(g,x,z)}
-  const art=bake(g);art.name='plots-'+key;seasonalScenery?.bind(art,{filter:object=>object.material?.userData?.seasonSurface==='soil'});plots.add(art);plotChunks.set(key,{signature,art});plotBuilds++;changed=true;
- }
- for(const [key,old] of plotChunks)if(!regions.has(key)){seasonalScenery?.release(old.art);plots.remove(old.art);old.art.traverse(o=>{if(o.isMesh)o.geometry.dispose()});plotChunks.delete(key);changed=true}
- if(changed){renderDirty=true;renderer.shadowMap.needsUpdate=true}
-}
-rebuild();
-const farmArt=new T.Group();farmArt.name="farm-art";for(const child of [...scene.children])if(child.isMesh||child.isGroup||child.isPoints)farmArt.add(child);scene.add(farmArt);scene.add(plots,cropShadows);
-seasonalScenery=createSeasonalScenery({season:state.season});for(const {art} of plotChunks.values())seasonalScenery.bind(art,{filter:object=>object.material?.userData?.seasonSurface==='soil'});const seasonalParticles=createSeasonalParticles(scene,{coarse:matchMedia('(pointer: coarse)').matches});
-const seasonalSkies=['#b6c6a1','#aec5ad','#c9b796','#d8e4e9'],seasonalSun=['#fff2df','#fff2d5','#ffdfa9','#dbe9ff'].map(c=>new T.Color(c)),seasonalGround=['#667657','#65734e','#89734d','#9caebd'];let seasonalArea=null;
-function seasonalMesh(object){if(object.isInstancedMesh)return !!object.material.userData.seasonSurface;for(let p=object;p&&p!==seasonalArea;p=p.parent)if(p.name==='static-art'||p.name==='forest-regions'||p.name==='meadow-regions'||p.name==='farm-destinations'||p.name==='farm-stumps'||p.name.endsWith('-static'))return true;return false}
-function setSeasonalArea(next){if(next.id==='farm')next.label=state.profile?.farmName||'Sua fazenda';seasonalScenery.updateSnowMask(state);seasonalScenery.setSeason(state.season);seasonalScenery.setIndoors(!!next.indoors);seasonalArea=next.id==='farm'?farmArt:next.root;if(!next.indoors)seasonalScenery.bind(seasonalArea,{filter:seasonalMesh});seasonalParticles.setArea({bounds:next.bounds,treePositions:next.id==='farm'?farmTrees:next.treePositions||[]});renderDirty=true}
-// Refined art uses the same joint hierarchy and animation pivots.
-const {farmer,body,head,eyes,scarf,tail,arms,legs,knees,feet,setAppearance}=createFarmer(scene,state.profile);
-const remoteFarmer=createRemoteFarmer(scene);let networkRole='solo',vehiclePermission=()=>true;
-function networkLocation(){const area=regions?.active.id||'farm';return {region:area,routeKey:area==='residentHome'?String(state.residentHomeArea||'valleyTrail')+':'+String(state.residentHome||''):area==='valleyTrail'?[state.valleyRoute?.from,state.valleyRoute?.to].sort().join(':'):null,lotId:area==='homestead'?state.homesteads?.selected||null:['house','barn'].includes(area)&&state.buildingReturn?.area==='homestead'?state.buildingReturn.lotId||null:null}}
-function setRemotePose(p){if(!validRemotePose(p))return false;const changed=remoteFarmer.set(p);if(changed)renderDirty=true;return changed}
-function clearRemotePose(){remoteFarmer.clear();renderDirty=true}
-function multiplayerTick(dt){if(remoteFarmer.tick(Math.max(0,Math.min(.1,Number(dt)||0)),networkLocation()))renderDirty=true}
-function setNetworkRole(role){cancelStumpMove();networkRole=['guest','host'].includes(role)?role:'solo'}
-function setVehiclePermission(fn){vehiclePermission=typeof fn==='function'?fn:()=>true}
-function cancelVehicleControl(){horseRiding=false;driving=false;vehicleTravel=0;stop();renderDirty=true;renderer.shadowMap.needsUpdate=true}function setAvatar(profile){setAppearance(profile);if(regions?.active.id==='farm')regions.active.label=profile.farmName;renderDirty=true;renderer.shadowMap.needsUpdate=true}
-const wrapAngle=angle=>T.MathUtils.euclideanModulo(angle+Math.PI,Math.PI*2)-Math.PI;state.player.angle=Number.isFinite(state.player.angle)?wrapAngle(state.player.angle):Math.PI;farmer.rotation.y=state.player.angle;
-const waterHandleGeometry=new T.TorusGeometry(.15,.025,5,14);const equipment=new T.Group();arms[1].add(equipment);function toolModel(id){renderDirty=true;renderer.shadowMap.needsUpdate=true;equipment.clear();if(id==='hand'||id==='seed')return;
- if(id==='milker'){
-  cyl(equipment,'#849b98',0,-.46,.16,.153,.33);
-  cyl(equipment,'#c6d2c8',0,-.28,.16,.153,.033);
-  const handle=new T.Mesh(waterHandleGeometry,mat('#727a6c'));handle.position.set(0,-.25,.16);equipment.add(handle);
-  const tube=cyl(equipment,'#554b42',.15,-.36,.22,.032,.24);tube.rotation.z=.84;
-  cyl(equipment,'#a4b3a7',.236,-.45,.26,.048,.13);return;
- }
- if(id==='shears'){
-  for(const side of [-1,1]){
-   const blade=box(equipment,'#b7c7c0',side*.065,-.30,.31,.065,.040,.31);
-   blade.rotation.y=side*.36;
-   ball(equipment,'#805947',side*.091,-.30,.11,.077,.047,.067);
-  }
-  ball(equipment,'#606c64',0,-.273,.235,.035,.018,.034);return;
- }
- if(id==='camera'){box(equipment,'#6d7b69',0,-.38,.13,.36,.23,.19);box(equipment,'#414b42',0,-.39,.245,.30,.15,.06);const lens=cyl(equipment,'#33413f',0,-.39,.30,.10,.10);lens.rotation.x=Math.PI/2;const glass=cyl(equipment,'#9fb8af',0,-.39,.357,.071,.012);glass.rotation.x=Math.PI/2;box(equipment,'#c5c0a7',.10,-.245,.13,.075,.035,.07);box(equipment,'#c9c1a2',-.11,-.29,.235,.065,.045,.018);return}if(id==='water'){cyl(equipment,'#6f9293',0,-.43,.15,.17,.29);const handle=new T.Mesh(waterHandleGeometry,mat('#9fb2a5'));handle.position.set(0,-.25,.15);equipment.add(handle);let spout=cyl(equipment,'#a3b7ab',0,-.4,.4,.035,.3);spout.rotation.x=1.1;ball(equipment,'#b8c5ae',0,-.33,.54,.09,.035,.07)}else{let h=cyl(equipment,'#a6824b',0,-.34,.3,.035,.85);h.rotation.x=Math.PI/2;if(id==='snowShovel'){const scoop=box(equipment,'#9cb4b4',0,-.34,.76,.53,.10,.37);scoop.rotation.x=-.25;box(equipment,'#c3c9b7',0,-.32,.94,.54,.13,.035)}if(id==='hoe')box(equipment,'#879390',0,-.35,.7,.27,.2,.055);if(id==='axe')box(equipment,'#8c9992',.03,-.34,.65,.31,.07,.24);if(id==='hammer')box(equipment,'#7c8782',0,-.34,.65,.4,.2,.22);if(id==='sickle'){let blade=box(equipment,'#bcc6ab',.1,-.34,.65,.37,.035,.08);blade.rotation.y=.5}}}toolModel(state.tool);
-const playerShadow=new T.Mesh(shadowGeometry,new T.MeshBasicMaterial({map:contactTexture(),transparent:true,opacity:.30,depthWrite:false}));playerShadow.scale.set(.67,.67,.67);playerShadow.renderOrder=1;scene.add(playerShadow);
-const carried=new T.Group();body.add(carried);let lastHeld=null;function heldModel(){renderDirty=true;renderer.shadowMap.needsUpdate=true;carried.clear();if(state.held){if(state.held==='egg'){ball(carried,'#efe5c8',0,0,0,.16,.22,.16);ball(carried,'#f9f0d8',-.045,.075,.10,.06,.10,.045)}else if(state.held==='milk'||state.held==='mayo'){
-  const milk=state.held==='milk',color=milk?'#f0e9d5':'#e8d6a0';
-  cyl(carried,color,0,-.020,0,.139,.31);
-  ball(carried,color,0,.113,0,.135,.08,.135);
-  cyl(carried,milk?'#89a19c':'#b19864',0,.19,0,.091,.060);
-  cyl(carried,milk?'#b1c2b0':'#e7dcc0',0,-.05,0,.141,.115);
- }else if(state.held==='wool'){
-  for(let i=0;i<9;i++){
-   const angle=i*2.4;
-   ball(carried,i%3?'#ece4cd':'#d7ccb2',Math.sin(angle)*.094,(i%3-1)*.076,Math.cos(angle)*.091,.12,.11,.12);
-  }
- }else if(state.held==='cheese'){
-  cyl(carried,'#e3b967',0,-.04,0,.19,.19);
-  cyl(carried,'#eed197',0,.058,0,.187,.02);
- }else if(CROPS[state.held])cropModel(carried,{crop:state.held,age:CROPS[state.held].days},0,0,true);carried.position.set(0,2.05,.08)}lastHeld=state.held}
-const target=new T.Mesh(new T.PlaneGeometry(1.18,1.18),new T.MeshBasicMaterial({color:'#ffe6a1',transparent:true,opacity:.065,depthWrite:false,side:T.DoubleSide}));target.rotation.x=-Math.PI/2;target.position.y=.14;scene.add(target);const border=new T.LineSegments(new T.EdgesGeometry(new T.PlaneGeometry(1.16,1.16)),new T.LineBasicMaterial({color:'#fff0ad',transparent:true,opacity:.55}));border.rotation.x=-Math.PI/2;border.position.y=.145;scene.add(border);
-const pollenGeometry=new T.BufferGeometry(),pollenPosition=new Float32Array(120*3);for(let i=0;i<120;i++){pollenPosition[i*3]=rand(i+301)*28-14;pollenPosition[i*3+1]=.4+rand(i+401)*3;pollenPosition[i*3+2]=rand(i+501)*26-12}pollenGeometry.setAttribute('position',new T.BufferAttribute(pollenPosition,3));const pollen=new T.Points(pollenGeometry,new T.PointsMaterial({color:'#fff0b5',size:.035,transparent:true,opacity:.5,depthWrite:false}));farmArt.add(pollen);
-const activityArt=createActivityArt(state,(x,z)=>!blocked(x,z),()=>networkRole!=='guest');scene.add(activityArt.root);
-const particles=[];function effect(type){pendingEffect={type,delay:.36}}
-function emitEffect(type){const field=fieldForState(state),p=frontTile(state);const x=p?field.x+p.x*TILE:state.player.x,z=p?field.z+p.z*TILE:state.player.z;for(let i=0;i<12;i++){const m=ball(scene,type==='water'?'#bbebed':type==='leaf'?'#94ac51':'#c4a36d',x,.5,z,.035);particles.push({m,v:new T.Vector3((rand(i+t)*2-1)*1.2,.6+rand(i+2)*1.3,(rand(i+3)*2-1)*1.2),life:.65})}}
-let plantingMask=null,plantingMaskSignature='',hammockTime=0,hammockExit=null,layoutSignature=JSON.stringify(state.farmLayout);
-let zoomValue=1,zoomTarget=1;const minimumZoom=.08,maximumZoom=3.4;
-function setZoom(value){if(!Number.isFinite(value))return zoomTarget;const next=T.MathUtils.clamp(value,minimumZoom,maximumZoom);if(next!==zoomTarget){zoomTarget=next;renderDirty=true}return zoomTarget}
-const herdGrounds=new Map([['farm',{bounds:[...MAIN_FARM_BOUNDS],colliders}]]);let hop=null,jumpHeight=0,hopCooldown=0,hopCount=0;let viewHeight=12,t=0,actionTime=0,actionTool=state.tool,pendingEffect=null,gait=0,isRunning=true,motion=0,travel=0,runBlend=0,speed=0;const velocity=new T.Vector3(),desired=new T.Vector3(),displacement=new T.Vector3(),deltaVelocity=new T.Vector3(),playerTarget=new T.Vector3(),look=new T.Vector3();const actionKeys=[[0,0],[.22,-2.4],[.38,-2.4],[.52,-.65],[.72,-.75],[1,0]];const follow=new T.Vector3(state.player.x,0,state.player.z),offset=new T.Vector3(9,13,9),right=new T.Vector3(.707,0,-.707),down=new T.Vector3(.707,0,.707);function resize(){renderDirty=true;const a=innerWidth/innerHeight;viewHeight=(regions?.active.viewHeight||12)*(a<.7?1.125:1);camera.left=-viewHeight*a/2;camera.right=viewHeight*a/2;camera.top=viewHeight/2;camera.bottom=-viewHeight/2;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}resize();addEventListener('resize',resize);
-const farmPets=createFarmPets(scene,state),nightVisitors=createNightVisitors(scene,state);let sleepScene=null,sleepStart=null;function setSleepScene(v){if(v&&!sleepScene)sleepStart={...state.player};if(!v)sleepStart=null;sleepScene=v;renderDirty=true;if(!v)companion.endSleep()}let visitorChase=false,lastVisitorAlert=0;const companion=createCompanionDog(scene,state),tractorTracks=createTractorTracks(scene,{coarse:matchMedia('(pointer: coarse)').matches}),wildlifeDefense=createWildlifeDefense({state,getRegion:()=>regions?.active,dog:companion,canWalk:(x,z)=>!blocked(x,z)});
-const horseCart=createHorseCart(scene,state);let horseRiding=false;
-const sleepBlanket=new T.Mesh(new T.BoxGeometry(2.05,.15,2.3,8,1,8),new T.MeshStandardMaterial({color:'#9c83a5',roughness:.95}));sleepBlanket.visible=false;sleepBlanket.castShadow=true;scene.add(sleepBlanket);
-const tractor=createTractor();scene.add(tractor.root);let driving=false,vehicleTravel=0,lastVehicleCargo=null,lastTrailerAttached=false;
-function tractorData(){const previous=state.tractor;if(!previous||typeof previous!=='object'||Array.isArray(previous))state.tractor={};const d=state.tractor;if(!Number.isFinite(d.x))d.x=11.6;if(!Number.isFinite(d.z))d.z=4.7;if(!Number.isFinite(d.angle))d.angle=Math.PI;if(typeof d.area!=='string')d.area='farm';d.cutter=d.cutter===true;d.trailer=d.trailer===true;return d}
-tractorData();const transportedHerd=createTransportDisplay(state);scene.add(transportedHerd.root);
-function nearTractor(){return vehicleAccess(state,regions?.active.id||'farm',{driving}).nearDriver}
-function tractorAtBarnEntrance(){return vehicleAccess(state,regions?.active.id||'farm',{driving}).barnService}
-// Doorways must remain clear before an on-foot player can enter a building.
-function canUsePortal(point){
- if(!point||typeof point.to!=='string')return false;
- if(!isIndoorArea(point.to))return true;
- if(driving||horseRiding)return false;
- const d=tractorData(),area=regions?.active.id||'farm',sameLot=area!=='homestead'||d.lotId===state.homesteads?.selected;
- if(d.area!==area||!sameLot)return true;
- if(Math.hypot(d.x-point.x,d.z-point.z)<=3.2)return false;
- if(d.trailer&&Number.isFinite(d.trailerX)&&Number.isFinite(d.trailerZ)&&Math.hypot(d.trailerX-point.x,d.trailerZ-point.z)<=2.3)return false;
- return true;
-}
-function canEnterArea(id){if((driving||horseRiding)&&isIndoorArea(id))return false;const portal=regions?.active.portals?.find(p=>p.to===id);return !portal||canUsePortal(portal)}
-function clearDismountPoint(x,z){return !playerBlocked(x,z,false,true)&&!(regions?.active.portals||[]).some(p=>Math.hypot(x-p.x,z-p.z)<(p.autoRadius??Math.min(.85,p.radius??1.4))+.55)}
 
-function refreshVehicle(){updateTractor(0);renderDirty=true;renderer.shadowMap.needsUpdate=true}
-function toggleHorse(){
-  const h=economyState(state).horse;
-  if(horseRiding){
-   const p=horseCart.driverPose;
-   for(const distance of [1.55,2.15,2.8])for(const side of [-1,1]){
-    const x=p.x+Math.cos(p.angle)*side*distance,z=p.z-Math.sin(p.angle)*side*distance;
-    if(!clearDismountPoint(x,z))continue;
-    horseRiding=false;state.player.x=x;state.player.z=z;stop();renderDirty=true;
-    return {changed:true,message:'Você desmontou.'};
-   }
-   return {changed:false,message:'Estacione em um espaço livre para descer.'};
-  }
-  if(driving||hop||stumpSelection||state.held||state.carryingHay||!h.owned||h.area!==regions.active.id||Math.min(Math.hypot(h.x-state.player.x,h.z-state.player.z),Math.hypot(horseCart.driverPose.x-state.player.x,horseCart.driverPose.z-state.player.z))>3)return {changed:false,message:'Aproxime-se do cavalo com as mãos livres.'};
-  if(networkRole==='guest')return {changed:false,message:'O dono da fazenda conduz o cavalo nesta versão.'};
-  horseRiding=true;state.player.x=h.x;state.player.z=h.z;state.player.angle=h.angle;stop();
-  return {changed:true,message:'X abre as opções do cavalo. Y desmonta.'};
- }
- function toggleHorseCart(){
-  if(driving||networkRole==='guest')return {changed:false,message:'Estacione o trator e use o cavalo da sua fazenda.'};
-  const h=economyState(state).horse,collisions=horseCollision(h.x,h.z,false);
-  const result=horseCart.toggle(regions.active.id,horseRiding,(after,before)=>collisions.allows(after,before));
-  if(result.changed){stop();renderDirty=true;renderer.shadowMap.needsUpdate=true}
-  return result;
- }
-function toggleTractor(){if(horseRiding)return {changed:false,message:'Desça da carroça primeiro.'};if(stumpSelection)return {changed:false,message:'Coloque ou devolva o toco antes de usar o trator.'};if(hop)return{changed:false,message:'Espere terminar o pulinho antes de usar o trator.'};const d=tractorData();if(driving){const candidates=[[-1.25,0],[1.25,0],[0,1.6],[0,-1.6],[-2,0],[2,0],[0,2.4],[0,-2.4]];let point=null;for(const [x,z]of candidates){const a=d.angle,p=[d.x+x*Math.cos(a)+z*Math.sin(a),d.z-x*Math.sin(a)+z*Math.cos(a)];if(clearDismountPoint(p[0],p[1])){point=p;break}}if(!point)return {changed:false,message:'Afaste o trator das portas e estacione em um espaço livre para descer.'};driving=false;state.player.x=point[0];state.player.z=point[1];stop();renderDirty=true;renderer.shadowMap.needsUpdate=true;return {changed:true,message:'Você desceu do trator. Aproxime-se e use X para dirigir.'}}
-if(!nearTractor())return {changed:false,message:'Aproxime-se do trator estacionado na fazenda.'};if(state.held||state.carryingHay)return {changed:false,message:'Guarde o que está nas mãos antes de subir no trator.'};if(vehiclePermission()===false)return {changed:false,message:'O outro jogador está usando o trator. Espere ele descer.'};driving=true;state.player.x=d.x;state.player.z=d.z;state.player.angle=d.angle;actionTime=0;stop();renderDirty=true;renderer.shadowMap.needsUpdate=true;return {changed:true,message:'No trator! Direcional dirige · X liga/desliga a roçadeira · Y desce.'}}
-function vehicleAction(){const d=tractorData();if(!driving)return {changed:false,message:'Entre no trator para usar a roçadeira.'};d.cutter=!d.cutter;renderDirty=true;return {changed:true,message:d.cutter?'Roçadeira ligada. Passe sobre as ervas; pedras e galhos precisam de ferramentas.':'Roçadeira desligada.'}}
-function toggleTrailer(){const d=tractorData();if(!driving&&!nearTractor()&&!tractorAtBarnEntrance())return {changed:false,message:regions?.active.id==='barn'?'Estacione o trator perto do portão do celeiro para usar a carretinha por aqui.':'Aproxime-se do trator para acoplar a carretinha.'};if(d.cargo)return {changed:false,message:'Desembarque o animal no celeiro ou no pasto antes de desacoplar.'};updateTractor(0);d.trailer=!d.trailer;refreshVehicle();return {changed:true,message:d.trailer?'Carretinha acoplada. Agora escolha um animal para embarcar.':'Carretinha desacoplada e estacionada.'}}
-function updateTractor(distance){const d=tractorData();if(driving){d.x=state.player.x;d.z=state.player.z;d.angle=state.player.angle;d.area=regions?.active.id||'farm';d.lotId=d.area==='homestead'?state.homesteads?.selected:null}tractor.root.visible=d.area===(regions?.active.id||'farm')&&(d.area!=='homestead'||d.lotId===state.homesteads?.selected);tractor.root.position.set(d.x,terrainHeight(d.area,d.x,d.z),d.z);tractor.root.rotation.y=d.angle;
- if(tractor.trailer.parent!==scene)scene.add(tractor.trailer);let trailerDistance=0;if(d.trailer){const reset=!lastTrailerAttached||d.trailerArea!==d.area||d.trailerLot!==d.lotId,p=solveTrailer(d,{x:d.trailerX,z:d.trailerZ,angle:d.trailerAngle},reset);d.trailerX=p.x;d.trailerZ=p.z;d.trailerAngle=p.angle;d.trailerArea=d.area;d.trailerLot=d.lotId;trailerDistance=p.wheelTravel;tractor.trailer.visible=tractor.root.visible}else{if(!Number.isFinite(d.trailerX))d.trailerX=11.6;if(!Number.isFinite(d.trailerZ))d.trailerZ=7.8;if(!Number.isFinite(d.trailerAngle))d.trailerAngle=Math.PI;tractor.trailer.visible=(d.trailerArea||'farm')===(regions?.active.id||'farm')&&(d.trailerArea!=='homestead'||d.trailerLot===state.homesteads?.selected)}tractor.trailer.position.set(d.trailerX,terrainHeight(d.area,d.trailerX,d.trailerZ),d.trailerZ);tractor.trailer.rotation.y=d.trailerAngle;lastTrailerAttached=d.trailer;tractor.animate(distance,d.cutter,trailerDistance);if(networkRole!=='guest'&&tractor.root.visible&&(driving||state.coopDriver))activityArt.controls.crush(d.x,d.z,d.angle);
- const animal=ANIMALS.find(a=>a.id===d.cargo);if(lastVehicleCargo!==d.cargo){tractor.setCargo(animal||(d.cargo?{species:'cow'}:null));lastVehicleCargo=d.cargo}if(driving&&d.cutter&&state.season===3)clearSnow(state,d.x,d.z,1.6);if(driving&&d.cutter&&(regions?.isFarm||regions?.active.id==='homestead')){let changed=false;const field=fieldForState(state);nearPlots(state.plots,field,d.x,d.z,1.18,(p,x,z)=>{if(p.obstacle==='weed'&&Math.hypot(x-d.x,z-d.z)<1.18){p.obstacle=null;changed=true}return false});if(changed)rebuild()}}
-function nearPlots(plots,field,x,z,reach,test){if(field===MAIN_FIELD&&(!plantingMask||plantingMaskSignature!==layoutSignature)){plantingMask=Array.from({length:MAIN_FIELD.cols*MAIN_FIELD.rows},(_,i)=>isPlantablePlot({x:i%MAIN_FIELD.cols,z:Math.floor(i/MAIN_FIELD.cols)},MAIN_FIELD,state));plantingMaskSignature=layoutSignature}const minCol=Math.max(0,Math.ceil((x-reach-field.x)/TILE)),maxCol=Math.min(field.cols-1,Math.floor((x+reach-field.x)/TILE)),minRow=Math.max(0,Math.ceil((z-reach-field.z)/TILE)),maxRow=Math.min(field.rows-1,Math.floor((z+reach-field.z)/TILE));for(let row=minRow;row<=maxRow;row++)for(let col=minCol;col<=maxCol;col++){const p=plots[row*field.cols+col];if(p&&(field===MAIN_FIELD?plantingMask[row*field.cols+col]:true)&&test(p,field.x+col*TILE,field.z+row*TILE))return true}return false}
-function blocked(x,z,ignoreJumpable=false,onFoot=false){for(const c of activityArt.colliders)if(!((driving||horseRiding)&&!onFoot&&c.kind==='snow')&&colliderContains(c,x,z,(driving||horseRiding)&&!onFoot?.6:.23))return true;for(const c of transportedHerd.colliders||[])if(colliderContains(c,x,z,(driving||horseRiding)&&!onFoot?.6:.23))return true;if(regions){if(!regions.fits(regions.active,x,z,ignoreJumpable))return true;if((driving||horseRiding)&&!onFoot){const b=regions.active.bounds;if(x<b[0]+.6||x>b[1]-.6||z<b[2]+.6||z>b[3]-.6)return true;for(const c of regions.active.colliders){if(ignoreJumpable&&c.jumpable===true)continue;if(colliderContains(c,x,z,.6))return true}}if(!regions.isFarm&&regions.active.id!=='homestead')return false}else{if(x<MAIN_FARM_BOUNDS[0]||x>MAIN_FARM_BOUNDS[1]||z<MAIN_FARM_BOUNDS[2]||z>MAIN_FARM_BOUNDS[3])return true;for(const c of colliders){if(ignoreJumpable&&c.jumpable===true)continue;if(colliderContains(c,x,z,(driving||horseRiding)&&!onFoot?.6:.23))return true}}const field=fieldForState(state);return nearPlots(state.plots,field,x,z,.44,(p,px,pz)=>{if((!p.obstacle||((driving||horseRiding)&&!onFoot&&tractorData().cutter&&p.obstacle==='weed'))&&!(p.crop&&p.age>=CROPS[p.crop].days*.5))return false;return Math.abs(x-px)<.44&&Math.abs(z-pz)<.44})}
-// Vehicle footprints belong to the avatar; the dog keeps its own boarding route.
-function playerBlocked(x,z,ignoreJumpable=false,onFoot=false){if((!horseRiding||onFoot)&&horseCart.colliders(regions?.active.id||'farm').some(c=>colliderContains(c,x,z,driving&&!onFoot?.6:.23)))return true;if(blocked(x,z,ignoreJumpable,onFoot))return true;const d=tractorData(),area=regions?.active.id||'farm',lot=state.homesteads?.selected;if((!driving||onFoot)&&d.area===area&&(area!=='homestead'||d.lotId===lot)&&colliderContains({x:d.x,z:d.z,w:1.35,d:2.10,angle:d.angle},x,z))return true;const cartArea=d.trailer?d.area:d.trailerArea||'farm',cartLot=d.trailer?d.lotId:d.trailerLot;if((!driving||onFoot||!d.trailer)&&cartArea===area&&(area!=='homestead'||cartLot===lot)&&Number.isFinite(d.trailerX)&&Number.isFinite(d.trailerZ)&&colliderContains({x:d.trailerX,z:d.trailerZ,w:1.60,d:1.92,angle:d.trailerAngle},x,z,driving&&!onFoot?.6:.23))return true;return false}
-function resetHop(){hop=null;jumpHeight=0;hopCooldown=.12}
-function safeHopGround(plan){const first=plan.progress<.5?0:1;for(const u of[first,1-first]){const p=hopPosition(plan,u);if(!playerBlocked(p.x,p.z))return p}for(let i=1;i<10;i++){const p=hopPosition(plan,i/10);if(!playerBlocked(p.x,p.z))return p}for(let r=.35;r<=2.8;r+=.35)for(let i=0;i<20;i++){const a=i*Math.PI/10,x=plan.x+Math.sin(a)*r,z=plan.z+Math.cos(a)*r;if(!playerBlocked(x,z))return{x,z}}const b=regions?.active.bounds||[...MAIN_FARM_BOUNDS];for(let z=b[2]+.35;z<b[3]-.3;z+=.45)for(let x=b[0]+.35;x<b[1]-.3;x+=.45)if(!playerBlocked(x,z))return{x,z};return null}
-function recoverHop(plan){const p=safeHopGround(plan);resetHop();velocity.set(0,0,0);speed=0;if(p){state.player.x=p.x;state.player.z=p.z}else if(regions){regions.travel('farm',undefined,true)}renderDirty=true;renderer.shadowMap.needsUpdate=true;return true}
-function advanceHop(dt){const plan=hop,oldX=state.player.x,oldZ=state.player.z,next=Math.min(1,plan.progress+dt/plan.duration),p=hopPosition(plan,next);if(playerBlocked(p.x,p.z,true)||next===1&&playerBlocked(p.x,p.z)){recoverHop(plan);return false}plan.progress=next;state.player.x=p.x;state.player.z=p.z;state.player.angle=plan.angle;jumpHeight=p.height;const moved=Math.hypot(p.x-oldX,p.z-oldZ);speed=moved/dt;travel+=moved;gait+=moved/1.52*Math.PI*2;renderDirty=true;if(next===1){hop=null;jumpHeight=0;hopCooldown=.18;velocity.set(Math.sin(plan.angle)*Math.min(4.6,speed),0,Math.cos(plan.angle)*Math.min(4.6,speed))}return moved>1e-6}
-function safePlayer(){if(!hop)return{...state.player};const p=safeHopGround(hop);return{...state.player,x:p?.x??hop.x,z:p?.z??hop.z,angle:hop.angle}}
-function trackArea(){return (regions?.active.id||'farm')+':'+(regions?.active.lotId||'')}
-function trackGround(x,z){const region=regions?.active;if(!region||region.indoors||!['farm','homestead'].includes(region.id)||!regions.fits(region,x,z))return null;const field=fieldForState(state),col=Math.round((x-field.x)/TILE),row=Math.round((z-field.z)/TILE);if(col>=0&&col<field.cols&&row>=0&&row<field.rows){const p=state.plots[row*field.cols+col];if(p?.crop||p?.obstacle||!isPlantablePlot(p,field,state))return null;return 'soil'}return 'grass'}
-function trackGroundHeight(x,z){const field=fieldForState(state),col=Math.round((x-field.x)/TILE),row=Math.round((z-field.z)/TILE);if(col>=0&&col<field.cols&&row>=0&&row<field.rows){const p=state.plots[row*field.cols+col],xx=x-(field.x+col*TILE),zz=z-(field.z+row*TILE);if(p?.tilled){const edge=Math.max(0,1-Math.pow(Math.abs(xx)/.59,8))*Math.max(0,1-Math.pow(Math.abs(zz)/.59,8));return .034+edge*(.064+.019*Math.cos(xx*Math.PI*7)+.012*Math.sin(zz*14+xx*9))}}const main=field.cols===MAIN_FIELD.cols&&field.rows===MAIN_FIELD.rows,xx=x-(main?soilCenterX:.875),zz=z-(main?soilCenterZ:3.875);return Math.abs(xx)<(main?soilWidth/2:8.4)&&Math.abs(zz)<(main?soilDepth/2:8.4)?.023+.012*Math.sin(xx*7.1+zz*8.3)+.009*Math.sin(zz*14.3-xx*7)+.009*Math.sin(xx*2.9-zz*3.7):.035}
-function stop(){velocity.set(0,0,0);speed=0;if(hop)recoverHop(hop)}
- // Test the horse and axle footprints with their own clearances.
- function horseCollision(x,z,includeParked=true){
-  const area=regions.active.id,lot=state.homesteads?.selected,b=regions.active.bounds;
-  const nearby=(c)=>Math.abs(c.x-x)<5+Math.max(c.r||0,c.w||0,c.d||0,c.rx||0,c.rz||0)
-    &&Math.abs(c.z-z)<5+Math.max(c.r||0,c.w||0,c.d||0,c.rx||0,c.rz||0);
-  const solids=regions.active.colliders.filter(c=>!c.jumpable&&!c.stumpId&&nearby(c));
-  for(const c of transportedHerd.colliders||[])if(nearby(c))solids.push(c);
-  const d=tractorData();
-  if(d.area===area&&(area!=='homestead'||d.lotId===lot))solids.push({x:d.x,z:d.z,w:1.35,d:2.1,angle:d.angle});
-  if((d.trailer?d.area:d.trailerArea||'farm')===area&&(area!=='homestead'||(d.trailer?d.lotId:d.trailerLot)===lot)&&Number.isFinite(d.trailerX))solids.push({x:d.trailerX,z:d.trailerZ,w:1.60,d:1.92,angle:d.trailerAngle});
-  if(includeParked&&!horseCart.attached){
-   const parked=horseCart.colliders(area).slice(1);
-   solids.push(...parked);
-  }
-  if(area==='farm'||area==='homestead'){
-   const field=fieldForState(state);
-   nearPlots(state.plots,field,x,z,4.8,(p,px,pz)=>{
-    if((p.obstacle&&p.obstacle!=='weed')||(p.crop&&p.age>=CROPS[p.crop].days*.5))solids.push({x:px,z:pz,w:.60,d:.60});
-    return false;
-   });
-  }
-  function penetration(p,c){
-   if(!colliderContains(c,p.x,p.z,p.r))return 0;
-   let lo=0,hi=p.r+Math.max(c.r||0,c.w||0,c.d||0,c.rx||0,c.rz||0);
-   for(let i=0;i<7;i++){
-    const depth=(lo+hi)/2;
-    if(colliderContains(c,p.x,p.z,p.r-depth))lo=depth;else hi=depth;
-   }
-   return hi;
-  }
-  const boundary=p=>Math.max(0,b[0]-p.x+p.r,p.x+p.r-b[1],b[2]-p.z+p.r,p.z+p.r-b[3]);
-  return {allows(after,before){
-   const depth=(points,c)=>Math.max(...points.map(p=>penetration(p,c)));
-   if(Math.max(...after.map(boundary))>Math.max(...before.map(boundary))+.002)return false;
-   return solids.every(c=>depth(after,c)<=depth(before,c)+.001);
-  }};
- }
- function moveHorse(x,z,dx,dz,angle,oldAngle){
-  if(dx===0&&dz===0&&angle===oldAngle)return;
-  const h=economyState(state).horse,start=horseCart.samples(h),collision=horseCollision(x,z);
-  // Try the full movement, then slide, then turn in place to steer away.
-  for(const [xx,zz,a] of [[x+dx,z+dz,angle],[x+dx,z,angle],[x,z+dz,angle],[x,z,angle],
-   [x+dx,z+dz,oldAngle],[x+dx,z,oldAngle],[x,z+dz,oldAngle]]){
-   if(xx===x&&zz===z&&a===oldAngle)continue;
-   const next={x:xx,z:zz,angle:a};
-   if(!collision.allows(horseCart.samples(h,next),start))continue;
-   horseCart.commit(h,next);Object.assign(state.player,next);return;
-  }
-  state.player.angle=oldAngle;
- }
-function move(dx,dy,dt,run){
- isRunning=run;if(hammockTime>0){stop();return false}if(dt<=0)return false;hopCooldown=Math.max(0,hopCooldown-dt);if(hop)return advanceHop(dt);if(actionTime>0){stop();return false}
- const oldX=state.player.x,oldZ=state.player.z,oldAngle=state.player.angle;
- desired.copy(right).multiplyScalar(dx).addScaledVector(down,dy);
- const strength=Math.min(1,desired.length()),active=strength>.045;
- if(active){desired.normalize();const angle=Math.atan2(desired.x,desired.z);if(driving){const delta=wrapAngle(angle-state.player.angle);state.player.angle=wrapAngle(state.player.angle+T.MathUtils.clamp(delta,-dt*2.6,dt*2.6));desired.set(Math.sin(state.player.angle),0,Math.cos(state.player.angle)).multiplyScalar(6.3*(economyState(state).tractorTuned?1.1:1)*strength*(1-Math.min(.65,Math.abs(delta)*.22)))}else if(horseRiding){const delta=wrapAngle(angle-state.player.angle);state.player.angle=wrapAngle(state.player.angle+T.MathUtils.clamp(delta,-dt*(horseCart.attached?2.8:4.4),dt*(horseCart.attached?2.8:4.4)));desired.set(Math.sin(state.player.angle),0,Math.cos(state.player.angle)).multiplyScalar((horseCart.attached?5.6:6.5)*strength*(1-Math.min(.60,Math.abs(delta)*.20)))}else{desired.multiplyScalar((run?4.6:2.4)*strength);state.player.angle=angle}}else desired.set(0,0,0);
- if(active){const h0=terrainHeight(regions?.active.id,oldX,oldZ),h1=terrainHeight(regions?.active.id,oldX+desired.x*.1,oldZ+desired.z*.1);desired.multiplyScalar(1/(1+Math.max(0,h1-h0)*1.6))}
- // Exact exponential integration keeps acceleration consistent at 30, 60 and 120 fps.
- const rate=active?(driving?5:14):(driving?8:30),decay=Math.exp(-rate*dt);
- displacement.copy(desired).multiplyScalar(dt).addScaledVector(deltaVelocity.copy(velocity).sub(desired),(1-decay)/rate);
- velocity.lerp(desired,1-decay);
- if(!active&&velocity.length()<.025)velocity.set(0,0,0);
- if(active&&!driving&&!horseRiding&&!state.held&&!state.carryingHay&&!stumpSelection&&hopCooldown===0){const candidates=regions?.active.colliders||colliders,plan=planAutoHop(state.player,desired,candidates,playerBlocked);if(plan){hop=plan;hopCount++;velocity.set(0,0,0);return advanceHop(dt)}}const nx=oldX+displacement.x,nz=oldZ+displacement.z;
- if(horseRiding){
-  moveHorse(oldX,oldZ,displacement.x,displacement.z,state.player.angle,oldAngle);
-  if(state.player.x===oldX)velocity.x=0;
-  if(state.player.z===oldZ)velocity.z=0;
- }else{
-  if(!playerBlocked(nx,oldZ))state.player.x=nx;else velocity.x=0;
-  if(!playerBlocked(state.player.x,nz))state.player.z=nz;else velocity.z=0;
- }
- const distance=Math.hypot(state.player.x-oldX,state.player.z-oldZ);
- speed=distance/dt;travel+=distance;if(driving)vehicleTravel+=distance;
- const blend=T.MathUtils.smoothstep(speed,2.1,4.2);
- gait+=distance/(1.05+blend*.47)*Math.PI*2;
- return distance>1e-6;
-}
-function update(dt,moving){const activityRevision=activityArt.controls.revision;activityArt.controls.update(dt,regions?.active.id,terrainHeight(regions?.active.id,state.player.x,state.player.z));if(activityRevision!==activityArt.controls.revision)renderDirty=true;refreshFarmLayout();syncStumps();if(hammockTime>0){hammockTime=Math.max(0,hammockTime-dt);if(hammockTime===0){farmer.rotation.z=0;farmer.rotation.x=0;if(hammockExit){state.player.x=hammockExit.x;state.player.z=hammockExit.z}hammockExit=null;renderDirty=true}}if(dt===0&&!renderDirty&&lastHeld===state.held)return;t+=dt;alertTime=Math.max(0,alertTime-dt);alertSprite.visible=alertTime>0;if(alertTime>0){alertSprite.position.set(state.player.x,1.82+jumpHeight+Math.sin((1.45-alertTime)*5)*.035,state.player.z);const pop=Math.min(1,(1.45-alertTime)*9);alertSprite.scale.set(.32*pop,.48*pop,1);alertMaterial.opacity=Math.min(1,alertTime*4)}regions?.update(dt,t);transportedHerd.update(networkRole==='guest'?0:dt,t,regions?.active.id);updateAnimalHeart(dt);equipment.visible=!driving&&!state.held&&!state.carryingHay&&(state.tool==='camera'||state.tool==='snowShovel'||state.tool==='milker'||state.tool==='shears'||!regions||regions.isFarm||regions.active.id==='homestead');pollen.visible=state.season===0||state.season===1;pollen.rotation.y=Math.sin(t*.05)*.025;pollen.position.y=Math.sin(t*.3)*.05;actionTime=Math.max(0,actionTime-dt);if(pendingEffect){pendingEffect.delay-=dt;if(pendingEffect.delay<=0){emitEffect(pendingEffect.type);pendingEffect=null}}updateTractor(vehicleTravel);horseCart.update(dt,regions?.active.id,horseRiding,moving&&horseRiding,t,networkRole!=='guest');vehicleTravel=0;wildlifeDefense.update(dt);const habitat={player:state.player,area:regions?.active.id,bounds:regions?.active.bounds,blocked,indoors:!!regions?.indoors};farmPets.update(dt,habitat);nightVisitors.update(dt,habitat);const visitor=nightVisitors.status;if(visitor.active&&!driving)companion.watchVisitor(nightVisitors.guardTarget(),visitorChase&&visitor.retreating);if(!visitor.active)visitorChase=false;if(visitor.alertSerial!==lastVisitorAlert){lastVisitorAlert=visitor.alertSerial;if(visitor.active)showAlert('danger')}if(!sleepScene)companion.update(dt,{player:state.player,area:regions?.active.id,driving,blocked,indoors:!!regions?.indoors,bounds:regions?.active.bounds,trailer:{attached:tractorData().trailer,empty:!tractorData().cargo,x:tractorData().trailerX,z:tractorData().trailerZ,angle:tractorData().trailerAngle,visible:tractor.trailer.visible}});if(sleepScene)companion.sleepPose(dt,sleepScene.stage);else companion.root.position.y=companion.elevation+terrainHeight(regions?.active.id,companion.root.position.x,companion.root.position.z);tractorTracks.update(dt,{tractor:tractorData(),driving,area:trackArea(),indoors:!!regions?.indoors,season:state.season,groundAt:trackGround,heightAt:trackGroundHeight});farmer.position.set(state.player.x-(driving?Math.sin(state.player.angle)*.50:0),(driving?.52:.05+jumpHeight)+terrainHeight(regions?.active.id,state.player.x,state.player.z),state.player.z-(driving?Math.cos(state.player.angle)*.50:0));playerShadow.position.set(state.player.x,.06+terrainHeight(regions?.active.id,state.player.x,state.player.z),state.player.z);playerShadow.scale.setScalar(.67*(1-jumpHeight*.22));playerShadow.material.opacity=.30*(1-jumpHeight*.35);if(!Number.isFinite(state.player.angle))state.player.angle=Number.isFinite(farmer.rotation.y)?farmer.rotation.y:Math.PI;if(!Number.isFinite(farmer.rotation.y))farmer.rotation.y=state.player.angle;const diff=wrapAngle(state.player.angle-farmer.rotation.y);farmer.rotation.y=wrapAngle(farmer.rotation.y+diff*(1-Math.exp(-dt*18)));motion+=((moving?Math.min(1,speed/2.4):0)-motion)*(1-Math.exp(-dt*20));runBlend+=(T.MathUtils.smoothstep(speed,2.1,4.2)-runBlend)*(1-Math.exp(-dt*12));const bounce=(1-Math.cos(gait*2))*(.006+runBlend*.012)*motion;
-const blinkPhase=t%4.7,blink=blinkPhase>4.49?1-Math.sin((blinkPhase-4.49)/.21*Math.PI)*.94:1;for(const eye of eyes)eye.scale.y=.083*blink;body.position.y=bounce+Math.sin(t*2.1)*.005*(1-motion);body.rotation.x=(.035+runBlend*.065)*motion;head.rotation.z=Math.sin(gait)*.018*motion;
-const actionProgress=1-actionTime/.72,hit=actionTime>0?Math.sin(Math.max(0,(actionProgress-.24)/.76)*Math.PI):0;
-body.scale.set(1+hit*.018,1-hit*.025,1+hit*.018);if(actionTime>0&&(actionTool==='hand'||actionTool==='seed'))body.rotation.x=Math.sin(actionProgress*Math.PI)*.28;
-for(let i=0;i<2;i++){const cycle=((gait/(Math.PI*2)+i*.5)%1+1)%1,stance=.62-runBlend*.14,stride=.20+runBlend*.08;
- const stancePhase=Math.min(1,cycle/stance),swingPhase=Math.max(0,(cycle-stance)/(1-stance));
- const u=swingPhase,m=-2*(1-stance)/stance;
- const swing=-1+6*u*u-4*u*u*u+m*(2*u*u*u-3*u*u+u);
- const footZ=stride*(cycle<stance?1-2*stancePhase:swing)*motion;
- const lift=(cycle<stance?0:Math.sin(swingPhase*Math.PI)**2*(.10+runBlend*.07))*motion;
- const fy=-.43-bounce+lift,fz=footZ-.015,L1=.22,L2=.23,dist=Math.min(.449,Math.hypot(fy,fz));
- const bend=Math.acos(Math.max(-1,Math.min(1,(dist*dist-L1*L1-L2*L2)/(2*L1*L2))));
- const hip=Math.atan2(-fz,-fy)-Math.atan2(L2*Math.sin(bend),L1+L2*Math.cos(bend));
- legs[i].rotation.x=hip;knees[i].rotation.x=bend;feet[i].rotation.x=-hip-bend-body.rotation.x;
- let arm=-Math.sin(gait+i*Math.PI)*(.35+runBlend*.3)*motion;
-if(actionTime>0){if(actionTool==='water')arm=-.9*Math.sin(Math.min(1,actionProgress/.2)*Math.PI/2)*Math.min(1,(1-actionProgress)/.2);
-else if(actionTool==='camera')arm=-1.48*Math.sin(Math.min(1,actionProgress/.20)*Math.PI/2)*Math.min(1,(1-actionProgress)/.20);
-else if(actionTool==='hand'||actionTool==='seed')arm=-1.1*Math.sin(actionProgress*Math.PI);
-else{const keys=actionKeys;let at=keys.findIndex(k=>k[0]>=actionProgress);at=Math.max(1,at);const a=keys[at-1],b=keys[at],t=(actionProgress-a[0])/(b[0]-a[0]);arm=a[1]+(b[1]-a[1])*t;if(i===0)arm*=.78;}}
-arms[i].rotation.x=state.held?-2.3:state.carryingHay||stumpSelection?-1.12:state.tool==='camera'?Math.min(-.82,arm):arm;
- arms[i].rotation.z=(i===0?1:-1)*.06;if(hop){const tuck=Math.sin(hop.progress*Math.PI);legs[i].rotation.x=-.34*tuck;knees[i].rotation.x=.78*tuck;feet[i].rotation.x=-.44*tuck;arms[i].rotation.x=-.42*tuck;arms[i].rotation.z=(i===0?1:-1)*(.06+.14*tuck)}}
-if(hammockTime>0){const pose=farmObject(state,'hammock');farmer.position.set(pose.x,.92,pose.z);farmer.rotation.set(0,pose.angle,-Math.PI/2);body.position.y=0;body.rotation.x=0;for(let i=0;i<2;i++){legs[i].rotation.x=-.10;knees[i].rotation.x=.22;feet[i].rotation.x=-.12;arms[i].rotation.x=-.65;arms[i].rotation.z=(i===0?1:-1)*.13}playerShadow.material.opacity=0;}else{farmer.rotation.z=0;farmer.rotation.x=0;}if(horseRiding){const h=economyState(state).horse,p=horseCart.driverPose;farmer.position.set(p.x,p.y+terrainHeight(h.area,p.x,p.z),p.z);farmer.rotation.y=p.angle;equipment.visible=false}if(driving||horseRiding){body.position.y=0;body.rotation.x=0;for(let i=0;i<2;i++){legs[i].rotation.x=-1.25;knees[i].rotation.x=1.45;feet[i].rotation.x=-.20;arms[i].rotation.x=-.95;arms[i].rotation.z=(i===0?1:-1)*-.07}}
-scarf.rotation.y=Math.sin(gait-.4)*.07*motion;tail.rotation.x=Math.sin(gait-.5)*.15*motion;
-if(lastHeld!==state.held)heldModel();let p=(!driving&&(!regions||regions.isFarm||regions.active.id==='homestead'))?frontTile(state):null;target.visible=border.visible=!!p;if(p){const field=fieldForState(state);target.position.x=border.position.x=field.x+p.x*TILE;target.position.z=border.position.z=field.z+p.z*TILE}for(let i=particles.length-1;i>=0;i--){const q=particles[i];q.life-=dt;q.v.y-=dt*3;q.m.position.addScaledVector(q.v,dt);q.m.scale.multiplyScalar(.97);if(q.life<0){scene.remove(q.m);particles.splice(i,1)}}if(Math.abs(zoomValue-zoomTarget)>.0001){zoomValue+=(zoomTarget-zoomValue)*(1-Math.exp(-dt*10));if(Math.abs(zoomValue-zoomTarget)<.001)zoomValue=zoomTarget;camera.zoom=zoomValue;camera.updateProjectionMatrix()}follow.lerp(playerTarget.set(state.player.x,0,state.player.z),1-Math.exp(-dt*8));const closeView=T.MathUtils.smoothstep(zoomValue,1,2.8);look.copy(follow);if(regions?.isFarm){const overview=1-T.MathUtils.smoothstep(zoomValue,.18,.65);look.lerp(playerTarget.set(2,0,0),overview)}look.y+=terrainHeight(regions?.active.id,state.player.x,state.player.z)+.2+.55*closeView;look.z-=.9*(1-closeView);camera.position.copy(look).add(offset);camera.lookAt(look);const evening=Math.max(0,Math.min(1,(state.minutes-960)/360));sun.intensity=3.25-evening*2.85;sun.color.set(state.weather==='rain'?'#e4e9d9':evening>.3?'#ffc08b':'#fff2df');ambient.intensity=state.weather==='rain'?1.25:1.18-evening*.55;scene.background.set(evening>.8?'#65747d':'#a9b798');if(regions?.indoors){sun.intensity=1.55;sun.color.set("#ffe4b5");ambient.intensity=1.6;scene.background.set("#b8ac94");scene.fog.density=0}else scene.fog.density=regions?.isFarm&&zoomValue<.4?.005:.012;shadowElapsed+=dt;const shadowInterval=(moving||motion>.05||actionTime>0)?1/30:.5;if(shadowElapsed>=shadowInterval){renderer.shadowMap.needsUpdate=true;shadowElapsed%=shadowInterval}if(renderer.shadowMap.needsUpdate){const texel=28/shadowSize,cx=Math.round(state.player.x/texel)*texel,cz=Math.round(state.player.z/texel)*texel;sun.position.set(cx-10,19,cz+9);sun.target.position.set(cx,0,cz)}seasonalScenery.setSeason(state.season);seasonalScenery.setIndoors(!!regions?.indoors);seasonalParticles.update(dt,{season:state.season,indoors:!!regions?.indoors,player:state.player});if(!regions?.indoors){scene.background.set(evening>.8?'#687786':seasonalSkies[state.season]);scene.fog.color.copy(scene.background);sun.color.lerp(seasonalSun[state.season],.25);ambient.groundColor.set(seasonalGround[state.season]);}else ambient.groundColor.set('#667657');sleepBlanket.visible=!!sleepScene&&regions?.active.id==='house';if(sleepBlanket.visible){const p=bedPose(sleepScene.stage,sleepScene.stage==='asleep'?1:sleepScene.progress,sleepStart||undefined);farmer.position.set(p.x,p.y,p.z);farmer.rotation.set(p.lean,0,0);body.rotation.x=0;body.position.y=0;for(let i=0;i<2;i++){legs[i].rotation.x=p.hip+(i?-1:1)*p.step;knees[i].rotation.x=p.knee;arms[i].rotation.x=p.arm;arms[i].rotation.z=(i?-.13:.13)*(1-p.step)}sleepBlanket.position.set(-3.7,1.03+.16*p.cover,-.45-1.15*p.cover);sleepBlanket.scale.z=.10+.90*p.cover;playerShadow.material.opacity=0;equipment.visible=false}lens.render(scene,camera);renderDirty=false}
-let frameAverage=16.7,slowSeconds=0,fastSeconds=0,qualityCooldown=0;
-function observeFrame(milliseconds){
- if(!Number.isFinite(milliseconds)||milliseconds<1)return;const seconds=Math.min(.25,milliseconds/1000),sample=Math.min(100,milliseconds);
- frameAverage+=(sample-frameAverage)*.08;qualityCooldown=Math.max(0,qualityCooldown-seconds);
- slowSeconds=frameAverage>27?slowSeconds+seconds:0;fastSeconds=frameAverage<18.5?fastSeconds+seconds:0;
- const ratio=renderer.getPixelRatio(),floor=Math.min(.8,maximumPixelRatio);
- if(!qualityCooldown&&slowSeconds>1.6&&ratio>floor+.01){renderer.setPixelRatio(Math.max(floor,Math.round((ratio-.15)*100)/100));slowSeconds=fastSeconds=0;qualityCooldown=5;renderDirty=true}
- else if(!qualityCooldown&&fastSeconds>10&&ratio<maximumPixelRatio-.01){renderer.setPixelRatio(Math.min(maximumPixelRatio,Math.round((ratio+.1)*100)/100));slowSeconds=fastSeconds=0;qualityCooldown=10;renderDirty=true}
-}
-regions=createRegionManager({scene,state,bake,farmRoot:farmArt,farmColliders:colliders,canTravel:canEnterArea,onLeave(previous){hammockTime=0;hammockExit=null;farmer.rotation.z=0;cancelStumpMove();wildlifeDefense.clear();seasonalScenery.release(previous.id==='farm'?farmArt:previous.root)},onChange(next){if(horseRiding){const h=economyState(state).horse;h.area=next.id;h.x=state.player.x;h.z=state.player.z;h.angle=state.player.angle}resetHop();rememberHerdGround(next);setSeasonalArea(next);visitorChase=false;const habitat={player:state.player,area:next.id,bounds:next.bounds,blocked,indoors:next.indoors};farmPets.travel(habitat);nightVisitors.travel(habitat);companion.travel({player:state.player,area:next.id,blocked});tractorTracks.setArea(trackArea());transportedHerd.setBarnResidents?.(next.residentIds||[]);if(driving){if(next.indoors){driving=false;tractorData().cutter=false}else{const d=tractorData();d.area=next.id;d.lotId=next.id==='homestead'?state.homesteads?.selected:null;d.x=state.player.x;d.z=state.player.z;d.angle=state.player.angle}}plots.visible=cropShadows.visible=next.id==='farm'||next.id==='homestead';rebuild();stop();follow.set(state.player.x,0,state.player.z);farmer.rotation.y=state.player.angle;pendingEffect=null;actionTime=0;for(const q of particles)scene.remove(q.m);particles.length=0;renderDirty=true;renderer.shadowMap.needsUpdate=true;resize()}});companion.travel({player:state.player,area:regions.active.id,blocked});tractorTracks.setArea(trackArea());farmPets.travel({player:state.player,area:regions.active.id,bounds:regions.active.bounds,blocked,indoors:regions.active.indoors});nightVisitors.travel({player:state.player,area:regions.active.id,bounds:regions.active.bounds,blocked,indoors:regions.active.indoors});resize();
-function refreshFarmLayout(){migrateFarmLayout(state);const signature=JSON.stringify(state.farmLayout);if(signature===layoutSignature)return false;layoutSignature=signature;if(regions?.isFarm)seasonalScenery.release(farmArt);for(let i=colliders.length-1;i>=0;i--)if(colliders[i].farmObject)colliders.splice(i,1);colliders.push(...farmStructures.refresh());syncFarmPaths();regions?.refreshFarmLayout?.();if(regions?.isFarm){rememberHerdGround(regions.active);setSeasonalArea(regions.active);if(blocked(state.player.x,state.player.z)){const gate=farmPoint(state,'house',0,4.3);state.player.x=gate.x;state.player.z=gate.z;follow.set(gate.x,0,gate.z)}}rebuild();renderDirty=true;renderer.shadowMap.needsUpdate=true;return true}
-function restInHammock(duration=6){if(!regions?.isFarm||driving||state.held||state.carryingHay||stumpSelection||hammockTime>0)return false;const pose=farmObject(state,'hammock');if(Math.hypot(state.player.x-pose.x,state.player.z-pose.z)>4.5)return false;stop();hammockExit={x:state.player.x,z:state.player.z};hammockTime=Math.max(1,Math.min(10,Number(duration)||6));renderDirty=true;return true}
-function rememberHerdGround(region){if(!['farm','homestead'].includes(region.id))return;const key=region.id==='farm'?'farm':'homestead:'+region.lotId;herdGrounds.set(key,{bounds:[...region.bounds],colliders:region.id==='farm'?region.colliders:region.colliders.map(c=>({...c,passages:c.passages?.map(p=>({...p}))}))})}
-function herdGround(property){if(herdGrounds.has(property))return herdGrounds.get(property);const id=property?.split(':')[1],h=state.homesteads;if(!id||!h?.owned?.includes(id)||!h.lots?.[id]?.barn)return null;const copy={...state,homesteads:{...h,selected:id,owned:[...h.owned],lots:Object.fromEntries(Object.entries(h.lots).map(([key,value])=>[key,{...value}]))}};const region=buildHomestead(copy);rememberHerdGround(region);region.dispose();return herdGrounds.get(property)}
 
-function stumpTarget(){const angle=Math.round(state.player.angle/(Math.PI/2))*Math.PI/2;return snapFarmStump(state,stumpSelection,state.player.x+Math.sin(angle)*1.35,state.player.z+Math.cos(angle)*1.35)}
-function syncStumps(){
- if(stumpSelection){const p=state.farmStumps?.[stumpSelection];if(regions?.active.id!=='farm'||state.tool!=='hand'||state.held||state.carryingHay||!p||p.x!==expectedStumpPosition?.x||p.z!==expectedStumpPosition?.z)cancelStumpMove();}
- if(stumpSelection){const p=stumpTarget(),others=Object.entries(state.farmStumps).filter(([id])=>id!==stumpSelection),free=others.every(([,q])=>Math.hypot(p.x-q.x,p.z-q.z)>=1-1e-8)&&canPlaceStump(p.x,p.z,stumpSelection);stumpPreview.visible=true;stumpPreview.position.set(p.x,.22,p.z);stumpPreview.material.color.set(free?'#8fba78':'#c58979');renderDirty=true}else stumpPreview.visible=false;
- if(stumpArt.sync(stumpSelection)){renderDirty=true;renderer.shadowMap.needsUpdate=true;}
-}
-function beginStumpMove(id){
- if(regions?.active.id!=='farm'||driving||hop||state.tool!=='hand'||state.held||state.carryingHay)return {changed:false,message:'Deixe as mãos livres e aproxime-se de um toco da fazenda.'};
- const p=migrateFarmStumps(state)[id];if(!p||Math.hypot(p.x-state.player.x,p.z-state.player.z)>1.5)return {changed:false,message:'Aproxime-se do toco que quer mudar.'};
- cancelStumpMove();stumpSelection=id;expectedStumpPosition={...p};stumpGhost=stumpArt.carry(id);if(stumpGhost){stumpGhost.position.set(0,.59,.40);body.add(stumpGhost)}stop();syncStumps();return {changed:false,message:'Toco nas mãos. A prévia mostra o encaixe alinhado. X coloca; Y devolve.'};
-}
-function cancelStumpMove(){stumpPreview.visible=false;if(stumpGhost){body.remove(stumpGhost);stumpGhost=null}const had=!!stumpSelection;stumpSelection=null;expectedStumpPosition=null;if(had){stumpArt.sync();renderDirty=true;renderer.shadowMap.needsUpdate=true}return {changed:false,message:had?'Toco devolvido ao local original.':'Você está com as mãos livres.'}}
-function canPlaceStump(x,z,id){
- if(horseCart.colliders('farm').some(c=>colliderContains(c,x,z,.27)))return false;
- const radius=.27,b=MAIN_FARM_BOUNDS;if(x<b[0]+.5||x>b[1]-.5||z<b[2]+.5||z>b[3]-.5)return false;
- for(const c of colliders)if(c.stumpId!==id&&colliderContains(c,x,z,radius))return false;
- for(const c of transportedHerd.colliders||[])if(colliderContains(c,x,z,radius))return false;
- if(nearPlots(state.homePlots||state.plots,MAIN_FIELD,x,z,.62+radius,(p,px,pz)=>!!(p.tilled||p.crop||p.obstacle)&&Math.abs(px-x)<.62+radius&&Math.abs(pz-z)<.62+radius))return false;
- const d=tractorData();if(d.area==='farm'&&colliderContains({x:d.x,z:d.z,w:1.35,d:2.10,angle:d.angle},x,z,radius))return false;
- const cartArea=d.trailer?d.area:d.trailerArea||'farm';if(cartArea==='farm'&&Number.isFinite(d.trailerX)&&Number.isFinite(d.trailerZ)&&colliderContains({x:d.trailerX,z:d.trailerZ,w:1.60,d:1.92,angle:d.trailerAngle},x,z,radius))return false;
- return Math.hypot(x-state.player.x,z-state.player.z)>.55;
-}
-function placeStump(){if(!stumpSelection)return {changed:false,message:'Pegue primeiro um toco com as mãos livres.'};if(regions?.active.id!=='farm'){cancelStumpMove();return {changed:false,message:'Coloque os tocos dentro da sua fazenda.'}}const p=stumpTarget(),r=moveFarmStump(state,stumpSelection,p.x,p.z,{expected:expectedStumpPosition,canPlace:canPlaceStump});if(r.changed){cancelStumpMove();syncStumps()}return r}
-
-function animalCanWalk(x,z,radius=.43,id,area,property){const key=property||propertyKey(state,area),ground=herdGround(key);if(!ground)return false;const b=ground.bounds;if(x<b[0]+radius||x>b[1]-radius||z<b[2]+radius||z>b[3]-radius)return false;for(const c of ground.colliders){const passableStump=c.jumpable===true&&c.height<=.50&&(c.kind==='low-stump'||['boundary-stump','natural-stump'].includes(c.label));if(!passableStump&&colliderContains(c,x,z,radius))return false;}const plots=key==='farm'?(state.homePlots||state.plots):state.homesteads?.lots?.[key.split(':')[1]]?.plots;if(!Array.isArray(plots))return false;const field=fieldForProperty(key),reach=.48+radius;if(nearPlots(plots,field,x,z,reach,(p,px,pz)=>!!(p.crop||p.obstacle)&&Math.abs(x-px)<reach&&Math.abs(z-pz)<reach))return false;if(!state.herdRoutes?.[id]&&area===regions?.active.id&&key===propertyKey(state,area)&&Math.hypot(x-state.player.x,z-state.player.z)<radius+.30)return false;return true}
-transportedHerd.setWalkability?.(animalCanWalk);
-const alertCanvas=document.createElement('canvas');alertCanvas.width=64;alertCanvas.height=96;const aq=alertCanvas.getContext('2d');aq.fillStyle='#f7e3ac';aq.beginPath();aq.roundRect(6,4,52,76,23);aq.fill();aq.strokeStyle='#9e7d4e';aq.lineWidth=3;aq.stroke();aq.fillStyle='#725735';aq.font='bold 61px Georgia';aq.textAlign='center';aq.fillText('!',32,65);const alertMap=new T.CanvasTexture(alertCanvas),alertMaterial=new T.SpriteMaterial({map:alertMap,transparent:true,depthTest:false,toneMapped:false}),alertSprite=new T.Sprite(alertMaterial);alertSprite.visible=false;alertSprite.renderOrder=25;scene.add(alertSprite);let alertTime=0;function showAlert(kind='bird'){alertTime=1.45;alertSprite.visible=true;alertMaterial.color.set(kind==='danger'?'#f2c7a4':'#fff4cf');renderDirty=true}
-const heartCanvas=document.createElement('canvas');
-heartCanvas.width=heartCanvas.height=64;
-const heartInk=heartCanvas.getContext('2d');
-heartInk.beginPath();heartInk.moveTo(32,54);
-heartInk.bezierCurveTo(16,42,7,34,7,22);heartInk.bezierCurveTo(7,9,25,6,32,19);
-heartInk.bezierCurveTo(39,6,57,9,57,22);heartInk.bezierCurveTo(57,34,48,42,32,54);
-heartInk.closePath();heartInk.fillStyle='#df8096';heartInk.fill();
-heartInk.strokeStyle='#f9d6d8';heartInk.lineWidth=3;heartInk.stroke();
-const heartMap=new T.CanvasTexture(heartCanvas);
-heartMap.colorSpace=T.SRGBColorSpace;
-const animalHeart=new T.Sprite(new T.SpriteMaterial({map:heartMap,transparent:true,depthTest:false,depthWrite:false,toneMapped:false}));
-animalHeart.visible=false;animalHeart.renderOrder=26;scene.add(animalHeart);
-let animalHeartTarget=null,animalHeartArea=null,animalHeartTime=0;
-function showAnimalHeart(id){
- const subjects=[...(regions.active.photoSubjects||[]),...transportedHerd.photoSubjects];
- const subject=subjects.find(a=>(a.id==='barn-'+id||a.id==='pasture-'+id)&&a.object?.visible);
- if(!subject)return;
- animalHeartTarget=subject;animalHeartArea=regions.active;
- animalHeartTime=1.25;renderDirty=true;
-}
-function updateAnimalHeart(dt){
- if(!animalHeartTarget||animalHeartArea!==regions.active){animalHeart.visible=false;animalHeartTarget=null;return}
- animalHeartTime=Math.max(0,animalHeartTime-dt);
- animalHeart.visible=animalHeartTime>0&&animalHeartTarget.object.visible;
- if(!animalHeart.visible){animalHeartTarget=null;return}
- const age=1.25-animalHeartTime;
- animalHeartTarget.object.getWorldPosition(animalHeart.position);
- animalHeart.position.y+=(animalHeartTarget.speciesId==='chicken'?.85:animalHeartTarget.speciesId==='sheep'?1.13:1.56)+age*.39;
- animalHeart.scale.setScalar(.40*Math.min(1,.45+age*5));
- animalHeart.material.opacity=Math.min(1,animalHeartTime*3.8);
-}
-const photographPosition=new T.Vector3(),photographClip=new T.Vector3(),photoCanvas=document.createElement('canvas');photoCanvas.width=384;photoCanvas.height=256;const photoContext=photoCanvas.getContext('2d');
-function photoTargets(){const subjects=[...(regions?.active.photoSubjects||[]),...transportedHerd.photoSubjects],result=[];for(const subject of subjects){if(!subject.object)continue;let visible=true;for(let o=subject.object;o;o=o.parent)if(!o.visible){visible=false;break}if(!visible)continue;subject.object.getWorldPosition(photographPosition);photographPosition.y+=subject.offsetY||0;const distance=Math.hypot(photographPosition.x-state.player.x,photographPosition.z-state.player.z);if(distance>10)continue;photographClip.copy(photographPosition).project(camera);const screenX=(photographClip.x+1)/2,screenY=(1-photographClip.y)/2,inFrame=photographClip.z>=-1&&photographClip.z<=1&&screenX>.04&&screenX<.96&&screenY>.06&&screenY<.93,centering=Math.max(0,1-Math.hypot(screenX-.5,screenY-.5)*1.5),score=Math.round(100*(centering*.65+Math.max(0,1-distance/10)*.35));result.push({id:subject.id,speciesId:subject.speciesId,name:subject.name,area:subject.area||regions.active.id,x:photographPosition.x,z:photographPosition.z,screenX,screenY,distance,inFrame,score})}return result}
-function capturePhoto(subject){lens.render(scene,camera);const source=renderer.domElement,w=source.width,h=source.height,cropW=Math.min(w,h*1.5)*.75,cropH=cropW*2/3,cx=Math.max(cropW/2,Math.min(w-cropW/2,(subject?.screenX??.5)*w)),cy=Math.max(cropH/2,Math.min(h-cropH/2,(subject?.screenY??.5)*h));photoContext.drawImage(source,cx-cropW/2,cy-cropH/2,cropW,cropH,0,0,384,256);return photoCanvas.toDataURL('image/jpeg',.55)}
-function pickSign(clientX,clientY){const rect=canvas.getBoundingClientRect();const ray=new T.Raycaster();ray.setFromCamera(new T.Vector2((clientX-rect.left)/rect.width*2-1,1-(clientY-rect.top)/rect.height*2),camera);let best=null,score=Infinity;for(const point of regions.active.signs||[]){const s=point.sign;if(!s)continue;const corners=[];for(const side of[-1,1])for(const up of[-1,1]){const dx=side*s.width/2,v=new T.Vector3(s.x+Math.cos(s.rotation)*dx,s.y+up*s.height/2,s.z-Math.sin(s.rotation)*dx).project(camera);if(v.z>=-1&&v.z<=1)corners.push([rect.left+(v.x+1)*rect.width/2,rect.top+(1-v.y)*rect.height/2])}if(corners.length!==4)continue;const xs=corners.map(p=>p[0]),ys=corners.map(p=>p[1]),left=Math.min(...xs)-9,right=Math.max(...xs)+9,top=Math.min(...ys)-9,bottom=Math.max(...ys)+9;if(clientX>=left&&clientX<=right&&clientY>=top&&clientY<=bottom){const d=Math.hypot(clientX-(left+right)/2,clientY-(top+bottom)/2);if(d<score){best=point;score=d}}}return best}
-return {get animalVoices(){const subjects=[...(regions?.active.photoSubjects||[]),...transportedHerd.photoSubjects],targets=[...farmPets.soundTargets];for(const a of subjects){if(!['cow','sheep','chicken'].includes(a.speciesId)||!a.object)continue;let visible=true;for(let o=a.object;o;o=o.parent)if(!o.visible){visible=false;break}if(visible){a.object.getWorldPosition(photographPosition);targets.push({speciesId:a.speciesId,x:photographPosition.x,z:photographPosition.z})}}return targets.map(a=>({...a,distance:Math.hypot(a.x-state.player.x,a.z-state.player.z)})).filter(a=>a.distance<12)},setSleepScene,activities:activityArt.controls,canEnterArea,canUsePortal,refreshFarmLayout,restInHammock,beginStumpMove,cancelStumpMove,placeStump,get stumpSelection(){return stumpSelection},setRemotePose,clearRemotePose,multiplayerTick,setNetworkRole,setVehiclePermission,cancelVehicleControl,get localNetworkPose(){const p=safePlayer();return {x:p.x,z:p.z,angle:p.angle,jump:jumpHeight,...networkLocation(),profile:{...state.profile},driving,moving:motion>.05}},setAvatar,get safePlayer(){return safePlayer()},petFarmAnimal(id){renderDirty=true;const r=farmPets.pet(id);if(r.changed){stop();actionTool='hand';actionTime=.72}return r},get visitorStatus(){return nightVisitors.status},observeVisitor:()=>nightVisitors.observe(),dismissVisitor(){const r=nightVisitors.dismiss();if(r.changed){visitorChase=true;companion.watchVisitor(nightVisitors.guardTarget(),true);renderDirty=true}return r},whistleDog(){renderDirty=true;return companion.whistle()},petDog(){const pet=companion.pet();if(pet){stop();actionTool='hand';actionTime=.72;renderDirty=true;renderer.shadowMap.needsUpdate=true}return pet},defendThreat:target=>wildlifeDefense.defend(target),get companionStatus(){return companion.status},get trackStats(){return tractorTracks.stats},get seasonVisual(){return seasonalScenery.inspect()},pickSign,toggleTractor,vehicleAction,toggleTrailer,refreshVehicle,toggleHorse,toggleHorseCart,get horseCartAttached(){return horseCart.attached},get horseRiding(){return horseRiding},get driving(){return driving},get tractorStatus(){const access=vehicleAccess(state,regions?.active.id||'farm',{driving});return {...tractorData(),...access,driving,near:access.nearDriver,serviceReason:access.reason,speed:driving?speed:0}},renderer,scene,camera,photoTargets,capturePhoto,showAlert,showAnimalHeart,observeFrame,setZoom,travel:(id,spawn,restore=false)=>{if(!restore&&!canEnterArea(id))return regions.active;refreshFarmLayout();return regions.travel(id,spawn,restore)},nearby:()=>{const horse=horseCart.point(regions?.active.id);if(!driving&&horse&&Math.hypot(state.player.x-horse.x,state.player.z-horse.z)<horse.radius)return horse;const tree=!driving?activityArt.interactions.find(p=>p.type==='christmasTree'&&Math.hypot(state.player.x-p.x,state.player.z-p.z)<p.radius):null;if(tree)return tree;if(!driving&&state.carryingHay){const feed=[...regions.active.interactions,...transportedHerd.interactions].filter(p=>p.type==='feed'&&Math.hypot(state.player.x-p.x,state.player.z-p.z)<(p.radius||1.05)).sort((a,b)=>Number(animalStatus(state,a.data.animalId).fed)-Number(animalStatus(state,b.data.animalId).fed)||Math.hypot(state.player.x-a.x,state.player.z-a.z)-Math.hypot(state.player.x-b.x,state.player.z-b.z))[0];if(feed)return feed}let point=regions.nearby(p=>state.carryingHay||p.type!=='feed'),distance=point?Math.hypot(state.player.x-point.x,state.player.z-point.z):Infinity;if(!driving&&nearTractor()&&(!point||point.type==='portal'))return {type:'tractor',label:'Dirigir trator'};const stump=regions.isFarm&&!driving&&!stumpSelection&&!state.held&&!state.carryingHay&&state.tool==='hand'?findFarmStump(state,state.player.x,state.player.z,1.1):null;if(stump&&stump.distance<distance){point={type:'farmStump',x:stump.x,z:stump.z,radius:1.1,label:'Pegar toco para mudar de lugar',data:{id:stump.id}};distance=stump.distance}for(const candidate of [...transportedHerd.interactions,...(!driving&&state.tool==='hand'?activityArt.interactions:[]),...[farmPets.nearby(state.player),nightVisitors.nearby(state.player)].filter(Boolean)]){const d=Math.hypot(state.player.x-candidate.x,state.player.z-candidate.z);if(d<(candidate.radius||1.6)&&d<distance){point=candidate;distance=d}}const dog=companion.status,dogDistance=Math.hypot(state.player.x-dog.x,state.player.z-dog.z);if(!driving&&dog.present!==false&&dog.mode!=='riding'&&dogDistance<1.15&&dogDistance<distance)return {type:'dogPet',label:'Fazer carinho em '+dog.name,radius:1.15};return point||(driving||nearTractor()?{type:'tractor',label:driving?'Descer do trator':'Dirigir trator'}:null)},get area(){return regions.active.id},get region(){return regions.active},get destinations(){return regions.destinations},get zoom(){return {value:zoomValue,target:zoomTarget,min:minimumZoom,max:maximumZoom}},get performance(){return {pixelRatio:renderer.getPixelRatio(),maximumPixelRatio,frameAverage,plotBuilds,plotRegions:plotChunks.size,grassRegions:grassCells.size}},get animation(){return {moving:motion>.05,running:isRunning,phase:gait,travel,speed,actionTime,jumping:!!hop,jumpHeight,hopCount,hips:legs.map(l=>l.rotation.x),knees:knees.map(l=>l.rotation.x)}},rebuild,move,stop,update,toolModel,effect,act(id=state.tool){stop();actionTool=id;actionTime=.72},get locations(){return regions?.active.id==='homestead'?{house:{x:.5,z:-7.5},shipping:{x:5.2,z:-5.3},well:{x:11.6,z:.4}}:{house:farmPoint(state,'house',0,2.6),shipping:farmPoint(state,'shipping',0,1.5),well:farmPoint(state,'well',0,1.5)}},get busy(){return actionTime>0||!!hop||hammockTime>0}};
-}
