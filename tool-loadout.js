@@ -1,5 +1,5 @@
 export const STARTER_TOOLS=Object.freeze(['hoe','water','sickle','axe','hammer','camera','snowShovel']);
-export const PURCHASED_TOOLS=Object.freeze(['milker','shears']);
+export const PURCHASED_TOOLS=Object.freeze(['milker','shears','brush']);
 export const TOOLS=Object.freeze(['hand','hoe','water','seed','sickle','axe','hammer','camera','snowShovel',...PURCHASED_TOOLS]);
 
 export function ownsTool(state,id){

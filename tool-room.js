@@ -1,4 +1,4 @@
-import {ownsTool} from './tool-loadout.js?v=0.51';
+import {ownsTool} from './tool-loadout.js?v=0.52.0';
 import * as T from './three.module.js';
 import {createInteriorRoom,group,C,table,shelf,rug,vase,lantern} from './rural-room.js?v=0.50';
 function hangingTool(k,parent,x,y,z,kind){
@@ -40,6 +40,12 @@ export function buildToolRoom(state={}){
    blade.rotation.z=-side*.32;
    k.ball(model,'#765543',2.75+side*.112,.985,-3.96,.071,.055,.049);
   }
+ }
+ if(ownsTool(state,'brush')){
+  const model=storedTool('brush');
+  k.box(model,'#bc9666',3.30,1.04,-3.96,.38,.10,.23,'wood');
+  k.box(model,'#755c3d',3.30,.96,-3.96,.33,.09,.20);
+  k.box(model,'#947851',3.30,1.13,-3.96,.18,.08,.12,'wood');
  }
  const work=table(k,-3.78,-.25,1.52,2.55,.82);k.box(work,'#c9b084',0,.91,0,1.65,.08,2.64,'wood');k.box(work,'#b9c5af',0,.97,.35,.94,.035,.61,'fabric');k.beam(work,'#99794f',[-.35,1.01,-.75],[.35,1.01,-.20],.04,'wood');k.box(work,'#718376',-.35,1.01,-.75,.25,.13,.21);k.cyl(work,'#a78c60',.4,1.10,-.88,.12,.31,'wood');
  const boots=group(F,-3.6,0,2.1);for(const s of[-1,1]){k.cyl(boots,'#697b64',s*.21,.30,0,.14,.54);k.ball(boots,'#6f8066',s*.21,.09,.12,.16,.10,.25);k.cyl(boots,'#56664e',s*.21,.58,0,.145,.055);}k.solid(-3.6,2.1,.82,.65,{height:.65});

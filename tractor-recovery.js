@@ -1,6 +1,6 @@
 import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.47';
-import {FARM_GATES,FARM_EDGE_TREES,farmFootprints,farmPoint,migrateFarmLayout} from './farm-customization.js?v=0.47';
-import {MAIN_FIELD,LEGACY_FIELD,TILE} from './cultivation-layout.js?v=0.47';
+import {FARM_GATES,FARM_EDGE_TREES,farmFootprints,farmPoint,migrateFarmLayout} from './farm-customization.js?v=0.52.0';
+import {MAIN_FIELD,LEGACY_FIELD,TILE} from './cultivation-layout.js?v=0.52.0';
 import {colliderContains} from './scene-collisions.js?v=0.47';
 const RECOVERY_VERSION=1;
 /** Recover an old save once; normal parking remains untouched on later loads. */

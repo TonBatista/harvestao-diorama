@@ -1,8 +1,8 @@
 import {snowArea,parkedSnowballs,parkSnowball,crushSnow,expireSnowballs} from './snow-play.js?v=0.47';
-import {terrainHeight} from './valley-terrain.js?v=0.50';
+import {terrainHeight} from './valley-terrain.js?v=0.52.0';
 import * as T from './three.module.js';
-import {farmPoint,farmObject,FARM_OBJECTS} from './farm-customization.js?v=0.47';
-import {clearSnow} from './snow-rules.js?v=0.47';
+import {farmPoint,farmObject,FARM_OBJECTS} from './farm-customization.js?v=0.52.0';
+import {clearSnow} from './snow-rules.js?v=0.52.0';
 export function lifeState(s){s.gathered??={};let v=s.gathered['valley-life'];if(!v||typeof v!=='object')v=s.gathered['valley-life']={snowman:0,stock:{},tree:false,treePlaced:false};v.stock??={};v.decorations??=[];v.snowballs??=[];v.ornaments=Math.max(0,Math.min(16,Number(v.ornaments)||0));const winter=s.year+':'+s.season;if(v.winter!==winter){v.winter=winter;v.snowman=0;v.snowPosition=null;v.snowballs=[]}if(v.tree&&!v.treePlaced){v.treePlaced=true;v.treePosition??=farmPoint(s,'house',4.2,1)}if(v.treePlaced&&!v.treePosition)v.treePosition=farmPoint(s,'house',4.2,1);return v}
 export function createActivityArt(state,canPlace=()=>true,canEdit=()=>true){
  const root=new T.Group(),snow=new T.Group(),decor=new T.Group(),wardrobe=new T.Group(),pine=new T.Group(),parked=new T.Group(),rooster=new T.Group();root.name='valley-activities';root.add(snow,decor,wardrobe,pine,parked,rooster);

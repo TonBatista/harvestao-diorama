@@ -1,7 +1,7 @@
 import * as T from './three.module.js';
 import {PLAZA,VILLAGE_BOUNDS,VILLAGE_BEACH,VILLAGE_BRIDGE,villageWalkHeight,distanceToStream} from './village-layout.js?v=0.50';
 
-const SIDEWALK=1.30,BIKE=1.15,GUTTER=.18,VERGE=SIDEWALK+BIKE+GUTTER;
+const SIDEWALK=2.45,GUTTER=.18,VERGE=SIDEWALK+GUTTER;
 const plazaNorth=PLAZA.z-PLAZA.depth/2,plazaSouth=PLAZA.z+PLAZA.depth/2;
 const inner=PLAZA.width/2+VERGE,outer=inner+6.8;
 const upper=plazaNorth-VERGE,lower=plazaSouth+VERGE;
@@ -21,43 +21,32 @@ const walks=[
  [-16.6,16.6,42.1,43.55],
  ...[51,68,85].map(z=>[-10.8,10.8,z+2.5,z+4.05])
 ];
-const priority={plaza:0,walk:1,gutter:2,bike:3,road:4};
+const priority={plaza:0,walk:1,gutter:2,road:4};
 const noise=n=>{const f=Math.sin(n*91.173+39.3)*16453.495;return f-Math.floor(f)};
 function pavingTexture(kind){
  const canvas=document.createElement('canvas');
  canvas.width=canvas.height=256;
  const ctx=canvas.getContext('2d');
- const mosaic=kind==='walk',bike=kind==='bike';
- ctx.fillStyle=mosaic?'#a39b83':bike?'#6f625d':'#666760';
+ const mosaic=kind==='walk';
+ ctx.fillStyle=mosaic?'#a39b83':'#666760';
  ctx.fillRect(0,0,256,256);
  if(kind==='gutter'){
   ctx.fillStyle='#555a55';ctx.fillRect(0,0,256,256);
   ctx.fillStyle='#777c72';ctx.fillRect(12,0,232,256);
   ctx.fillStyle='#909082';ctx.fillRect(21,0,27,256);ctx.fillRect(208,0,27,256);
   ctx.fillStyle='#666b62';ctx.fillRect(51,0,154,256);
- }else if(bike){
-  for(let i=0;i<1300;i++){
-   ctx.fillStyle=i%2?'#a18474':'#615a56';
-   ctx.fillRect(noise(i*2)*256,noise(i*2+1)*256,1.3,1.8);
-  }
-  ctx.fillStyle='#e4d8ba';ctx.fillRect(8,0,3,256);ctx.fillRect(245,0,3,256);
-  ctx.strokeStyle='#eee4ce';ctx.lineWidth=4;ctx.lineJoin=ctx.lineCap='round';
-  for(const x of [97,158]){ctx.beginPath();ctx.arc(x,144,21,0,Math.PI*2);ctx.stroke()}
-  ctx.beginPath();ctx.moveTo(97,144);ctx.lineTo(115,111);ctx.lineTo(143,111);
-  ctx.lineTo(123,144);ctx.closePath();ctx.moveTo(123,144);ctx.lineTo(116,102);
-  ctx.moveTo(109,102);ctx.lineTo(123,102);ctx.moveTo(158,144);ctx.lineTo(142,100);
-  ctx.lineTo(152,100);ctx.stroke();
  }else{
-  const cols=mosaic?16:8,rows=mosaic?16:10,dx=256/cols,dz=256/rows;
+  const cols=mosaic?32:8,rows=mosaic?32:10,dx=256/cols,dz=256/rows;
   const stone=kind==='plaza'?['#c4bda9','#c0b8a4','#b6ae9e','#d0c7b4']:['#9a9b94','#8e918d','#a5a7a0','#878d87','#969991'];
   const cream=['#e0d4b6','#e8ddc2','#d5c7a9','#cfc3a7','#f0e1c2'];
   for(let row=0;row<rows;row++)for(let col=-1;col<cols;col++){
    const c=(col+cols)%cols,n=row*cols+c,x=col*dx+(row%2)*dx*.5,y=row*dz;
-   const u=(c+row*.5)%16,v=row/16;
-   const dark=mosaic&&(Math.abs(Math.sin(v*Math.PI*2)*3.2+8-u)<1.05||c===1||c===14);
+   const u=(col+(row%2)*.5)/cols,v=row/rows;
+   const wave=((u-.14*Math.sin(v*Math.PI*2))*4%1+1)%1;
+   const dark=mosaic&&wave<.42;
    const palette=dark?['#333633','#43443e','#535149']:mosaic?cream:stone;
    ctx.fillStyle=palette[Math.floor(noise(n)*palette.length)];
-   ctx.beginPath();ctx.roundRect(x+1,y+1,dx-2,dz-2,mosaic?2.8:5);ctx.fill();
+   ctx.beginPath();if(mosaic){const jitter=()=>.8+noise(n+ctx.currentSeed++)*1.1;ctx.currentSeed=1;ctx.moveTo(x+jitter(),y+jitter());ctx.lineTo(x+dx-jitter(),y+jitter());ctx.lineTo(x+dx-jitter(),y+dz-jitter());ctx.lineTo(x+jitter(),y+dz-jitter());ctx.closePath()}else ctx.roundRect(x+1,y+1,dx-2,dz-2,5);ctx.fill();
    ctx.fillStyle=dark?'#ffffff18':'#ffffff32';ctx.fillRect(x+4,y+2,dx-8,1.2);
   }
  }
@@ -71,7 +60,6 @@ function section(street,x,z){
  const distance=Math.max(street.a-across,across-street.b,0);
  if(distance===0)return {kind:'road',street};
  if(distance<GUTTER)return {kind:'gutter',street};
- if(distance<GUTTER+BIKE)return {kind:'bike',street};
  if(distance<VERGE)return {kind:'walk',street};
  return null;
 }
@@ -91,7 +79,7 @@ function breaks(axis){
  const values=new Set();
  for(const street of streets){
   if(street.axis===axis){values.add(street.lo);values.add(street.hi)}
-  else for(const offset of [0,GUTTER,GUTTER+BIKE,VERGE]){
+  else for(const offset of [0,GUTTER,VERGE]){
    values.add(street.a-offset);values.add(street.b+offset);
   }
  }
@@ -116,11 +104,11 @@ export function addVillageStreets(region){
    for(const xx of [x0,x1]){
     const lift=kind==='walk'?.043:kind==='gutter'?.018:.029;
     b.position.push(xx,villageWalkHeight(xx,zz)+lift,zz);
-    if(kind==='bike'||kind==='gutter'){
+    if(kind==='gutter'){
      const across=crosswise?zz:xx,along=crosswise?xx:zz;
      const side=(crosswise?z:x)<street.a;
-     const width=kind==='bike'?BIKE:GUTTER,edge=side?street.a:street.b;
-     b.uv.push((Math.abs(across-edge)-(kind==='bike'?GUTTER:0))/width,along/(kind==='bike'?6:1.2));
+     const width=GUTTER,edge=side?street.a:street.b;
+     b.uv.push(Math.abs(across-edge)/width,along/1.2);
     }else b.uv.push(xx/2.35,zz/2.35);
    }
    if(k<strips){const n=base+k*2;b.index.push(n,n+2,n+1,n+1,n+2,n+3)}
