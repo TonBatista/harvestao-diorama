@@ -1,8 +1,12 @@
 # Harvestão — a vida no campo
 
-Versão 0.51.1. Fazenda em miniatura para navegador, com regiões conectadas.
+Versão 0.52.0. Fazenda em miniatura para navegador, com regiões conectadas.
 
 [Jogar no navegador](https://tonbatista.github.io/harvestao-diorama/)
+
+## Atualização 0.52
+
+Colisões de veículos refinadas, ré do trator, engate assistido da carroça, escova equipável, máquinas separadas com uso direto, galinheiro com silo e calçadas portuguesas sem ciclovias.
 
 ## Ferramentas e coleta no celeiro — 0.51
 

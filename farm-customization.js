@@ -4,6 +4,7 @@ export const FARM_OBJECTS=Object.freeze([
  {id:'house',name:'Casa principal',w:5,d:4.1,default:{x:-3,z:-21,angle:0}},
  {id:'barn',name:'Celeiro',w:4.3,d:3.7,default:{x:-13.5,z:-20.5,angle:0}},
  {id:'toolroom',name:'Quarto de ferramentas',w:3.5,d:3.4,default:{x:6,z:-21,angle:0}},
+ {id:'coop',name:'Galinheiro e silo',w:7.4,d:4.4,default:{x:-11.5,z:20.6,angle:0}},
  {id:'hammock',name:'Árvores e rede',w:6.2,d:2.4,default:{x:-13.5,z:-13,angle:0}},
  {id:'shipping',name:'Caixa de entregas',w:1.8,d:1.3,default:{x:2,z:-17.7,angle:0}},
  {id:'well',name:'Poço',w:2.1,d:2.2,default:{x:15,z:-21,angle:0}}
@@ -32,7 +33,7 @@ function routeToLane(start,footprints){
 }
 export function farmPaths(s){
  const map=migrateFarmLayout(s),stamp=JSON.stringify(map),cached=pathsCache.get(s);if(cached?.stamp===stamp)return cached.value;
- const footprints=farmFootprints(s),value=fixedPaths.map(p=>({...p,angle:0}));for(const d of FARM_OBJECTS){const p=farmPoint(s,d.id,0,d.d/2+.85);value.push(...routeToLane(p,footprints))}pathsCache.set(s,{stamp,value});return value;
+ const footprints=farmFootprints(s),value=fixedPaths.map(p=>({...p,angle:0}));for(const d of FARM_OBJECTS){const p=farmPoint(s,d.id,d.id==='coop'?-1.35:0,d.d/2+.85);value.push(...routeToLane(p,footprints))}pathsCache.set(s,{stamp,value});return value;
 }
 function corners(c,padding=0){const result=[],cs=Math.cos(c.angle||0),sn=Math.sin(c.angle||0);for(const dx of[-c.w/2-padding,c.w/2+padding])for(const dz of[-c.d/2-padding,c.d/2+padding])result.push({x:c.x+cs*dx+sn*dz,z:c.z-sn*dx+cs*dz});return result}
 function overlaps(a,b,padding=.3){const ca=corners(a,padding),cb=corners(b),axes=[a.angle||0,(a.angle||0)+Math.PI/2,b.angle||0,(b.angle||0)+Math.PI/2];return axes.every(angle=>{const cs=Math.cos(angle),sn=Math.sin(angle),pa=ca.map(p=>p.x*cs+p.z*sn),pb=cb.map(p=>p.x*cs+p.z*sn);return Math.max(...pa)>Math.min(...pb)&&Math.max(...pb)>Math.min(...pa)})}
@@ -40,7 +41,7 @@ export function validateFarmLayout(s,map){
  if(!validFarmLayout(map))return {ok:false,message:'Escolha uma posição e rotação válidas.'};const preview={...s,farmLayout:map},footprints=farmFootprints(preview),b=MAIN_FARM_BOUNDS;
  for(let i=0;i<footprints.length;i++){const c=footprints[i],name=byId.get(c.farmObject).name;if(corners(c,.4).some(p=>p.x<b[0]||p.x>b[1]||p.z<b[2]||p.z>b[3]))return {ok:false,message:name+' precisa ficar dentro da cerca da fazenda.'};for(let j=i+1;j<footprints.length;j++)if(overlaps(c,footprints[j],.55))return {ok:false,message:'Deixe espaço entre '+name.toLowerCase()+' e '+byId.get(footprints[j].farmObject).name.toLowerCase()+'.'};if(fixedPaths.some(p=>overlaps(c,p,.02)))return {ok:false,message:name+' está sobre um caminho principal. Mova um pouco para o lado.'};
   if(FARM_EDGE_TREES.some(t=>onRect(c,t.x,t.z,.5)))return {ok:false,message:'Deixe espaço para as árvores da borda ao posicionar '+name.toLowerCase()+'.'};
-  if(['house','barn','toolroom'].includes(c.farmObject)){for(const distance of[2.8,3.5,4.2]){const p=farmPoint(preview,c.farmObject,0,distance);if(p.x<b[0]+.4||p.x>b[1]-.4||p.z<b[2]+.4||p.z>b[3]-.4||footprints.some(other=>other!==c&&onRect(other,p.x,p.z,.7)))return {ok:false,message:'Deixe a porta e a passagem em frente de '+name.toLowerCase()+' livres.'}}}
+  if(['house','barn','toolroom','coop'].includes(c.farmObject)){for(const distance of[2.8,3.5,4.2]){const p=farmPoint(preview,c.farmObject,c.farmObject==='coop'?-1.35:0,distance);if(p.x<b[0]+.4||p.x>b[1]-.4||p.z<b[2]+.4||p.z>b[3]-.4||footprints.some(other=>other!==c&&onRect(other,p.x,p.z,.7)))return {ok:false,message:'Deixe a porta e a passagem em frente de '+name.toLowerCase()+' livres.'}}}
   const source=s.homePlots||s.plots||[],old=source.length===144,ox=old?-6:-19.75,oz=old?-3:-23;for(const p of source)if(p?.crop&&onRect(c,ox+p.x*1.25,oz+p.z*1.25,.7))return {ok:false,message:'Colha a plantação antes de colocar '+name.toLowerCase()+' nesse lugar.'};
   for(const p of Object.values(s.farmStumps||{}))if(Number.isFinite(p?.x)&&Number.isFinite(p?.z)&&onRect(c,p.x,p.z,.3))return {ok:false,message:'Mova os tocos desse espaço antes de colocar '+name.toLowerCase()+'.'};
   const vehicles=[s.tractor,s.tractor?.trailer?{x:s.tractor.trailerX,z:s.tractor.trailerZ}:null];if(vehicles.some(v=>v&&Number.isFinite(v.x)&&Number.isFinite(v.z)&&(!s.tractor?.area||s.tractor.area==='farm')&&onRect(c,v.x,v.z,.8)))return {ok:false,message:'Estacione o trator e a carreta longe desse espaço primeiro.'};

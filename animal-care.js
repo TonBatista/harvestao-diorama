@@ -39,8 +39,7 @@ export function returnHay(s){
 export function feedAnimal(s,id){
  const a=byId.get(id);if(!a)return {changed:false,message:'Este cocho não pertence a um animal.'};
  const p=care(s).animals[id];if(!p.alive)return {changed:false,message:a.name+' não está mais no rebanho.'};if(p.fedDay===dayKey(s))return {changed:false,message:`${a.name} já comeu hoje. Guarde esta porção para outro animal.`};
- if(!s.carryingHay)return {changed:false,message:'Pegue uma porção de feno no depósito antes de encher este cocho.'};
- s.carryingHay=false;p.fedDay=dayKey(s);p.happiness=clamp(p.happiness+8);
+ if(a.species==='chicken'){if(s.held!=='chickenFeed')return {changed:false,message:'Pegue ração no silo do galinheiro.'};s.held=null}else{if(!s.carryingHay)return {changed:false,message:'Pegue uma porção de feno no depósito antes de encher este cocho.'};s.carryingHay=false;}p.fedDay=dayKey(s);p.happiness=clamp(p.happiness+8);
  return {changed:true,message:`Você encheu o cocho de ${a.name}. Bem alimentado por hoje! ♥`};
 }
 export function petAnimal(s,id){

@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
 import {cottage,artisanMaterial,treeCrown} from './art-direction.js?v=0.47';
-import {farmObject,farmFootprints,migrateFarmLayout} from './farm-customization.js?v=0.47';
+import {farmObject,farmFootprints,migrateFarmLayout} from './farm-customization.js?v=0.52.0';
 const g={box:new T.BoxGeometry(1,1,1),ball:new T.SphereGeometry(1,12,8),cyl:new T.CylinderGeometry(1,1,1,12)},mats=new Map();
 function mat(c,kind='wood'){const key=c+kind;if(!mats.has(key))mats.set(key,artisanMaterial(c,kind));return mats.get(key)}
 function part(p,geo,c,x,y,z,sx,sy,sz,kind){const o=new T.Mesh(geo,mat(c,kind));o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;p.add(o);return o}
@@ -18,6 +18,19 @@ export function createFarmStructures(state,bake){
  add('toolroom',p=>{p.add(cottage(0,0,3,2.9,'#d8bb83','#9a7848'));box(p,'#897b59',-1.18,.55,1.56,.25,1.1,.22);beam(p,[-1.2,.2,1.7],[-1.3,1.4,1.7],.027,'#b79769');box(p,'#768882',-1.3,1.4,1.7,.25,.18,.07,'plain');box(p,'#8c7958',1.25,.5,1.55,.46,1,.18);for(let i=0;i<3;i++)box(p,'#c4ab7a',1.25,.2+i*.28,1.68,.50,.06,.44)});
  add('shipping',p=>{box(p,'#857456',0,.52,0,1.6,1.04,1.1);for(let j=0;j<4;j++){box(p,'#c0a679',0,.15+j*.24,.57,1.7,.21,.08);box(p,'#ae946b',.86,.15+j*.24,0,.08,.21,1.12)}box(p,'#c5b287',0,1.08,0,1.85,.14,1.28);box(p,'#483b26',0,1.16,0,1.3,.025,.7,'plain');box(p,'#edd29c',0,.63,.625,.8,.36,.025,'plain')});
  add('well',p=>{for(let j=0;j<3;j++)for(let i=0;i<12;i++){const a=(i+(j%2)*.5)*Math.PI/6,b=box(p,['#a4a693','#b2af9b','#beb9a3'][i%3],Math.sin(a)*.72,.16+j*.24,Math.cos(a)*.72,.4,.22,.31,'stone');b.rotation.y=a}for(const x of[-.9,.9])box(p,'#755438',x,1.12,0,.13,2.24,.16);for(const side of[-1,1]){const roof=box(p,'#9d6747',side*.5,2.35,0,1.15,.12,1.7);roof.rotation.z=-side*.45}cyl(p,'#6baca5',0,.18,0,.61,.04,'plain')});
+ add('coop',p=>{
+  const house=cottage(-1.35,0,4.4,3.55,'#eee9d8','#638f91');p.add(house);
+  for(let i=0;i<10;i++)box(p,i%2?'#eee9d8':'#ded9c8',-1.35,.23+i*.21,1.80,4.42,.033,.06);
+  box(p,'#86704f',-1.35,1.1,1.87,1.05,1.65,.10);box(p,'#dcd3b9',-1.35,1.1,1.94,.82,1.42,.04);
+  ball(p,'#ddc894',-1.32,1.30,1.98,.13,.16,.02,'plain');ball(p,'#b48448',-1.22,1.36,2.0,.05,.06,.02,'plain');
+  // Tall plaster-and-stone grain silo inspired by the rustic windmill.
+  cyl(p,'#c8b793',2.50,1.75,0,.94,3.50,'stone');cyl(p,'#a2947c',2.50,.16,0,1.02,.32,'stone');
+  const roof=new T.Mesh(new T.ConeGeometry(1.14,.92,16),mat('#a77652','roof'));roof.position.set(2.5,3.88,0);roof.castShadow=true;p.add(roof);
+  for(const y of[.62,2.65,3.43])cyl(p,'#8a8773',2.50,y,0,.96,.065,'plain');
+  box(p,'#81745a',2.50,.62,.99,.55,.68,.16);box(p,'#c9bb96',2.50,.53,1.14,.44,.24,.33);
+  for(const xx of[2.30,2.70])box(p,'#9c8764',xx,1.95,1.02,.055,2.45,.055);
+  for(let i=0;i<9;i++)box(p,'#b69e75',2.50,.84+i*.28,1.05,.44,.045,.06);
+ });
  add('hammock',p=>p.add(hammock()));
  function refresh(){for(const[id,art]of objects){const pose=farmObject(state,id);art.position.set(pose.x,0,pose.z);art.rotation.y=pose.angle;art.updateMatrix();art.updateMatrixWorld(true)}return farmFootprints(state)}
  refresh();return {root,objects,refresh};

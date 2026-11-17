@@ -1,7 +1,7 @@
 import {solveHorseCart,cartSamples,cartWorldPose} from './horse-cart-physics.js?v=0.50';
 import * as T from './three.module.js';
-import {economyState} from './rural-economy.js?v=0.51';
-import {terrainHeight} from './valley-terrain.js?v=0.50';
+import {economyState} from './rural-economy.js?v=0.52.0';
+import {terrainHeight} from './valley-terrain.js?v=0.52.0';
 export function horseModel(){const root=new T.Group(),horse=new T.Group(),cart=new T.Group(),legs=[],wheels=[],mats=new Map(),sphere=new T.SphereGeometry(1,12,8),box=new T.BoxGeometry(1,1,1),cyl=new T.CylinderGeometry(1,1,1,12);root.add(horse,cart);
  function part(p,g,c,x,y,z,sx,sy,sz){let m=mats.get(c);if(!m){m=new T.MeshStandardMaterial({color:c,roughness:.85});mats.set(c,m)}const o=new T.Mesh(g,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=o.receiveShadow=true;p.add(o);return o}
  const oval=(p,c,x,y,z,a,b,d)=>part(p,sphere,c,x,y,z,a,b,d),beam=(p,c,x,y,z,w,h,d)=>part(p,box,c,x,y,z,w,h,d);
@@ -78,15 +78,22 @@ export function createHorseCart(scene,state){
   toggle(area,mounted,canAttach){
    const h=horseState(),player=state.player,p=pose(h);
    if(!h.owned||!h.cart||h.area!==area)return {changed:false,message:'O cavalo e a carroça precisam estar neste cenário.'};
-   if(!mounted&&Math.hypot(player.x-h.x,player.z-h.z)>3&&(!attached(h)||Math.hypot(player.x-p.rootX,player.z-p.rootZ)>2.5))return {changed:false,message:'Aproxime-se do cavalo.'};
+   if(!mounted&&Math.hypot(player.x-h.x,player.z-h.z)>3&&Math.hypot(player.x-p.rootX,player.z-p.rootZ)>2.8)return {changed:false,message:'Aproxime-se do cavalo.'};
    if(attached(h)){
     savePose(h,p);
     h.cartAttached=false;
     return {changed:true,message:'Carroça estacionada. Agora você pode andar só com o cavalo.'};
    }
-   const next=solveHorseCart(h,{},true);
-   if(parkArea(h)!==area||Math.hypot(p.x-next.x,p.z-next.z)>1.9)return {changed:false,message:'Leve o cavalo até a frente da carroça, com a traseira voltada para o engate.'};
-   if(!canAttach(cartSamples(next),cartSamples(p)))return {changed:false,message:'Precisa de espaço livre em volta da carroça para acoplar.'};
+   if(parkArea(h)!==area||Math.hypot(p.rootX-h.x,p.rootZ-h.z)>8)return {changed:false,message:'Traga o cavalo mais perto da carroça (até oito passos).'};
+   // Align the empty cart to the horse automatically; never require pixel-perfect parking.
+   let next=null;
+   for(const turn of [0,.20,-.20,.40,-.40,.60,-.60]){
+    const candidate=solveHorseCart(h,{},true),angle=h.angle+turn;
+    const dx=candidate.x-h.x,dz=candidate.z-h.z,cs=Math.cos(turn),sn=Math.sin(turn);
+    const aligned=cartWorldPose({x:h.x+dx*cs+dz*sn,z:h.z-dx*sn+dz*cs,angle});
+    if(canAttach(cartSamples(aligned),[])){next=aligned;break}
+   }
+   if(!next)return {changed:false,message:'Deixe um espaço livre atrás do cavalo para encaixar a carroça.'};
    savePose(h,next);
    h.cartAttached=true;
    return {changed:true,message:'Carroça acoplada.'};
@@ -99,8 +106,9 @@ export function createHorseCart(scene,state){
   point(area){
    const h=horseState();
    if(!h.owned||h.area!==area)return null;
-   const p=pose(h),cartNear=attached(h)&&Math.hypot(state.player.x-p.rootX,state.player.z-p.rootZ)<2.2;
-   return {type:'horse',x:cartNear?p.rootX:h.x,z:cartNear?p.rootZ:h.z,radius:2.5,label:attached(h)?'Cavalo e carroça':'Cavalo',data:{}};
+   const p=pose(h),player=state.player,horseDistance=Math.hypot(player.x-h.x,player.z-h.z),cartDistance=Math.hypot(player.x-p.rootX,player.z-p.rootZ);
+   if(h.cart&&parkArea(h)===area&&cartDistance<2.8&&cartDistance<horseDistance)return {type:'horseCart',x:p.rootX,z:p.rootZ,radius:2.8,label:'Carroça · acoplar ou desacoplar',data:{}};
+   return {type:'horse',x:h.x,z:h.z,radius:2.4,label:'Cavalo · montar ou escovar',data:{}};
   }
  };
 }
