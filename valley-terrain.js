@@ -1,5 +1,5 @@
 import {villageGroundHeight,villageWalkHeight} from './village-layout.js?v=0.50';
-import {buildLaneHomes,gazeboFloorHeight} from './rural-village.js?v=0.52.0';
+import {buildLaneHomes,gazeboFloorHeight} from './rural-village.js?v=0.53.0';
 import {coastalGroundHeight} from './coastal-layout.js?v=0.47';
 import * as T from './three.module.js';
 import {createKit} from './region-kit.js?v=0.50';

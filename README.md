@@ -1,3 +1,11 @@
+# Harvestão · atualização 0.53.0
+
+Mochila em fila: X guarda no fim; Y retira o próximo item. Sementes alternam a seleção sem perder os pacotes.
+
+Interiores: com as mãos livres, toque em um móvel próximo e no martelo. Toque/arraste no chão ou use as setas; X confirma, Y cancela. Ninhos, mesas, cadeiras, estantes e móveis agrupados preservam colisões e interações. Portas e paredes não são móveis. No multiplayer, o dono organiza os interiores e a sala recebe as alterações.
+
+Caixa de vendas com salto, compressão e som de entrega. Árvores da praça iguais às da Montanha da Lua. Calçadas portuguesas giradas 90 graus. Menus com papel envelhecido, madeira, ícones ilustrados e corações.
+
 # Harvestão — a vida no campo
 
 Versão 0.52.0. Fazenda em miniatura para navegador, com regiões conectadas.

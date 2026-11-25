@@ -1,0 +1,54 @@
+/* Shared material palette: aged paper, carved walnut edges and honey-colored wood. */
+:root{
+ --paper:#e8d8af;--ink:#51331f;--wood-edge:#5a3627;
+ --paper-surface:radial-gradient(ellipse at 12% 28%,#9d7b3930,transparent 24%),radial-gradient(ellipse at 83% 76%,#96733f25,transparent 27%),repeating-linear-gradient(97deg,#fff5d508 0 2px,#987d4a07 3px 4px),linear-gradient(110deg,#efdfba,#f6ebce 48%,#decca0);
+ --wood-surface:repeating-linear-gradient(2deg,transparent 0 5px,#79482b16 6px,transparent 8px 14px),repeating-linear-gradient(177deg,#f3cd9215 0 2px,transparent 3px 10px),linear-gradient(110deg,#b88752,#e0b77d 45%,#c39258);
+}
+dialog:not(#titleScreen):not(#areaLoading){color:var(--ink);background:var(--paper-surface);border:5px solid #76503a;border-radius:20px 12px 24px 14px;box-shadow:0 16px 0 -9px #482d24,0 26px 60px #23150e88,inset 0 0 0 2px #f9e6b4,inset 0 0 30px #87633145;scrollbar-color:#9b704a #e4d1a8;overscroll-behavior:contain;}
+dialog::backdrop{background:#231d145c;backdrop-filter:blur(4px)}
+dialog:not(#titleScreen)>h2{color:#4c2b17;font-family:Georgia,'Times New Roman',serif;font-weight:600;font-style:italic;font-size:clamp(24px,5vw,34px);line-height:1.2;text-shadow:0 1px #fff2cd;margin:10px 0 18px;padding:15px 21px;background:var(--wood-surface);border:5px solid var(--wood-edge);border-radius:14px 5px 14px 5px;box-shadow:inset 0 0 0 2px #eac28e,inset 0 0 9px #76452f55,0 5px 0 #3d261d,0 9px 12px #59402533}
+dialog:not(#titleScreen) .dialog-eyebrow{color:#86633f;letter-spacing:.17em;font-size:10px}
+dialog p,dialog small{color:#70583d}
+dialog:not(#titleScreen) button,dialog:not(#titleScreen) .import{transition:filter .15s,transform .12s;touch-action:manipulation}
+dialog:not(#titleScreen) button:active:not(:disabled){transform:translateY(2px)}
+dialog:not(#titleScreen) button:focus-visible,dialog:not(#titleScreen) input:focus-visible{outline:3px solid #416a63;outline-offset:3px}
+dialog:not(#titleScreen) .primary,dialog:not(#titleScreen) .secondary,dialog:not(#titleScreen) .import{background:var(--wood-surface);border:2px solid #8d603e;color:#4b2f1d;box-shadow:inset 0 0 0 1px #f3d7a5,0 3px 0 #67452f,0 5px 7px #5a3a2226;border-radius:8px;min-height:44px;font-weight:650}
+dialog:not(#titleScreen) .primary{background:repeating-linear-gradient(2deg,transparent 0 6px,#fff2b512 7px 8px),linear-gradient(#778150,#596642);border-color:#4b5334;color:#fff4d8;box-shadow:inset 0 0 0 1px #b6b787,0 3px 0 #3a422b}
+dialog:not(#titleScreen) .close{background:var(--wood-surface);border:2px solid #775139;color:#5b3822;box-shadow:0 2px 3px #39251944;min-width:36px;min-height:36px;border-radius:50%;z-index:4}
+dialog:not(#titleScreen) input:not([type=checkbox]):not([type=range]),dialog:not(#titleScreen) select{background:#fff2d5;border-color:#b79360;color:#503c28;box-shadow:inset 0 2px 5px #835c2e22;border-radius:6px}
+dialog:not(#titleScreen) .season-tabs button,dialog:not(#titleScreen) .journal-tabs button{background:#deca9a;color:#65492b;border:1px solid #ad8b58;box-shadow:inset 0 1px #fff0c8;border-radius:7px 7px 2px 2px;min-height:38px}
+dialog:not(#titleScreen) .season-tabs button.active,dialog:not(#titleScreen) .journal-tabs button[aria-current=page]{background:#866342;color:#fff1cb;border-color:#66452d}
+#bag.rucksack-menu{background:var(--paper-surface);border:5px solid #705039;border-radius:15px;width:min(650px,95vw);box-shadow:0 20px 60px #26180e77,inset 0 0 28px #a17b3c45}
+#bag.rucksack-menu h2{font-size:27px;margin-bottom:14px;padding:12px 18px}
+.rucksack-panel{background:#f5e6c0;border:2px solid #a58450;border-radius:8px;overflow:hidden;box-shadow:0 3px 8px #654a2728}
+.rucksack-equipped{background:var(--wood-surface);border-right:2px solid #b18b57}
+.rucksack-equipped h3{font:italic 20px Georgia,serif;color:#58371f;letter-spacing:0}
+.rucksack-slot{background:radial-gradient(ellipse at 50% 35%,#f4e7c6,#ddc796);border:2px solid #af8a58;border-radius:5px;box-shadow:inset 1px 2px 6px #63492238,0 1px #fff5d5}
+.rucksack-slot.selected{outline:3px solid #7b8c52;outline-offset:-3px;background:#eee4b8}
+.rucksack-slot svg{filter:drop-shadow(1px 3px 2px #78522f55)}
+dialog.farm-journal{width:min(750px,96vw);max-width:750px;background:var(--paper-surface);padding:24px 23px 27px;border:5px solid #785137;border-bottom:9px solid #715039}
+.farm-journal .journal-board{display:flex;align-items:center;gap:12px;background:var(--wood-surface);padding:15px 9px;border:6px solid #62402d;border-radius:20px 7px 18px 8px;box-shadow:inset 0 0 0 2px #eccb96,inset 0 0 10px #7f503655,0 6px 0 #3c291f,0 10px 12px #57392244;margin:8px 0 24px}
+.journal-heading{flex:1;min-width:0}.journal-heading strong{display:block;color:#4e2b15;font:italic 600 clamp(23px,5vw,36px)/1.15 Georgia,serif;overflow-wrap:anywhere;text-shadow:0 1px #ffe6b7}
+.journal-heading small{display:block;color:#775031;font-size:10px;margin-top:6px}
+.journal-percent strong{color:#4a2b1b;font:italic 30px Georgia,serif}.journal-percent small{color:#775234}
+.farm-journal .journal-turn{flex-shrink:0;background:var(--wood-surface);border:2px solid #745035;border-radius:8px;color:#59371d;font:38px/.9 Georgia,serif;min-width:36px;min-height:44px;padding:0 5px;box-shadow:inset 0 0 0 1px #f4d5a5,0 3px 0 #563b2d}
+.journal-top{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0 26px;padding-bottom:18px;border-bottom:1px solid #ae925244}
+.journal-stats{display:grid;grid-template-columns:1fr 1fr;gap:20px 22px}
+.journal-stat{background:none;border:0;display:flex;align-items:center;gap:10px;padding:0;min-width:0}
+.journal-stat>div{min-width:0}.journal-stat small{display:block;font:11px/1.35 system-ui;color:#806344;margin-bottom:5px}
+.journal-picture{display:inline-block;width:70px;height:76px;flex-shrink:0;background:radial-gradient(ellipse at center,#fff6dd55,transparent 70%);border:0}
+.journal-picture svg{width:100%;height:100%;filter:drop-shadow(2px 4px 2px #74513345)}
+.journal-nameplate,.journal-tag{display:inline-block;color:#4e2d17;background:linear-gradient(105deg,#d5b577,#f3dfab 42%,#d9bc81);border:1px solid #ab8851;border-radius:5px 1px 5px 1px;padding:3px 10px;box-shadow:inset 0 1px #fff5d2,0 3px 0 #92713e,1px 5px 5px #5e45262b;font:24px/1.2 Georgia,serif;max-width:100%;overflow-wrap:anywhere}
+.journal-nameplate{font:italic 24px/1.2 Georgia,serif;background:var(--wood-surface)}
+.journal-wallet .journal-tag{font-size:clamp(23px,4vw,34px)}
+.journal-hearts{display:flex;gap:3px;margin:9px 0 5px;line-height:1}.journal-hearts span{font-size:23px;color:#c99c8e;text-shadow:0 1px #f9d1ba,0 2px 1px #77413566;filter:drop-shadow(0 2px 1px #8c634333)}.journal-hearts span.full{color:#be4d3b;text-shadow:0 -1px #f5a28b,0 2px 1px #6f2e21}
+.journal-animal{background:transparent;border:0;border-bottom:1px solid #ad884b38;padding:13px 0;display:flex;gap:13px;align-items:center}
+.journal-animal .journal-picture{width:76px;height:80px}.journal-animal small{display:block;margin-top:6px;font-size:11px;line-height:1.45}
+.journal-care{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:11px}.journal-care span{background:#e2ce9f;padding:4px 7px;border-radius:4px}.journal-care .is-fed{background:#c6cda2;color:#43572f}.journal-care .is-hungry{background:#edd096;color:#7a4825}
+.journal-bottom{margin-top:24px;padding:13px;border:3px solid #845137;border-radius:6px;background:#decca4;box-shadow:inset 0 2px 6px #573c2833;font-size:11px;color:#745234}
+.interior-transform[hidden],.interior-controls[hidden],.interior-hammer[hidden]{display:none!important}
+.interior-transform{position:fixed;z-index:40;left:50%;top:max(16px,env(safe-area-inset-top));transform:translateX(-50%);width:min(350px,88vw);text-align:center;color:#503823;font-family:system-ui;pointer-events:none}
+.interior-transform button,.interior-controls{pointer-events:auto}.interior-hammer{width:56px;height:56px;background:var(--wood-surface);border:3px solid #705037;border-radius:50%;box-shadow:0 4px 12px #38281966}.interior-hammer svg{width:33px;fill:#e4d3a7;stroke:#604a31;stroke-width:2}
+.interior-controls{padding:14px;background:var(--paper-surface);border:3px solid #87613d;border-radius:13px;box-shadow:0 6px 18px #35261955}.interior-controls strong{font:italic 23px Georgia,serif}.interior-controls p{font-size:11px;line-height:1.4;margin:7px}.interior-controls small{display:block;font-size:11px;min-height:28px;padding:5px}.interior-arrows,.interior-actions{display:flex;gap:7px;justify-content:center}.interior-transform button{color:#573720;border:2px solid #997241;background:var(--wood-surface);border-radius:7px;min-height:40px;min-width:42px}.interior-actions button{flex:1;font-size:12px}.interior-transform[data-valid=false] [role=status]{color:#a44228}.interior-transform button:focus-visible{outline:3px solid #467168;outline-offset:2px}
+@media(max-width:480px){dialog.farm-journal{padding:18px 12px 22px}.farm-journal .journal-board{gap:6px;padding:12px 5px;border-width:4px}.journal-heading strong{font-size:24px}.journal-percent strong{font-size:24px}.farm-journal .journal-turn{min-width:30px;font-size:32px}.journal-stats{gap:18px 10px}.journal-stat{gap:6px}.journal-picture{width:50px;height:57px}.journal-tag{font-size:22px;padding:3px 7px}.journal-top{gap:10px}.journal-nameplate{font-size:22px}.journal-animal .journal-picture{width:64px;height:69px}.journal-hearts span{font-size:21px}.rucksack-equipped h3{font-size:17px}}
+@media(prefers-reduced-motion:reduce){dialog:not(#titleScreen) button{transition:none}}

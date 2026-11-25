@@ -109,7 +109,7 @@ export function addVillageStreets(region){
      const side=(crosswise?z:x)<street.a;
      const width=GUTTER,edge=side?street.a:street.b;
      b.uv.push(Math.abs(across-edge)/width,along/1.2);
-    }else b.uv.push(xx/2.35,zz/2.35);
+    }else if(kind==='walk')b.uv.push(zz/2.35,-xx/2.35);else b.uv.push(xx/2.35,zz/2.35);
    }
    if(k<strips){const n=base+k*2;b.index.push(n,n+2,n+1,n+1,n+2,n+3)}
   }

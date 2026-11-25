@@ -1,3 +1,5 @@
+import {createKit} from './region-kit.js?v=0.50';
+import {treeCrown} from './art-direction.js?v=0.47';
 import {artisanMaterial} from './art-direction.js?v=0.47';
 import {mergeParts} from './wildlife-art.js?v=0.47';
 import * as T from './three.module.js';
@@ -100,7 +102,7 @@ export function leafNormalMap(texture){const canvas=document.createElement('canv
 // Fixed instance counts keep the wind and petals light even when the whole farm is visible.
 export function addCherryScenery(region,state,heightAt=()=>0){
  if(region.indoors)return;const b=region.bounds,trees=[],plaza=region.id==='village';
- if(plaza)for(const x of[-7.2,7.2])for(const z of[-4.25,7.1])trees.push({x,z,s:1.05,plaza:true});
+ if(plaza){const kit=createKit();for(const x of[-7.2,7.2])for(const z of[-4.25,7.1]){const tree=kit.tree(x,z,1.05);tree.position.y=heightAt(region.id,x,z)}for(const child of [...kit.fixed.children])region.fixed.add(child);region.colliders.push(...kit.colliders);region.root.userData.treePositions?.push(...kit.treePositions)}
  const candidates=region.id==='farm'?[[-20,-21],[-20,-7],[-20,18],[24,-23],[24,-2],[24,15],[-9,24],[3,24]]:Array.from({length:8},(_,i)=>{const t=(Math.floor(i/2)+.8)/4.8;return[i%2?b[1]-2.4:b[0]+2.4,b[2]+2.6+t*(b[3]-b[2]-5.2)]});
  for(const [x,z]of candidates){if((region.portals||[]).some(p=>Math.hypot(x-p.x,z-p.z)<3)||(region.colliders||[]).some(c=>colliderContains(c,x,z,.8)))continue;trees.push({x,z,s:.9+(trees.length%3)*.09})}
  if(!trees.length)return;const root=new T.Group();root.name='winter-cherries';region.root.add(root);const matrix=new T.Matrix4(),pos=new T.Vector3(),scale=new T.Vector3(),q=new T.Quaternion(),up=new T.Vector3(0,1,0);
@@ -113,7 +115,9 @@ export function addCherryScenery(region,state,heightAt=()=>0){
  for(const tree of trees){const {x,z,s}=tree,y=heightAt(region.id,x,z);region.colliders.push({x,z,r:.27*s,height:3.1*s});
   function branch(a,b,r){const v=new T.Vector3(...b).sub(new T.Vector3(...a)),mid=new T.Vector3(...a).add(new T.Vector3(...b)).multiplyScalar(.5);q.setFromUnitVectors(up,v.clone().normalize());matrix.compose(mid,q,new T.Vector3(r,v.length(),r));trunk.setMatrixAt(ti++,matrix)}
   branch([x,y,z],[x+.12*s,y+2.8*s,z],.17*s);for(let i=0;i<3;i++){const a=i*Math.PI*2/3;branch([x,y+1.9*s,z],[x+Math.sin(a)*1.05*s,y+3.0*s,z+Math.cos(a)*1.05*s],.07*s)}
-  const count=tree.plaza?18:13;
+  const core=treeCrown(Math.round(x*67+z*41));core.traverse(o=>{if(o.isMesh)o.userData.featherColor='#'+o.material.color.getHexString()});const foliage=mergeParts(core);foliage.material=foliage.material.clone();foliage.material.userData.regionOwned=true;foliage.material.userData.seasonSurface='leaf';
+  core.position.set(x,y+3.15*s,z);core.scale.set(1.12*s,.95*s,1.12*s);root.add(core);
+  const count=tree.plaza?18:21;
   for(let i=0;i<count;i++){const a=i*2.4,j=i%3,r=tree.plaza?.64:i<4?.45:1,cy=tree.plaza?3.20+(i%3)*.20:3+(i%4)*.22,sz=(tree.plaza?.92:1)*s;cards[j].push({x:x+Math.sin(a)*r*s,y:y+cy*s,z:z+Math.cos(a)*r*s,size:sz,turn:a,phase:i+x*.41+z*.21});kinds[j].push(!!tree.plaza)}
   if(tree.plaza)for(let i=0;i<18;i++){const a=i*2.4;blooms.push({x:x+Math.sin(a)*(.45+(i%3)*.18)*s,y:y+(3.16+(i%3)*.21)*s,z:z+Math.cos(a)*(.45+(i%3)*.18)*s,turn:a,phase:i+x*.41+z*.21})}
  }
@@ -124,7 +128,7 @@ export function addCherryScenery(region,state,heightAt=()=>0){
   if(season!==state.season){season=state.season;const c=new T.Color(),green=['#91a877','#a7b98a','#7e9968'],pink=['#dfb0c2','#efd0dc','#d5a5bb'];crowns.forEach((m,j)=>{for(let i=0;i<m.count;i++)m.setColorAt(i,c.set(kinds[j][i]?green[j]:season===3?pink[j]:season===2?['#c39a69','#c5ac73','#ad8866'][j]:green[j]));m.instanceColor.needsUpdate=true})}
   crowns.forEach((m,j)=>{cards[j].forEach((card,i)=>{const wind=Math.sin(time*1.22+card.phase)*.065+Math.sin(time*2.1+card.phase*.7)*.022;pos.set(card.x+wind*.22,card.y+Math.sin(time*.9+card.phase)*.014,card.z);q.setFromEuler(new T.Euler((i%4===0?-1.0:i%4===1?-.35:.32)+wind,card.turn+wind*.4,wind*.55));scale.set(card.size,card.size,card.size);matrix.compose(pos,q,scale);m.setMatrixAt(i,matrix)});m.instanceMatrix.needsUpdate=true});
   blooms.forEach((flower,i)=>{const wind=Math.sin(time*1.22+flower.phase)*.065;pos.set(flower.x+wind*.22,flower.y,flower.z);q.setFromEuler(new T.Euler(wind,flower.turn+wind*.4,wind*.55));matrix.compose(pos,q,new T.Vector3(1,1,1));flowers.setMatrixAt(i,matrix)});flowers.instanceMatrix.needsUpdate=true;
-  petals.visible=season===3||plaza;if(!petals.visible)return;const sources=season===3?trees:trees.filter(t=>t.plaza);
+  petals.visible=season===3;if(!petals.visible)return;const sources=season===3?trees:trees.filter(t=>t.plaza);
   for(let i=0;i<petalCount;i++){const tree=sources[i%sources.length],phase=(time*.12+i*.127)%1,y=heightAt(region.id,tree.x,tree.z);pos.set(tree.x+Math.sin(i*2.4+phase*3)*1.1*tree.s+phase*.9,y+(3.9-3.65*phase)*tree.s,tree.z+Math.cos(i*1.7+phase*4)*1.1*tree.s);q.setFromEuler(new T.Euler(time*.7+i,time*.4+i*2.4,phase*4));matrix.compose(pos,q,new T.Vector3(1,1,1));petals.setMatrixAt(i,matrix)}petals.instanceMatrix.needsUpdate=true;
  }
  const previous=region.update.bind(region);region.update=(dt,time)=>{previous(dt,time);update(time)};update(0);

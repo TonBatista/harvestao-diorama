@@ -1,9 +1,9 @@
 import * as T from './three.module.js';
 import {createInteriorRoom,group,C} from './rural-room.js?v=0.50';
-import {chicken,barnCareDisplay} from './region-interiors.js?v=0.52.0';
+import {chicken,barnCareDisplay} from './region-interiors.js?v=0.53.0';
 import {ANIMALS,animalStatus,migrateAnimalCare} from './animal-care.js?v=0.52.0';
 import {migrateTransport,indoorStall,transportRoster} from './transport-rules.js?v=0.52.0';
-import {availableEggs} from './simulation.js?v=0.52.0';
+import {availableEggs} from './simulation.js?v=0.53.0';
 export function buildCoop(state){
  migrateAnimalCare(state);migrateTransport(state);
  const k=createInteriorRoom({id:'coop',label:'Galinheiro',w:10,d:9,wall:'#ac8257',floor:'#ac936c',floorKind:'earth',wallKind:'wood',returnTo:'farm',returnSpawn:[-12.85,24.3]}),F=k.fixed;
@@ -20,10 +20,10 @@ export function buildCoop(state){
   k.box(nest,C.oak,0,.12,.49,2.05,.24,.10,'wood');k.box(nest,'#c7ae74',0,.08,0,1.88,.09,.93,'earth');
   for(let j=0;j<45;j++){const a=j*2.4,straw=k.box(nest,j%2?'#d9bf79':'#b69b5b',Math.sin(a)*.84,.14+(j%3)*.009,Math.cos(j*3.1)*.40,.012,.009,.14+(j%4)*.04);straw.rotation.y=a;straw.castShadow=false}
   k.solid(x,-3.45,2.08,1.08,{height:.88});
-  const egg=k.ball(k.dynamic,'#f2e5c5',x,.28,-3.25,.11,.15,.11);eggMeshes.push({hen:hen.id,egg});
+  const egg=k.ball(nest,'#f2e5c5',0,.28,.20,.11,.15,.11);eggMeshes.push({hen:hen.id,egg});
   k.interact({x,z:-2.2,type:'eggs',radius:1.3,label:'Recolher ovo de '+hen.name,data:{animalId:hen.id}});
   const dish=group(F,x,0,1.75);k.cyl(dish,'#ab6d4e',0,.12,0,.34,.22);k.cyl(dish,'#79563a',0,.235,0,.28,.02);
-  const grain=k.cyl(k.dynamic,'#d9b975',x,.25,1.75,.27,.035);haySlots.push({id:hen.id,filled:grain});
+  const grain=k.cyl(dish,'#d9b975',0,.25,0,.27,.035);haySlots.push({id:hen.id,filled:grain});
   k.roundSolid(x,1.75,.36,{height:.24});
   if(assigned.has(hen.id))k.interact({x,z:2.4,type:'feed',radius:.95,label:'Ração de '+hen.name,data:{animalId:hen.id}});
   if(state.animalLocations[hen.id]==='barn'&&!state.herdRoutes?.[hen.id]&&animalStatus(state,hen.id).alive){const p=indoorStall(hen.id),object=chicken(k,p.x,p.z,i*2,false,hen.id);residents.push({id:hen.id,object,height:1.15})}

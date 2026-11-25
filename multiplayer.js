@@ -1,13 +1,13 @@
 import {fieldForProperty} from './cultivation-layout.js?v=0.52.0';
-import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.52.0';
+import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.53.0';
 import {mountMultiplayerMenu} from './multiplayer-menu.js?v=0.47';
-import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.52.0';
-import {FIELD,TILE} from './simulation.js?v=0.52.0';
-import {validRemotePose} from './remote-farmer.js?v=0.52.0';
+import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.53.0';
+import {FIELD,TILE} from './simulation.js?v=0.53.0';
+import {validRemotePose} from './remote-farmer.js?v=0.53.0';
 const copy=value=>JSON.parse(JSON.stringify(value)),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const dayKey=s=>[s.year,s.season,s.day].join(':');
 const vehicleKeys=['x','z','angle','area','lotId','trailerX','trailerZ','trailerAngle','trailerArea','trailerLot'];
-function areaStamp(s){return JSON.stringify([s.homesteads?.owned,Object.entries(s.homesteads?.lots||{}).map(([id,l])=>[id,l.house,l.barn,l.cleared]),s.animalLocations,Object.keys(s.herdRoutes||{}).sort(),s.farmLayout])}
+function areaStamp(s){return JSON.stringify([s.homesteads?.owned,Object.entries(s.homesteads?.lots||{}).map(([id,l])=>[id,l.house,l.barn,l.cleared]),s.animalLocations,Object.keys(s.herdRoutes||{}).sort(),s.farmLayout,s.interiorLayout])}
 export function mountCooperative({state,world,notify,writeLocal,refresh,beforeOpen,onProfile}){
  let connection,menu,backup=null,applying=false,pending=null,baseline=null,personalBaseline=null,revision=0,remoteRevision=-1,sequence=0,lastSeq=0,lastAck=null,lastShared='',networkTime=0,publishAt=0,lastAction=0,remoteName='',day=dayKey(state),mountPosition=null,closed=false;
  let guestId=null,flushQueued=false,statusText='Sua fazenda está pronta.',lastPose=null;
