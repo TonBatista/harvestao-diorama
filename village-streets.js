@@ -1,4 +1,5 @@
 import * as T from './three.module.js';
+import {addStreetDetails} from './village-street-details.js?v=0.54.0';
 import {PLAZA,VILLAGE_BOUNDS,VILLAGE_BEACH,VILLAGE_BRIDGE,villageWalkHeight,distanceToStream} from './village-layout.js?v=0.50';
 
 const SIDEWALK=2.45,GUTTER=.18,VERGE=SIDEWALK+GUTTER;
@@ -42,12 +43,18 @@ function pavingTexture(kind){
   for(let row=0;row<rows;row++)for(let col=-1;col<cols;col++){
    const c=(col+cols)%cols,n=row*cols+c,x=col*dx+(row%2)*dx*.5,y=row*dz;
    const u=(col+(row%2)*.5)/cols,v=row/rows;
-   const wave=((u-.14*Math.sin(v*Math.PI*2))*4%1+1)%1;
-   const dark=mosaic&&wave<.42;
+   const wave=((u-.22*Math.sin(v*Math.PI*2))%1+1)%1;
+   const dark=mosaic&&wave<.30;
    const palette=dark?['#333633','#43443e','#535149']:mosaic?cream:stone;
    ctx.fillStyle=palette[Math.floor(noise(n)*palette.length)];
    ctx.beginPath();if(mosaic){const jitter=()=>.8+noise(n+ctx.currentSeed++)*1.1;ctx.currentSeed=1;ctx.moveTo(x+jitter(),y+jitter());ctx.lineTo(x+dx-jitter(),y+jitter());ctx.lineTo(x+dx-jitter(),y+dz-jitter());ctx.lineTo(x+jitter(),y+dz-jitter());ctx.closePath()}else ctx.roundRect(x+1,y+1,dx-2,dz-2,5);ctx.fill();
+   ctx.save();ctx.clip();
    ctx.fillStyle=dark?'#ffffff18':'#ffffff32';ctx.fillRect(x+4,y+2,dx-8,1.2);
+   // Occasional worn stones, rather than noise on every tile.
+   if(noise(n+1901)>.91){ctx.strokeStyle='#44483c88';ctx.lineWidth=mosaic?.55:1;ctx.beginPath();ctx.moveTo(x+dx*.36,y);ctx.lineTo(x+dx*.48,y+dz*.42);ctx.lineTo(x+dx*.29,y+dz*.68);ctx.lineTo(x+dx*.53,y+dz);ctx.stroke()}
+   if(noise(n+2107)>.94){ctx.fillStyle='#68775177';ctx.beginPath();ctx.ellipse(x+dx*.18,y+dz*.79,dx*.24,dz*.2,-.3,0,Math.PI*2);ctx.fill()}
+   if(noise(n+3011)>.94){ctx.fillStyle='#62675a';ctx.beginPath();ctx.moveTo(x,y+dz);ctx.lineTo(x+dx*.28,y+dz);ctx.lineTo(x,y+dz*.72);ctx.fill()}
+   ctx.restore();
   }
  }
  const map=new T.CanvasTexture(canvas);
@@ -109,7 +116,7 @@ export function addVillageStreets(region){
      const side=(crosswise?z:x)<street.a;
      const width=GUTTER,edge=side?street.a:street.b;
      b.uv.push(Math.abs(across-edge)/width,along/1.2);
-    }else if(kind==='walk')b.uv.push(zz/2.35,-xx/2.35);else b.uv.push(xx/2.35,zz/2.35);
+    }else if(kind==='walk')b.uv.push(zz/3.6,-xx/3.6);else b.uv.push(xx/2.35,zz/2.35);
    }
    if(k<strips){const n=base+k*2;b.index.push(n,n+2,n+1,n+1,n+2,n+3)}
   }
@@ -125,4 +132,5 @@ export function addVillageStreets(region){
   const mesh=new T.Mesh(geometry,material);
   mesh.name='village-'+kind;mesh.receiveShadow=true;region.fixed.add(mesh);
  }
+ addStreetDetails(region,pavement);
 }

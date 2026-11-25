@@ -1,4 +1,4 @@
-import {onVillagePavement} from './village-streets.js?v=0.53.0';
+import {onVillagePavement} from './village-streets.js?v=0.54.0';
 import {VILLAGE_BOUNDS,VILLAGE_BEACH,VILLAGE_MOUNTAIN} from './village-layout.js?v=0.50';
 import {buildGazebo} from './rural-village.js?v=0.53.0';
 import {addNewResidents} from './new-residents.js?v=0.50';

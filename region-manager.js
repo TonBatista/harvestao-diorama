@@ -1,6 +1,6 @@
-import {prepareInteriorFurniture} from './interior-furniture.js?v=0.53.0';
+import {prepareInteriorFurniture} from './interior-furniture.js?v=0.54.0';
 import {buildCoop} from './region-coop.js?v=0.53.0';
-import {addVillageStreets} from './village-streets.js?v=0.53.0';
+import {addVillageStreets} from './village-streets.js?v=0.54.0';
 import {SERVICES,addVillageServices,addHorseFacilities,buildAgro,buildVet,buildClothes,buildArt,buildBirdClub,buildMechanic,buildHaras,buildHarasOffice} from './village-services.js?v=0.53.0';
 import {addVillageExpansion} from './village-expansion.js?v=0.53.0';
 import {buildResidentHome,addCherryScenery} from './rural-village.js?v=0.53.0';
@@ -21,7 +21,7 @@ import {migrateHomesteads,lotState} from './homestead-rules.js?v=0.53.0';
 import {addMapFauna} from './fauna-art.js?v=0.47';
 import {createKit} from './region-kit.js?v=0.50';
 import {buildHouse,buildBarn} from './region-interiors.js?v=0.53.0';
-import {buildVillage} from './region-village.js?v=0.53.0';
+import {buildVillage} from './region-village.js?v=0.54.0';
 import {buildMountain,buildBeach} from './region-nature.js?v=0.50';
 import {buildMarket} from './region-market.js?v=0.53.0';
 export const DESTINATIONS=[{id:'farm',label:'Sua fazenda',description:'Cultivo amplo, construções e caminhos até as bordas',icon:'✿'},{id:'house',label:'Sua casa',description:'Cozinha, lareira, quarto e descanso',icon:'⌂'},{id:'barn',label:'Celeiro',description:'Vacas, ovelhas e cuidados',icon:'♧'},{id:'toolroom',label:'Quarto de ferramentas',description:'Prateleiras, sementes e bebidas refrescantes',icon:'⚒'},{id:'village',label:'Vila Santa Cruz',description:'Praça São Benedito, jardins, riacho e bairro do pomar',icon:'♜'},{id:'market',label:'Mercado da Vila',description:'Prateleiras e sementes das quatro estações',icon:'♧'},{id:'mountain',label:'Montanha da Lua',description:'Bosque, riacho, mina e águas termais',icon:'▲'},{id:'beach',label:'Praia das Conchas',description:'Grupo Alforria, mar, píer e praia ampliada',icon:'≈'}];

@@ -1,3 +1,11 @@
+# Harvestão · atualização 0.54.0
+
+Caixa de vendas: correção da matriz estática, salto baixo de 18 cm com squash and stretch e retorno exato à posição inicial.
+
+Calçadas: ondas maiores e espaçadas, pedras com trincas, lascas e musgo discreto; mato e flores nas bordas. Três pombinhos passeiam sem bloquear veículos. Vegetação e aves usam instâncias para reduzir chamadas de desenho.
+
+Interiores: botões ↶ / ↷ giram os móveis em passos de 15 graus; teclado Q / E. X confirma, Y cancela e restaura posição e rotação. Colisões, interações, cama e poltrona acompanham a rotação. A organização é salva no progresso existente.
+
 # Harvestão · atualização 0.53.0
 
 Mochila em fila: X guarda no fim; Y retira o próximo item. Sementes alternam a seleção sem perder os pacotes.

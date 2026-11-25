@@ -1,5 +1,5 @@
 import {fieldForProperty} from './cultivation-layout.js?v=0.52.0';
-import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.53.0';
+import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.54.0';
 import {mountMultiplayerMenu} from './multiplayer-menu.js?v=0.47';
 import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.53.0';
 import {FIELD,TILE} from './simulation.js?v=0.53.0';
