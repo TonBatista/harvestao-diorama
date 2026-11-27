@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C} from './rural-room.js?v=0.50';
-import {chicken,barnCareDisplay} from './region-interiors.js?v=0.53.0';
+import {createInteriorRoom,group,C} from './rural-room.js?v=0.55.0';
+import {chicken,barnCareDisplay} from './region-interiors.js?v=0.55.0';
 import {ANIMALS,animalStatus,migrateAnimalCare} from './animal-care.js?v=0.52.0';
 import {migrateTransport,indoorStall,transportRoster} from './transport-rules.js?v=0.52.0';
 import {availableEggs} from './simulation.js?v=0.53.0';

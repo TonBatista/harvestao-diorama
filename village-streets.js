@@ -1,5 +1,6 @@
+import {weatherStone} from './ground-weathering.js?v=0.55.0';
 import * as T from './three.module.js';
-import {addStreetDetails} from './village-street-details.js?v=0.54.0';
+import {addStreetDetails} from './village-street-details.js?v=0.55.0';
 import {PLAZA,VILLAGE_BOUNDS,VILLAGE_BEACH,VILLAGE_BRIDGE,villageWalkHeight,distanceToStream} from './village-layout.js?v=0.50';
 
 const SIDEWALK=2.45,GUTTER=.18,VERGE=SIDEWALK+GUTTER;
@@ -55,6 +56,7 @@ function pavingTexture(kind){
    if(noise(n+2107)>.94){ctx.fillStyle='#68775177';ctx.beginPath();ctx.ellipse(x+dx*.18,y+dz*.79,dx*.24,dz*.2,-.3,0,Math.PI*2);ctx.fill()}
    if(noise(n+3011)>.94){ctx.fillStyle='#62675a';ctx.beginPath();ctx.moveTo(x,y+dz);ctx.lineTo(x+dx*.28,y+dz);ctx.lineTo(x,y+dz*.72);ctx.fill()}
    ctx.restore();
+   weatherStone(ctx,x,y,dx,dz,n+600);
   }
  }
  const map=new T.CanvasTexture(canvas);

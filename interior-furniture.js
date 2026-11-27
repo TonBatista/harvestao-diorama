@@ -13,7 +13,8 @@ function boxesOverlap(a,b){
 }
 /** Keep furnishings separate from the room bake, with their original collision and interaction records. */
 export function prepareInteriorFurniture(region,state){
- if(!region.indoors)return;
+ // Public shops, neighbours' homes and civic buildings are never editable.
+ if(!region.indoors||!['house','barn','coop','toolroom'].includes(region.id))return;
  const roomKey=region.id+':'+(state.buildingReturn?.lotId||'main')+':'+(region.id==='residentHome'?state.residentHome||'':'');
  const saved=state.interiorLayout?.[roomKey]||{},items=[],used=new Set();
  region.root.updateMatrixWorld(true);

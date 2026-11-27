@@ -1,5 +1,5 @@
 import {ANIMALS,animalStatus} from './animal-care.js?v=0.52.0';
-import {getBirdingProgress} from './birding.js?v=0.47';
+import {getBirdingProgress} from './birding.js?v=0.55.0';
 import {DOG_COATS} from './profile-rules.js?v=0.47';
 import {LOTS} from './homestead-rules.js?v=0.53.0';
 const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n};

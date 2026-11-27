@@ -1,3 +1,11 @@
+# Harvestão · atualização 0.55.0
+
+Apenas os interiores da casa, celeiro, galinheiro e quarto de ferramentas da fazenda podem ser reorganizados. Interiores públicos e casas de NPCs voltam à organização original.
+
+Pisos com rachaduras, musgo, pedras soltas e falhas; vegetação mais variada nas bordas. Detalhes pintados em texturas compartilhadas, sem acrescentar obstáculos.
+
+12 novas espécies de aves, com perfis de comportamento e fontes em BIRD-REFERENCES.md. Encontros aleatórios, limitados a quatro aves ativas por cenário. Ao ser vista na tela a menos de nove unidades, a ave ganha cinco segundos antes de começar a decolar; a contagem não reinicia ao fotografar. Aves domésticas não são afetadas.
+
 # Harvestão · atualização 0.54.0
 
 Caixa de vendas: correção da matriz estática, salto baixo de 18 cm com squash and stretch e retorno exato à posição inicial.

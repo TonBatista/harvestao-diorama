@@ -1,6 +1,6 @@
 import * as T from './three.module.js';
-import {miniatureTexture} from './miniature-materials.js?v=0.47';
-import {meadowGeometry} from './art-direction.js?v=0.47';
+import {miniatureTexture} from './miniature-materials.js?v=0.55.0';
+import {meadowGeometry} from './art-direction.js?v=0.55.0';
 import {FIELD,TILE} from './simulation.js?v=0.53.0';
 
 const rand=n=>{const v=Math.sin(n*127.1+34.2)*43758.5453;return v-Math.floor(v)};

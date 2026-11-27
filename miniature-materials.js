@@ -1,3 +1,4 @@
+import {weatherSoil} from './ground-weathering.js?v=0.55.0';
 import * as T from './three.module.js';
 const sources=new Map(),maps=new Map();
 export async function loadMiniatureMaterials(){
@@ -15,6 +16,7 @@ export function miniatureTexture(kind,repeat=1){
   let seed=4271;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
   for(let i=0;i<12500;i++){const x=random()*768,y=random()*768,r=.35+random()*1.5;q.fillStyle=i%3?'#2e241b12':'#e1cba21c';q.beginPath();q.ellipse(x,y,r,r*(.45+random()*.6),random()*6.28,0,6.28);q.fill()}
  }
+ if(['earth','tilled','moss'].includes(kind))weatherSoil(q,768,kind);
  const map=new T.CanvasTexture(c);map.colorSpace=T.SRGBColorSpace;map.wrapS=map.wrapT=T.MirroredRepeatWrapping;map.repeat.set(repeat,repeat);map.anisotropy=8;maps.set(key,map);return map;
 }
 export function contactTexture(){const c=document.createElement('canvas');c.width=c.height=64;const q=c.getContext('2d'),g=q.createRadialGradient(32,32,2,32,32,32);g.addColorStop(0,'#202416b0');g.addColorStop(.38,'#20241670');g.addColorStop(1,'#20241600');q.fillStyle=g;q.fillRect(0,0,64,64);return new T.CanvasTexture(c)}

@@ -1,6 +1,8 @@
+import {NEW_BIRDS} from './bird-natural-history.js?v=0.55.0';
 // Stable catalog IDs also identify saved life-list entries. New species can be
 // appended without migrating existing check marks or keeping animals in memory.
 export const SPECIES = Object.freeze([
+  ...NEW_BIRDS,
   Object.freeze({ id: 'urutau', name: 'Urutau', scientificName: 'Nyctibius griseus', kind: 'bird', icon: '🪶', habitat: 'Floresta da montanha', description: 'Uma ave de hábitos noturnos que descansa camuflada, ereta, parecendo parte de um galho quebrado. Seus grandes olhos amarelos ajudam a reconhecê-la.', sourceUrl: 'https://birdnet.cornell.edu/taxonomy/species/Nyctibius%20griseus' }),
   Object.freeze({ id: 'gull', name: 'Gaivota-prateada', scientificName: 'Larus argentatus', kind: 'bird', icon: '🪶', habitat: 'Praia das Conchas', description: 'Observe as aves marinhas que passam perto do cais. Neste vale, as gaivotas são representadas pela gaivota-prateada.' }),
   Object.freeze({id:'bemtevi',name:'Bem-te-vi',scientificName:'Pitangus sulphuratus',kind:'bird',icon:'🪶',habitat:'Fazenda, vila e bosque',description:'Procure a pequena ave de peito amarelo nos poleiros e nas bordas dos caminhos.'}),

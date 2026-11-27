@@ -1,9 +1,9 @@
 import {fieldForProperty} from './cultivation-layout.js?v=0.52.0';
-import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.54.0';
+import {createMultiplayerConnection,BUILD} from './multiplayer-connection.js?v=0.55.0';
 import {mountMultiplayerMenu} from './multiplayer-menu.js?v=0.47';
 import {sharedSnapshot,applyShared,diffShared,applyTransaction,capturePersonal,applyPersonal,resetVisitorPersonal} from './cooperative-state.js?v=0.53.0';
 import {FIELD,TILE} from './simulation.js?v=0.53.0';
-import {validRemotePose} from './remote-farmer.js?v=0.53.0';
+import {validRemotePose} from './remote-farmer.js?v=0.55.0';
 const copy=value=>JSON.parse(JSON.stringify(value)),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const dayKey=s=>[s.year,s.season,s.day].join(':');
 const vehicleKeys=['x','z','angle','area','lotId','trailerX','trailerZ','trailerAngle','trailerArea','trailerLot'];

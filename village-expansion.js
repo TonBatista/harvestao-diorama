@@ -1,7 +1,7 @@
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.50';
-import {artisanMaterial,treeCrown} from './art-direction.js?v=0.47';
-import {leafNormalMap} from './rural-village.js?v=0.53.0';
+import {createKit} from './region-kit.js?v=0.55.0';
+import {artisanMaterial,treeCrown} from './art-direction.js?v=0.55.0';
+import {leafNormalMap} from './rural-village.js?v=0.55.0';
 import {VILLAGE_BOUNDS,VILLAGE_MOUNTAIN,VILLAGE_RAMP,VILLAGE_STAIRS as S,VILLAGE_BRIDGE as B,streamPoints,villageLandHeight,villageWalkHeight,villageWaterHeight} from './village-layout.js?v=0.50';
 const random=n=>{const v=Math.sin(n*127.1+45.9)*43758.5453;return v-Math.floor(v)};
 function own(color,options={}){const m=new T.MeshStandardMaterial({color,roughness:.92,...options});m.userData.regionOwned=true;return m}

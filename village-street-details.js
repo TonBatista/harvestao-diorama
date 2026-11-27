@@ -9,7 +9,7 @@ export function addStreetDetails(region,pavement){
  const blocked=(x,z,r=.25)=>region.colliders.some(c=>colliderContains(c,x,z,r));
  const safe=(x,z)=>x>region.bounds[0]+1&&x<region.bounds[1]-1&&z>region.bounds[2]+1&&z<region.bounds[3]-1&&distanceToStream(x,z)>1.8&&!blocked(x,z);
  const sites=[];
- for(let i=0;i<3500&&sites.length<165;i++){
+ for(let i=0;i<5200&&sites.length<230;i++){
   const x=region.bounds[0]+random()*(region.bounds[1]-region.bounds[0]),z=region.bounds[2]+random()*(region.bounds[3]-region.bounds[2]),mark=pavement(x,z);
   if(!safe(x,z)||!mark||mark.kind==='road'||mark.kind==='plaza')continue;
   if(![[.5,0],[-.5,0],[0,.5],[0,-.5]].some(([dx,dz])=>!pavement(x+dx,z+dz)))continue;
@@ -31,29 +31,5 @@ export function addStreetDetails(region,pavement){
  flowerSites.forEach((p,i)=>{for(let j=0;j<6;j++){const a=j*Math.PI*2/5;dummy.position.set(p.x+(j<5?Math.sin(a)*.043:0),p.y+.17*p.s,p.z+(j<5?Math.cos(a)*.043:0));dummy.scale.set(j<5?.034:.023,.018,j<5?.034:.023);dummy.updateMatrix();const n=i*6+j;flowers.setMatrixAt(n,dummy.matrix);flowers.setColorAt(n,color.set(j===5?'#d5a54d':['#eee3be','#c99eaf','#e3cea5'][i%3]))}});
  flowers.name='small-verge-flowers';flowers.computeBoundingSphere();region.dynamic.add(flowers);
 
- // Three pigeons stroll and peck; they are decorative and never block vehicles.
- const birds=[],parts=[
-  [0,.19,0,.13,.16,.22,'#9ba4a2'],[0,.36,.13,.09,.095,.1,'#657d78'],
-  [0,.36,.23,.032,.025,.065,'#d1b889'],[-.105,.2,-.015,.035,.11,.17,'#626e72'],
-  [.105,.2,-.015,.035,.11,.17,'#626e72'],[-.055,.055,.04,.018,.055,.025,'#ae816f'],[.055,.055,.04,.018,.055,.025,'#ae816f']
- ];
- for(let i=0;i<160&&birds.length<3;i++){const x=-9+random()*18,z=-4+random()*12;if(safe(x,z)&&pavement(x,z))birds.push({x,z,tx:x,tz:z,angle:random()*6.28,wait:random()*3,phase:random()*6.28})}
- const birdMat=new T.MeshStandardMaterial({color:'#ffffff',roughness:.95});birdMat.userData.regionOwned=true;
- const mesh=new T.InstancedMesh(new T.SphereGeometry(1,8,6),birdMat,birds.length*parts.length);mesh.name='village-pigeons';mesh.frustumCulled=false;
- parts.forEach((p,j)=>birds.forEach((_,i)=>mesh.setColorAt(i*parts.length+j,color.set(p[6]))));region.dynamic.add(mesh);
- let elapsed=0;const previous=region.update;
- region.update=(dt,time)=>{previous(dt,time);elapsed+=dt;if(elapsed<.05)return;const step=Math.min(.15,elapsed);elapsed=0;
-  birds.forEach((b,i)=>{
-   let distance=Math.hypot(b.tx-b.x,b.tz-b.z);b.wait-=step;
-   if(distance<.08&&b.wait<=0){b.wait=1.5+random()*3;for(let j=0;j<8;j++){const x=b.x+(random()-.5)*4,z=b.z+(random()-.5)*4;if(safe(x,z)&&pavement(x,z)){b.tx=x;b.tz=z;break}}}
-   const moving=distance>.08;
-   if(moving){const dx=(b.tx-b.x)/distance,dz=(b.tz-b.z)/distance,nx=b.x+dx*step*.48,nz=b.z+dz*step*.48;if(safe(nx,nz)){b.x=nx;b.z=nz;b.angle=Math.atan2(dx,dz);b.phase+=step*11}else{b.tx=b.x;b.tz=b.z}}
-   const sn=Math.sin(b.angle),cs=Math.cos(b.angle),y=villageWalkHeight(b.x,b.z)+.05;
-   parts.forEach((p,j)=>{const bob=moving?Math.sin(b.phase)*.014:0,peck=!moving&&j===1?Math.max(0,Math.sin(time*3+i))*.09:0;
-    dummy.position.set(b.x+p[0]*cs+p[2]*sn,y+p[1]+bob-peck,b.z-p[0]*sn+p[2]*cs);dummy.rotation.set(0,b.angle,0);dummy.scale.set(p[3],p[4],p[5]);dummy.updateMatrix();mesh.setMatrixAt(i*parts.length+j,dummy.matrix);
-   });
-  });mesh.instanceMatrix.needsUpdate=true;
- };
- // Populate the instance matrices immediately, before the first rendered frame.
- region.update(.05,0);
+ // Birds are supplied by the shared, timed wildlife encounters.
 }

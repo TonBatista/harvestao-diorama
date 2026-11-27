@@ -1,29 +1,30 @@
-import {prepareInteriorFurniture} from './interior-furniture.js?v=0.54.0';
-import {buildCoop} from './region-coop.js?v=0.53.0';
-import {addVillageStreets} from './village-streets.js?v=0.54.0';
-import {SERVICES,addVillageServices,addHorseFacilities,buildAgro,buildVet,buildClothes,buildArt,buildBirdClub,buildMechanic,buildHaras,buildHarasOffice} from './village-services.js?v=0.53.0';
-import {addVillageExpansion} from './village-expansion.js?v=0.53.0';
-import {buildResidentHome,addCherryScenery} from './rural-village.js?v=0.53.0';
-import {buildCapoeiraHall} from './alforria-academy.js?v=0.50';
-import {applyRelief,buildValleyTrail,terrainHeight} from './valley-terrain.js?v=0.53.0';
+import {attachBirdEncounters} from './bird-encounters.js?v=0.55.0';
+import {prepareInteriorFurniture} from './interior-furniture.js?v=0.55.0';
+import {buildCoop} from './region-coop.js?v=0.55.0';
+import {addVillageStreets} from './village-streets.js?v=0.55.0';
+import {SERVICES,addVillageServices,addHorseFacilities,buildAgro,buildVet,buildClothes,buildArt,buildBirdClub,buildMechanic,buildHaras,buildHarasOffice} from './village-services.js?v=0.55.0';
+import {addVillageExpansion} from './village-expansion.js?v=0.55.0';
+import {buildResidentHome,addCherryScenery} from './rural-village.js?v=0.55.0';
+import {buildCapoeiraHall} from './alforria-academy.js?v=0.55.0';
+import {applyRelief,buildValleyTrail,terrainHeight} from './valley-terrain.js?v=0.55.0';
 import {migrateFarmLayout,farmPoint} from './farm-customization.js?v=0.52.0';
-import {buildToolRoom} from './tool-room.js?v=0.52.0';
+import {buildToolRoom} from './tool-room.js?v=0.55.0';
 import {migrateCultivation} from './cultivation-layout.js?v=0.52.0';
 import {MAIN_FARM_BOUNDS} from './farm-layout.js?v=0.47';
 import {colliderContains,compactSceneColliders} from './scene-collisions.js?v=0.47';
-import {buildLighthouseUpper} from './lighthouse-upper.js?v=0.50';
+import {buildLighthouseUpper} from './lighthouse-upper.js?v=0.55.0';
 import {INTERIOR_DESTINATIONS} from './interior-catalog.js?v=0.50';
-import {buildChapel,buildLibrary,buildClinic} from './interiors-civic.js?v=0.50';
-import {buildInn,buildRosaHouse,buildFisherHouse} from './interiors-homes.js?v=0.50';
-import {buildSmithy,buildCarpenter,buildMine,buildLighthouse} from './interiors-workshops.js?v=0.50';
-import {buildLake,buildHomestead} from './region-homesteads.js?v=0.53.0';
+import {buildChapel,buildLibrary,buildClinic} from './interiors-civic.js?v=0.55.0';
+import {buildInn,buildRosaHouse,buildFisherHouse} from './interiors-homes.js?v=0.55.0';
+import {buildSmithy,buildCarpenter,buildMine,buildLighthouse} from './interiors-workshops.js?v=0.55.0';
+import {buildLake,buildHomestead} from './region-homesteads.js?v=0.55.0';
 import {migrateHomesteads,lotState} from './homestead-rules.js?v=0.53.0';
 import {addMapFauna} from './fauna-art.js?v=0.47';
-import {createKit} from './region-kit.js?v=0.50';
-import {buildHouse,buildBarn} from './region-interiors.js?v=0.53.0';
-import {buildVillage} from './region-village.js?v=0.54.0';
-import {buildMountain,buildBeach} from './region-nature.js?v=0.50';
-import {buildMarket} from './region-market.js?v=0.53.0';
+import {createKit} from './region-kit.js?v=0.55.0';
+import {buildHouse,buildBarn} from './region-interiors.js?v=0.55.0';
+import {buildVillage} from './region-village.js?v=0.55.0';
+import {buildMountain,buildBeach} from './region-nature.js?v=0.55.0';
+import {buildMarket} from './region-market.js?v=0.55.0';
 export const DESTINATIONS=[{id:'farm',label:'Sua fazenda',description:'Cultivo amplo, construções e caminhos até as bordas',icon:'✿'},{id:'house',label:'Sua casa',description:'Cozinha, lareira, quarto e descanso',icon:'⌂'},{id:'barn',label:'Celeiro',description:'Vacas, ovelhas e cuidados',icon:'♧'},{id:'toolroom',label:'Quarto de ferramentas',description:'Prateleiras, sementes e bebidas refrescantes',icon:'⚒'},{id:'village',label:'Vila Santa Cruz',description:'Praça São Benedito, jardins, riacho e bairro do pomar',icon:'♜'},{id:'market',label:'Mercado da Vila',description:'Prateleiras e sementes das quatro estações',icon:'♧'},{id:'mountain',label:'Montanha da Lua',description:'Bosque, riacho, mina e águas termais',icon:'▲'},{id:'beach',label:'Praia das Conchas',description:'Grupo Alforria, mar, píer e praia ampliada',icon:'≈'}];
 DESTINATIONS.push({id:'coop',label:'Galinheiro',description:'Galinhas, ninhos, ovos e ração',icon:'♧',interior:true});
 DESTINATIONS.push({id:'lake',label:'Lago dos Ipês',description:'Terrenos à venda e oficina do lenhador',icon:'≈'},{id:'homestead',label:'Sua fazenda do lago',description:'Limpar, plantar e construir do zero',icon:'⌂'});
@@ -76,7 +77,7 @@ export function createRegionManager({scene,state,bake,farmRoot,farmColliders,onC
   if(next.indoors&&state.buildingReturn?.area==='homestead'){for(const p of next.portals)if(p.to==='farm'){p.to='homestead';p.spawn=[10,10];}}
   else if(['house','barn','toolroom'].includes(id)){const door=farmPoint(state,id,0,4.2);for(const p of next.portals)if(p.to==='farm')p.spawn=[door.x,door.z];}
   if(id==='coop'){const door=farmPoint(state,'coop',-1.35,3.7);for(const p of next.portals)if(p.to==='farm')p.spawn=[door.x,door.z]}
-  if(id==='library')next.interactions.push({type:'tutorialBooks',x:0,z:3,radius:1.5,label:'Manuais do jogo · aprender a jogar'});if(id==='house'){const wardrobe={type:'wardrobe',x:4.35,z:-1.7,radius:1.5,label:'Abrir guarda-roupa',sign:{x:4.90,y:1.1,z:-1.7,width:1.4,height:2.2,rotation:-Math.PI/2}};next.interactions.push(wardrobe);next.signs.push(wardrobe);next.colliders.push({x:5.3,z:-1.7,w:.72,d:1.4})}if(id==='market')next.interactions.push({type:'festiveShop',x:0,z:1.5,radius:1.8,label:'Enfeites de Natal'});if(id==='mountain')next.colliders.push({x:6,z:11,r:.3});if(id==='mountain')next.interactions.push({type:'christmasPine',x:6,z:11,radius:1.8,label:'Pinheiro para o Natal'});applyRelief(next);addVillageExpansion(next,state);addVillageServices(next);addVillageStreets(next);addHorseFacilities(next,state);if(id!=='farm')addCherryScenery(next,state,terrainHeight);if(id!=='farm'){prepareInteriorFurniture(next,state);const shipping=next.fixed.getObjectByName('shipping-box');if(shipping)next.dynamic.add(shipping);const art=bake(next.fixed,8);art.name=id+'-static';next.root.remove(next.fixed);next.fixed.clear();next.root.add(art)}
+  if(id==='library')next.interactions.push({type:'tutorialBooks',x:0,z:3,radius:1.5,label:'Manuais do jogo · aprender a jogar'});if(id==='house'){const wardrobe={type:'wardrobe',x:4.35,z:-1.7,radius:1.5,label:'Abrir guarda-roupa',sign:{x:4.90,y:1.1,z:-1.7,width:1.4,height:2.2,rotation:-Math.PI/2}};next.interactions.push(wardrobe);next.signs.push(wardrobe);next.colliders.push({x:5.3,z:-1.7,w:.72,d:1.4})}if(id==='market')next.interactions.push({type:'festiveShop',x:0,z:1.5,radius:1.8,label:'Enfeites de Natal'});if(id==='mountain')next.colliders.push({x:6,z:11,r:.3});if(id==='mountain')next.interactions.push({type:'christmasPine',x:6,z:11,radius:1.8,label:'Pinheiro para o Natal'});applyRelief(next);addVillageExpansion(next,state);addVillageServices(next);addVillageStreets(next);addHorseFacilities(next,state);attachBirdEncounters(next,state,terrainHeight);if(id!=='farm')addCherryScenery(next,state,terrainHeight);if(id!=='farm'){prepareInteriorFurniture(next,state);const shipping=next.fixed.getObjectByName('shipping-box');if(shipping)next.dynamic.add(shipping);const art=bake(next.fixed,8);art.name=id+'-static';next.root.remove(next.fixed);next.fixed.clear();next.root.add(art)}
   const requested=spawn||(restore?[state.player.x,state.player.z]:id==='farm'&&state.farmReturn?[state.farmReturn.x,state.farmReturn.z]:null),position=safeSpawn(next,requested);
   onLeave?.(active);if(active.id==='farm'&&id!=='farm'&&!restore)state.farmReturn={x:state.player.x,z:state.player.z,angle:state.player.angle};if(active.id!=='farm'){scene.remove(active.root);active.dispose()}farmRoot.visible=id==='farm';if(id!=='farm')scene.add(next.root);active=next;next.portalVisit=++portalVisit;state.region=id;state.player.x=position[0];state.player.z=position[1];if(!restore)state.player.angle=id==='farm'&&state.farmReturn&&Number.isFinite(state.farmReturn.angle)?state.farmReturn.angle:Math.PI/4;state.visited=Array.from(new Set([...(Array.isArray(state.visited)?state.visited.filter(x=>DESTINATIONS.some(d=>d.id===x)):[]),id]));onChange?.(next);return next;
  }
