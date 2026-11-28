@@ -1,9 +1,9 @@
 import {villageGroundHeight,villageWalkHeight} from './village-layout.js?v=0.50';
-import {buildLaneHomes,gazeboFloorHeight} from './rural-village.js?v=0.55.0';
+import {buildLaneHomes,gazeboFloorHeight} from './rural-village.js?v=0.55.1';
 import {coastalGroundHeight} from './coastal-layout.js?v=0.47';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.55.0';
-import {artisanMaterial} from './art-direction.js?v=0.55.0';
+import {createKit} from './region-kit.js?v=0.55.1';
+import {artisanMaterial} from './art-direction.js?v=0.55.1';
 const smooth=(a,b,x)=>{const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t)};
 // All walkers and ground vertices sample this same continuous surface.
 function landHeight(area,x,z){if(area==='beach')return coastalGroundHeight(x,z);if(area==='mountain')return 3.5*smooth(-1,13,-z);if(area==='village')return villageGroundHeight(x,z);if(area==='valleyTrail')return 1.15*Math.sin(Math.PI*Math.max(0,Math.min(1,(z+30)/60)))**2;return 0}

@@ -1,9 +1,9 @@
-import {createKit} from './region-kit.js?v=0.55.0';
-import {treeCrown} from './art-direction.js?v=0.55.0';
-import {artisanMaterial} from './art-direction.js?v=0.55.0';
+import {createKit} from './region-kit.js?v=0.55.1';
+import {treeCrown} from './art-direction.js?v=0.55.1';
+import {artisanMaterial} from './art-direction.js?v=0.55.1';
 import {mergeParts} from './wildlife-art.js?v=0.47';
 import * as T from './three.module.js';
-import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.55.0';
+import {createInteriorRoom,group,C,table,chair,shelf,rug,vase,lantern,npc} from './rural-room.js?v=0.55.1';
 import {addResident,NEW_RESIDENTS} from './new-residents.js?v=0.50';
 import {colliderContains} from './scene-collisions.js?v=0.47';
 
