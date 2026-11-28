@@ -1,11 +1,11 @@
 import {VILLAGE_BEACH,VILLAGE_MOUNTAIN} from './village-layout.js?v=0.50';
-import {buildAcademyExterior} from './alforria-academy.js?v=0.55.1';
+import {buildAcademyExterior} from './alforria-academy.js?v=0.55.2';
 import {BEACH_BOUNDS} from './coastal-layout.js?v=0.47';
 import {addNewResidents} from './new-residents.js?v=0.50';
 import {addInteriorEntrances} from './interior-catalog.js?v=0.50';
 import {addMapFauna} from './fauna-art.js?v=0.47';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.55.1';
+import {createKit} from './region-kit.js?v=0.55.2';
 import {buildUrutau} from './wildlife-art.js?v=0.47';
 const TAU=Math.PI*2;
 function ownedMaterial(options){const m=new T.MeshStandardMaterial(options);m.userData.regionOwned=true;return m}

@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {miniatureTexture} from './miniature-materials.js?v=0.55.1';
+import {miniatureTexture} from './miniature-materials.js?v=0.55.2';
 
 // The original movement controller animates the same articulated hierarchy.
 // The portrait and shoulders are repositioned to match the miniature proportions.

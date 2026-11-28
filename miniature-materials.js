@@ -1,8 +1,7 @@
 import {weatherSoil} from './ground-weathering.js?v=0.55.0';
 import * as T from './three.module.js';
 const sources=new Map(),maps=new Map();
-const mobileMaterials=matchMedia('(pointer: coarse)').matches||new URLSearchParams(location.search).has('leve');
-const materialSize=mobileMaterials?512:768;
+const materialSize=768;
 export async function loadMiniatureMaterials(){
  const definitions=[['./material-atlas-v07.png',['earth','bark','moss','leaf']],['./cottage-atlas-v07.png',['stone','wood','clay','fabric']]];
  // Decode atlases one at a time so phones do not hold both full images in memory.
@@ -11,10 +10,6 @@ export async function loadMiniatureMaterials(){
   try{
    await new Promise((resolve,reject)=>{const timer=setTimeout(()=>{img.onload=img.onerror=null;img.src='';reject(new Error('Tempo de carregamento: '+url))},20000);img.onload=()=>{clearTimeout(timer);resolve()};img.onerror=()=>{clearTimeout(timer);reject(new Error('Imagem indisponível: '+url))};img.src=new URL(url,import.meta.url).href});
    names.forEach((name,i)=>{const canvas=document.createElement('canvas');canvas.width=canvas.height=materialSize;const q=canvas.getContext('2d');q.drawImage(img,(i%2)*img.width/2,Math.floor(i/2)*img.height/2,img.width/2,img.height/2,0,0,materialSize,materialSize);sources.set(name,canvas)});
-  }catch(error){
-   console.warn('Usando materiais leves para continuar:',error);
-   const colors={earth:'#91734e',bark:'#70563d',moss:'#71824a',leaf:'#638347',stone:'#a49b87',wood:'#aa8054',clay:'#ab7352',fabric:'#b9a784'};
-   for(const name of names){const canvas=document.createElement('canvas');canvas.width=canvas.height=materialSize;const q=canvas.getContext('2d');q.fillStyle=colors[name];q.fillRect(0,0,materialSize,materialSize);for(let i=0;i<1500;i++){q.fillStyle=i%2?'#ffffff10':'#00000010';q.fillRect((i*97)%materialSize,(i*173)%materialSize,2+(i%4),1+(i%3))}sources.set(name,canvas)}
   }finally{img.onload=img.onerror=null;img.src=''}
  }
 }
@@ -38,8 +33,8 @@ export function soilEdgeTexture(){const c=document.createElement('canvas');c.wid
 // The game and HUD remain sharp around the player; only the scene goes through the lens.
 export function miniatureLens(renderer){
  renderer.info.autoReset=false;
- // Mobile uses the same lit scene without the HDR/depth multisampled framebuffer.
- if(mobileMaterials||!renderer.extensions.has('EXT_color_buffer_float'))return {render(world,view){renderer.info.reset();renderer.setRenderTarget(null);renderer.render(world,view)}};
+ // Only unsupported GPUs need direct rendering; phones otherwise keep the full lens.
+ if(!renderer.extensions.has('EXT_color_buffer_float'))return {render(world,view){renderer.info.reset();renderer.setRenderTarget(null);renderer.render(world,view)}};
  const drawingSize=new T.Vector2();
  const target=new T.WebGLRenderTarget(1,1,{type:T.HalfFloatType,samples:2,depthTexture:new T.DepthTexture(1,1)});
  const uniforms={sceneMap:{value:target.texture},depthMap:{value:target.depthTexture},pixel:{value:new T.Vector2(1,1)},depthRange:{value:99.9},blurScale:{value:1}};

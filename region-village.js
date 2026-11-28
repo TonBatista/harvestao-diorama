@@ -1,11 +1,11 @@
 import {onVillagePavement} from './village-streets.js?v=0.55.0';
 import {VILLAGE_BOUNDS,VILLAGE_BEACH,VILLAGE_MOUNTAIN} from './village-layout.js?v=0.50';
-import {buildGazebo} from './rural-village.js?v=0.55.1';
+import {buildGazebo} from './rural-village.js?v=0.55.2';
 import {addNewResidents} from './new-residents.js?v=0.50';
 import {addInteriorEntrances} from './interior-catalog.js?v=0.50';
 import {addMapFauna} from './fauna-art.js?v=0.47';
 import * as T from './three.module.js';
-import {createKit} from './region-kit.js?v=0.55.1';
+import {createKit} from './region-kit.js?v=0.55.2';
 export function buildVillage(state={}){const k=createKit(),F=k.fixed,D=k.dynamic,C={cream:'#ddcfad',timber:'#927354',dark:'#574c40',stone:'#b5b3a0',paving:'#b8b9a5',grass:'#93a472',sage:'#7b9279',clay:'#bd8a66',rose:'#b59391',slate:'#738184',blue:'#93b0b7',gold:'#cdb878',leaf:'#789155'};
 k.floor(C.grass,74,121,0,33.5,-.045,'moss');
 // Move a frontage as one unit, including its doorway, signs and collision.

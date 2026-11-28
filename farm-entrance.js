@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {artisanMaterial} from './art-direction.js?v=0.55.1';
+import {artisanMaterial} from './art-direction.js?v=0.55.2';
 import {FARM_GATES} from './farm-customization.js?v=0.52.0';
 const noise=n=>{const v=Math.sin(n*127.1+53.8)*43758.5453;return v-Math.floor(v)};
 const GEO={box:new T.BoxGeometry(1,1,1),cyl:new T.CylinderGeometry(1,1,1,10),ball:new T.SphereGeometry(1,8,5)};

@@ -1,5 +1,5 @@
 import * as T from './three.module.js';
-import {cottage,artisanMaterial,treeCrown} from './art-direction.js?v=0.55.1';
+import {cottage,artisanMaterial,treeCrown} from './art-direction.js?v=0.55.2';
 import {farmObject,farmFootprints,migrateFarmLayout} from './farm-customization.js?v=0.52.0';
 const g={box:new T.BoxGeometry(1,1,1),ball:new T.SphereGeometry(1,12,8),cyl:new T.CylinderGeometry(1,1,1,12)},mats=new Map();
 function mat(c,kind='wood'){const key=c+kind;if(!mats.has(key))mats.set(key,artisanMaterial(c,kind));return mats.get(key)}

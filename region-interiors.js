@@ -1,7 +1,7 @@
 import {availableEggs} from './simulation.js?v=0.53.0';
 import {indoorLocation,transportRoster,propertyKey} from './transport-rules.js?v=0.52.0';
 import * as T from './three.module.js';
-import {createInteriorKit} from './rural-room.js?v=0.55.1';
+import {createInteriorKit} from './rural-room.js?v=0.55.2';
 import {ANIMALS,animalStatus,migrateAnimalCare} from './animal-care.js?v=0.52.0';
 import {migrateTransport} from './transport-rules.js?v=0.52.0';
 const palette={oak:'#ae8c5e',dark:'#76543b',trim:'#d0ad79',cream:'#e7dbc3',stone:'#aaa48d',sage:'#829275',violet:'#87718c',iron:'#586361',terracotta:'#b78b65'},roundedCache=new Map();
